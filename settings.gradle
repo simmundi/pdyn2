@@ -1,0 +1,3 @@
+rootProject.name = 'pdyn2-stack'
+include 'pdyn2-core',
+        'pdyn2-model'

@@ -1,0 +1,18 @@
+dependencies {
+    annotationProcessor 'pl.edu.icm.em:trurl-generator:1.1-SNAPSHOT'
+
+    api 'pl.edu.icm.em:trurl-core:1.1-SNAPSHOT'
+}
+
+publishing {
+    publications {
+        modelPublication(MavenPublication) {
+            from components.java
+            artifact sourceJar
+
+            groupId rootProject.getGroup()
+            artifactId project.name
+            version rootProject.getVersion()
+        }
+    }
+}

@@ -1,0 +1,9 @@
+area.n,area.e,n,e,members,sex,age,name,teryt,level,pupilCount,teacherCount,employees,contexts,institution,secondaryInstitution,stage,dayOfLastChange,load,contextType,contextInfectivity,contaminations.load,contaminations.level,contaminations_start,contaminations_length,events.day,events.load,events_start,events_length,agentCount
+,,244874,768858,,,,,1804,,,,,,,,,,,HOUSEHOLD,1.0,WILD,1.0,0,3,,,,,2
+,,,,,K,71,TERESA CHUCHRA,,,,,,0,,,,,,,,,,,,0,PFIZER,0,3,
+,,,,,K,5,HENRYKA CHUCHRA,,,,,,"7,0",8,,OBJAWOWY,0,WILD,,,,,,,,,,,
+,,337087,259569,,,,,0206,,,,,,,,,,,HOUSEHOLD,1.0,WILD,1.0,,,,,,,3
+,,,,,K,35,IWONA BIERNACKA,,,,,,3,,,,,,,,,,,,,,,,
+,,,,,M,59,GRZEGORZ BIERNACKI,,,,,,3,,,,,,,,,,,,,,,,
+,,,,,K,7,NADIA BIERNACKA,,,,,,"7,3",8,,,,,,,,,,,,,,,
+,,286500,322500,,,,PRZEDSZKOLE PUBLICZNE NR 1,0208051,K,90,9,,,,,,,,SCHOOL,1.0,,,3,3,,,,,2

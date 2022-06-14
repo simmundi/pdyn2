@@ -1,0 +1,20 @@
+                                       LATENTNY      INFEKCYJNY_BEZOBJAWOWY       INFEKCYJNY_OBJAWOWY        HOSPITALIZOWANY_BEZ_OIOM     HOSPITALIZOWANY_PRZED_OIOM      HOSPITALIZOWANY_NA_OIOM      UMARLY     WYZDROWIALY
+LATENTNY                                  4                   0.94                     0.06                                      x                             x                                x          x          x
+INFEKCYJNY_BEZOBJAWOWY                    x                   7                        x                                         x                             x                                x          x          1
+INFEKCYJNY_OBJAWOWY                       x                   x                        5                                         0.01                          0.002                            x          0.001      0.987
+HOSPITALIZOWANY_BEZ_OIOM                  x                   x                        x                                         10                            x                                x          0.08       0.92
+HOSPITALIZOWANY_PRZED_OIOM                x                   x                        x                                         x                             13                               1          x          x
+HOSPITALIZOWANY_NA_OIOM                   x                   x                        x                                         x                             x                                7          0.75       0.25
+UMARLY                                    x                   x                        x                                         x                             x                                x        999999       x
+WYZDROWIALY                               x                   x                        x                                         x                             x                                x           x       999999
+#  0 - 10
+                                       LATENTNY      INFEKCYJNY_BEZOBJAWOWY       INFEKCYJNY_OBJAWOWY        HOSPITALIZOWANY_BEZ_OIOM     HOSPITALIZOWANY_PRZED_OIOM      HOSPITALIZOWANY_NA_OIOM      UMARLY     WYZDROWIALY
+LATENTNY                                  4                   0.40                     0.60                                      x                             x                                x          x          x
+INFEKCYJNY_BEZOBJAWOWY                    x                   7                        x                                         x                             x                                x          x          1
+INFEKCYJNY_OBJAWOWY                       x                   x                        5                                         0.25                          0.15                             x          0.03       0.57
+HOSPITALIZOWANY_BEZ_OIOM                  x                   x                        x                                         10                            x                                x          0.08       0.92
+HOSPITALIZOWANY_PRZED_OIOM                x                   x                        x                                         x                             13                               1          x          x
+HOSPITALIZOWANY_NA_OIOM                   x                   x                        x                                         x                             x                                7          0.75       0.25
+UMARLY                                    x                   x                        x                                         x                             x                                x        999999       x
+WYZDROWIALY                               x                   x                        x                                         x                             x                                x          x       999999
+#  120 - 130

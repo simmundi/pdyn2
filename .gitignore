@@ -1,0 +1,10 @@
+# intellij
+.idea
+
+# gradle
+build
+.gradle
+
+#jupyter
+/jupyter/.ipynb_checkpoints/
+/jte-classes/
