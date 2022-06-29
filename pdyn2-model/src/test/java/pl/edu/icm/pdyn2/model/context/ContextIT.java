@@ -22,6 +22,7 @@ import static pl.edu.icm.pdyn2.model.context.ContextType.SCHOOL;
 import static pl.edu.icm.pdyn2.model.context.ContextType.STREET_10;
 import static pl.edu.icm.pdyn2.model.context.ContextType.WORKPLACE;
 import static pl.edu.icm.pdyn2.model.immunization.Load.ALPHA;
+import static pl.edu.icm.pdyn2.model.immunization.Load.BA2;
 import static pl.edu.icm.pdyn2.model.immunization.Load.DELTA;
 import static pl.edu.icm.pdyn2.model.immunization.Load.OMICRON;
 import static pl.edu.icm.pdyn2.model.immunization.Load.WILD;
@@ -29,7 +30,7 @@ import static pl.edu.icm.pdyn2.model.immunization.Load.WILD;
 public class ContextIT {
     private Mapper<Context> mapper;
 
-    Store store = new ArrayStore(10);
+    Store store = new ArrayStore(10000);
 
     @BeforeEach
     void before() {
@@ -94,6 +95,56 @@ public class ContextIT {
         assertThat(result.getContaminations()).hasSize(3);
     }
 
+    @Test
+    @DisplayName("Should resolve conflicts by summing two contexts")
+    void resolve() {
+        // given
+        Context contextA = exampleData().get(0);
+        Context contextB = exampleData().get(0);
+
+        contextA.changeContaminationLevel(WILD, 10f);
+        contextA.changeContaminationLevel(ALPHA, 20f);
+        contextA.changeContaminationLevel(DELTA, 30f);
+        contextA.changeContaminationLevel(OMICRON, 40f);
+        contextA.updateAgentCount(50);
+
+        contextB.changeContaminationLevel(WILD, 100f);
+        contextB.changeContaminationLevel(ALPHA, 200f);
+        contextB.changeContaminationLevel(BA2, 300f);
+        contextB.updateAgentCount(-100);
+
+        // execute
+        Context resolved = contextA.resolve(contextB);
+        assertThat(resolved.getAgentCount()).isEqualTo(100f + 50f - 100f);
+        assertThat(resolved.getContaminationByLoad(WILD).getLevel()).isEqualTo(136f + 10f + 100f);
+        assertThat(resolved.getContaminationByLoad(ALPHA).getLevel()).isEqualTo(45f + 20f + 200f);
+        assertThat(resolved.getContaminationByLoad(DELTA).getLevel()).isEqualTo(89f + 30f + 0f);
+        assertThat(resolved.getContaminationByLoad(OMICRON).getLevel()).isEqualTo(5f + 40f + 0f);
+        assertThat(resolved.getContaminationByLoad(BA2).getLevel()).isEqualTo(0f + 0f + 300f);
+    }
+
+    @Test
+    @DisplayName("Should normalize: sort contaminations by load and remove empty")
+    void normalize() {
+        // given
+        Context context = context(HOUSEHOLD, 10, contamination(10, WILD));
+
+        context.changeContaminationLevel(BA2, 10f);
+        context.changeContaminationLevel(OMICRON, 20f);
+        context.changeContaminationLevel(DELTA, 30f);
+        context.updateAgentCount(50);
+        context.getContaminationByLoad(OMICRON).setLevel(0f);
+        context.getContaminationByLoad(ALPHA).setLevel(0f);
+
+        // execute
+        context.normalize();
+
+        // execute
+        assertThat(context.getContaminations()).extracting(Contamination::getLoad).containsExactly(WILD, DELTA, BA2);
+        assertThat(context.getContaminations()).extracting(Contamination::getLevel).doesNotContain(0f);
+    }
+
+
     private List<Context> exampleData() {
         return List.of(
                 context(SCHOOL, 100,
@@ -116,6 +167,7 @@ public class ContextIT {
         context.setAgentCount(agentCount);
         context.setContextType(type);
         context.getContaminations().addAll(Arrays.asList(contaminations));
+        context.setup();
         return context;
     }
 
@@ -123,6 +175,7 @@ public class ContextIT {
         Contamination contamination = new Contamination();
         contamination.setLoad(load);
         contamination.setLevel(level);
+        contamination.setup();
         return contamination;
     }
 }

@@ -74,7 +74,7 @@ class AgentImpactServiceTest {
                 person(34, Person.Sex.M));
         Context context = ComponentCreator.context(ContextType.BIG_UNIVERSITY);
         context.changeContaminationLevel(Load.WILD, 0.1f);
-        context.setAgentCount(123);
+        context.updateAgentCount(123);
 
         when(contextFractionService.calculateLoadFractionFor(entity.get(Person.class), context)).thenReturn(1f);
         when(stageShareConfig.getInfluenceOf(Stage.INFECTIOUS_ASYMPTOMATIC)).thenReturn(0.1f);

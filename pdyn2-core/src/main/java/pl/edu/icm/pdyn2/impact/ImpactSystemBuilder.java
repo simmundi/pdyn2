@@ -18,6 +18,7 @@ public class ImpactSystemBuilder {
 
     public EntitySystem buildImpactSystem() {
         return EntityIterator.select(areaClusteredSelectors.personSelector())
+                .parallel()
                 .forEach(e -> {
                     agentImpactService.updateImpact(e);
                 });

@@ -1,20 +1,17 @@
 package pl.edu.icm.pdyn2;
 
-import org.junit.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.edu.icm.pdyn2.model.progression.Stage;
-import pl.edu.icm.trurl.util.DebugFile;
 import tech.tablesaw.api.Table;
 
 import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class StatsServiceTest {

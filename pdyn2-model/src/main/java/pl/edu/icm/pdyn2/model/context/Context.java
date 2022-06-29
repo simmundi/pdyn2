@@ -1,15 +1,28 @@
 package pl.edu.icm.pdyn2.model.context;
 
 import pl.edu.icm.pdyn2.model.immunization.Load;
+import pl.edu.icm.trurl.ecs.annotation.NotMapped;
 import pl.edu.icm.trurl.ecs.annotation.WithMapper;
+import pl.edu.icm.trurl.ecs.mapper.feature.CanBeNormalized;
+import pl.edu.icm.trurl.ecs.mapper.feature.CanResolveConflicts;
+import pl.edu.icm.trurl.ecs.mapper.feature.IsDirtyMarked;
+import pl.edu.icm.trurl.ecs.mapper.feature.RequiresSetup;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
 @WithMapper
-public final class Context {
+public final class Context
+        implements IsDirtyMarked, CanResolveConflicts<Context>, CanBeNormalized, RequiresSetup {
     private ContextType contextType;
     private float agentCount;
+    private float originalAgentCount;
+    @NotMapped
+    private boolean dirty = true;
+    @NotMapped
+    private int ownerId;
     private List<Contamination> contaminations = new ArrayList<>(3);
 
     public Context() {
@@ -45,28 +58,84 @@ public final class Context {
         return fresh;
     }
 
-    public Contamination changeContaminationLevel(Load load, float delta) {
-        return getContaminationByLoad(load).changeLevel(delta);
+    public void changeContaminationLevel(Load load, float delta) {
+        if (delta != 0) {
+            Contamination contamination = getContaminationByLoad(load);
+            contamination.changeLevel(delta);
+            dirty = true;
+        }
     }
 
     public float getAgentCount() {
         return agentCount;
     }
 
-    public void setAgentCount(float agentCount) {
+    void setAgentCount(float agentCount) {
         this.agentCount = agentCount;
     }
 
     public void updateAgentCount(float delta) {
-        this.agentCount += delta;
+        if (delta != 0) {
+            this.agentCount += delta;
+            dirty = true;
+        }
     }
 
-    @Override
+
     public String toString() {
         return "Context{" +
                 "contextType=" + contextType +
                 ", agentCount=" + agentCount +
                 ", contaminations=" + contaminations +
                 '}';
+    }
+
+
+    public boolean isDirty() {
+        return dirty;
+    }
+
+
+    public Context resolve(Context other) {
+        for (Contamination contamination : contaminations) {
+            other.changeContaminationLevel(contamination.getLoad(), contamination.getTotalLevelChange());
+        }
+        other.agentCount += getTotalAgentCountChange();
+        return other;
+    }
+
+
+    public int getOwnerId() {
+        return ownerId;
+    }
+
+
+    public void setOwnerId(int ownerId) {
+        this.ownerId = ownerId;
+    }
+
+
+    public void markAsClean() {
+        dirty = false;
+    }
+
+
+    public void normalize() {
+        Iterator<Contamination> i = contaminations.iterator();
+        while (i.hasNext()) {
+            if (i.next().getLevel() == 0) {
+                i.remove();
+            }
+        }
+        contaminations.sort(Comparator.comparingInt(c -> c.getLoad().ordinal()));
+    }
+
+    private float getTotalAgentCountChange() {
+        return this.agentCount - this.originalAgentCount;
+    }
+
+    @Override
+    public void setup() {
+        this.originalAgentCount = this.agentCount;
     }
 }
