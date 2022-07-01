@@ -16,7 +16,6 @@ import pl.edu.icm.board.util.RandomProvider;
 import pl.edu.icm.pdyn2.AgentStateService;
 import pl.edu.icm.pdyn2.StatsService;
 import pl.edu.icm.pdyn2.administration.TestingService;
-import pl.edu.icm.pdyn2.model.context.ContextInfectivityClass;
 import pl.edu.icm.pdyn2.model.immunization.Load;
 import pl.edu.icm.pdyn2.model.progression.Stage;
 import pl.edu.icm.pdyn2.progression.DiseaseStageTransitionsService;
@@ -25,7 +24,6 @@ import pl.edu.icm.trurl.ecs.Entity;
 import pl.edu.icm.trurl.ecs.util.ArraySelector;
 import pl.edu.icm.trurl.ecs.util.EntityIterator;
 import pl.edu.icm.trurl.ecs.util.Selectors;
-import pl.edu.icm.trurl.sampleSpace.EnumSampleSpace;
 import pl.edu.icm.trurl.util.Status;
 
 import java.util.*;
@@ -108,8 +106,6 @@ public class SowingFromDistribution implements SowingStrategy {
         shuffle(households, random);
         ArraySelector householdsSelector = new ArraySelector(households);
         var status = Status.of("Infecting agents", 100);
-        var source = new EnumSampleSpace<>(ContextInfectivityClass.class);
-        source.changeOutcome(ContextInfectivityClass.SOWING, 1.0f);
         board.getEngine().execute(EntityIterator.select(householdsSelector).forEach(entity -> {
             var members = entity.get(Household.class).getMembers();
             var toBeInfected = (int) (members.size() * 0.5);
@@ -169,7 +165,8 @@ public class SowingFromDistribution implements SowingStrategy {
                             var stage = states.sample(randomGenerator.nextDouble()).pick();
                             var durationLatentny = diseaseStageTransitionsService.durationOf(Load.WILD, Stage.LATENT, age);
                             var symptomatic = symptoms.sample(randomGenerator.nextDouble()).pick();
-                            agentStateService.infect(member, Load.WILD, source, stage);
+
+                            agentStateService.infect(member, Load.WILD, stage);
                             status.tick();
                             if (stage >= durationLatentny) {
                                 testingService.maybeTestAgentOnDay(member, stage - durationLatentny);

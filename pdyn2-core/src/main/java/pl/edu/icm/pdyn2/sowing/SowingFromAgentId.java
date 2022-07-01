@@ -5,13 +5,11 @@ import pl.edu.icm.board.Board;
 import pl.edu.icm.board.model.Household;
 import pl.edu.icm.pdyn2.AgentStateService;
 import pl.edu.icm.pdyn2.index.AreaClusteredSelectors;
-import pl.edu.icm.pdyn2.model.context.ContextInfectivityClass;
 import pl.edu.icm.pdyn2.model.immunization.Load;
 import pl.edu.icm.pdyn2.model.progression.Stage;
 import pl.edu.icm.trurl.ecs.selector.Selector;
 import pl.edu.icm.trurl.ecs.util.EntityIterator;
 import pl.edu.icm.trurl.ecs.util.StaticSelectors;
-import pl.edu.icm.trurl.sampleSpace.EnumSampleSpace;
 import pl.edu.icm.trurl.util.Status;
 
 import java.io.FileNotFoundException;
@@ -56,8 +54,6 @@ public class SowingFromAgentId implements SowingStrategy {
         ));
 
         AtomicInteger agentId = new AtomicInteger();
-        var source = new EnumSampleSpace<>(ContextInfectivityClass.class);
-        source.changeOutcome(ContextInfectivityClass.SOWING, 1.0f);
 
         Selector householdSelector = staticSelectors.select(staticSelectors.config().withMandatoryComponents(Household.class).build());
 
@@ -68,7 +64,7 @@ public class SowingFromAgentId implements SowingStrategy {
                 var id = agentId.getAndIncrement();
                 if (infectedMap.containsKey(id)) {
                     status.tick();
-                    agentStateService.infect(memberEntity, Load.WILD, source);
+                    agentStateService.infect(memberEntity, Load.WILD);
                     int elapsedDays = infectedMap.get(id).getElapsedDays();
                     Stage stage = Stage.LATENT;
                     if (elapsedDays > 5) {

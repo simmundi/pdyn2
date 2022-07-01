@@ -13,31 +13,7 @@ Should return with something like (only the first 11 is important):
 javac 11.0.10
 ```
 
-### DVC
-
-To access dvc you need to use VPN or have a whitelisted IP.
-
-Since dvc configuration contains secret keys to a dedicated S3 bucket
-and - for security reasons - the required credentials are not stored in this repository,
-they need to be acquired in some other way (email, SMS) from admin.
-
-The credentials consist of the _key id_ and the _secret key_. Once they are known,
-they need to be configured in the local config (so that they don't get commited
-by accident):
-
-```
-dvc remote modify --local icm_s3 access_key_id 'KEY_ID_GOES_HERE'
-dvc remote modify --local icm_s3 secret_access_key 'SECRET_ACCESS_KEY_GOES_HERE'  
-```
-
 ## Steps to build
-
-### blobs
-
-Checkout the large files from DVC:
-```
-dvc pull
-```
 
 ### gradle
 

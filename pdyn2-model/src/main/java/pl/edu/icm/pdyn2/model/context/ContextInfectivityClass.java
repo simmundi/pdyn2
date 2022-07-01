@@ -7,6 +7,5 @@ public enum ContextInfectivityClass {
     SCHOOL,
     UNIVERSITY,
     BIG_UNIVERSITY,
-    STREET,
-    SOWING
+    STREET
 }
