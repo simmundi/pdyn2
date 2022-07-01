@@ -7,7 +7,6 @@ import pl.edu.icm.pdyn2.context.ContextFractionService;
 import pl.edu.icm.pdyn2.context.ContextsService;
 import pl.edu.icm.pdyn2.model.behaviour.Behaviour;
 import pl.edu.icm.pdyn2.model.behaviour.BehaviourType;
-import pl.edu.icm.pdyn2.model.context.ContextInfectivityClass;
 import pl.edu.icm.pdyn2.model.immunization.Immunization;
 import pl.edu.icm.pdyn2.model.immunization.ImmunizationEvent;
 import pl.edu.icm.pdyn2.model.immunization.Load;
@@ -17,7 +16,6 @@ import pl.edu.icm.pdyn2.model.progression.Stage;
 import pl.edu.icm.pdyn2.model.travel.Travel;
 import pl.edu.icm.pdyn2.time.SimulationTimer;
 import pl.edu.icm.trurl.ecs.Entity;
-import pl.edu.icm.trurl.sampleSpace.EnumSampleSpace;
 
 import static pl.edu.icm.pdyn2.model.progression.Stage.LATENT;
 import static pl.edu.icm.pdyn2.model.progression.Stage.HEALTHY;
@@ -72,10 +70,9 @@ public class AgentStateService {
      *
      * @param agentEntity
      * @param load
-     * @param source
      */
-    public void infect(Entity agentEntity, Load load, EnumSampleSpace<ContextInfectivityClass> source) {
-        infect(agentEntity, load, source, 0);
+    public void infect(Entity agentEntity, Load load) {
+        infect(agentEntity, load, 0);
     }
 
     /**
@@ -88,17 +85,13 @@ public class AgentStateService {
      *
      * @param agentEntity
      * @param load
-     * @param source
      * @param dayInState
      */
-    public void infect(Entity agentEntity, Load load, EnumSampleSpace<ContextInfectivityClass> source, int dayInState) {
+    public void infect(Entity agentEntity, Load load, int dayInState) {
         Preconditions.checkArgument(dayInState >= 0, "Cannot infect agent at a future date. dayInState should be >= 0: %s", dayInState);
         HealthStatus healthStatus = getHealthStatusWhenNotSick(agentEntity);
         healthStatus.setDiseaseLoad(load);
         healthStatus.resetDiseaseHistory();
-        for (ContextInfectivityClass contextClass : ContextInfectivityClass.values()) {
-            healthStatus.setSource(contextClass, source.getProbability(contextClass));
-        }
         healthStatus.transitionTo(Stage.LATENT, simulationTimer.getDaysPassed() - dayInState);
     }
 
@@ -214,9 +207,6 @@ public class AgentStateService {
         immunizationEvent.setLoad(healthStatus.getDiseaseLoad());
         immunizationEvent.setDay(healthStatus.getDayOfLastChange());
         immunizationEvent.setDiseaseHistory(healthStatus.getDiseaseHistory());
-        for (ContextInfectivityClass contextClass : ContextInfectivityClass.values()) {
-            immunizationEvent.setSource(contextClass, healthStatus.getSource(contextClass));
-        }
         return immunizationEvent;
     }
 

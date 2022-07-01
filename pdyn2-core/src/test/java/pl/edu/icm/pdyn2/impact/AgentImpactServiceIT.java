@@ -6,11 +6,9 @@ import org.junit.jupiter.api.Test;
 import pl.edu.icm.pdyn2.AgentStateService;
 import pl.edu.icm.pdyn2.ExampleDataForIntegrationTests;
 import pl.edu.icm.pdyn2.model.context.Context;
-import pl.edu.icm.pdyn2.model.context.ContextInfectivityClass;
 import pl.edu.icm.pdyn2.model.immunization.Load;
 import pl.edu.icm.pdyn2.model.progression.Stage;
 import pl.edu.icm.trurl.ecs.Entity;
-import pl.edu.icm.trurl.sampleSpace.EnumSampleSpace;
 
 import java.util.List;
 
@@ -49,13 +47,10 @@ public class AgentImpactServiceIT {
     @DisplayName("Should properly account for infection of two agents")
     void twoAgentsShedding() {
         // given
-        var source = new EnumSampleSpace<>(ContextInfectivityClass.class);
-        source.changeOutcome(ContextInfectivityClass.UNIVERSITY, 1.0f);
-
-        agentStateService.infect(data.agent2, Load.WILD, source);
+        agentStateService.infect(data.agent2, Load.WILD);
         agentStateService.progressToDiseaseStage(data.agent2, Stage.INFECTIOUS_SYMPTOMATIC);
 
-        agentStateService.infect(data.agent3, Load.WILD, source);
+        agentStateService.infect(data.agent3, Load.WILD);
         agentStateService.progressToDiseaseStage(data.agent3, Stage.INFECTIOUS_SYMPTOMATIC);
 
         // execute

@@ -12,6 +12,10 @@ subprojects {
         }
     }
 
+    configurations.all {
+        resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+    }
+
     repositories {
         mavenLocal()
         maven {

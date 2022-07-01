@@ -13,7 +13,6 @@ import pl.edu.icm.pdyn2.model.behaviour.Behaviour;
 import pl.edu.icm.pdyn2.model.behaviour.BehaviourType;
 import pl.edu.icm.pdyn2.model.context.Contamination;
 import pl.edu.icm.pdyn2.model.context.Context;
-import pl.edu.icm.pdyn2.model.context.ContextInfectivityClass;
 import pl.edu.icm.pdyn2.model.context.ContextType;
 import pl.edu.icm.pdyn2.model.immunization.Load;
 import pl.edu.icm.pdyn2.model.progression.HealthStatus;
@@ -21,7 +20,6 @@ import pl.edu.icm.pdyn2.model.progression.Stage;
 import pl.edu.icm.pdyn2.model.travel.Travel;
 import pl.edu.icm.pdyn2.time.SimulationTimer;
 import pl.edu.icm.trurl.ecs.Entity;
-import pl.edu.icm.trurl.sampleSpace.EnumSampleSpace;
 
 import java.util.stream.Stream;
 
@@ -51,34 +49,12 @@ class AgentStateServiceTest {
         when(simulationTimer.getDaysPassed()).thenReturn(123);
 
         // execute
-        var source = new EnumSampleSpace<>(ContextInfectivityClass.class);
-        source.changeOutcome(ContextInfectivityClass.BIG_UNIVERSITY, 1.0f);
-        agentStateService.infect(data.agent2, Load.ALPHA, source);
+        agentStateService.infect(data.agent2, Load.ALPHA);
         var result = data.agent2.get(HealthStatus.class);
 
         // assert
         assertThat(result.getDiseaseLoad()).isEqualTo(Load.ALPHA);
         assertThat(result.getDayOfLastChange()).isEqualTo(123);
-        assertThat(result.getBigUniversitySource()).isEqualTo(1.0f);
-    }
-
-    @Test
-    @DisplayName("Should infect a healthy agent on a given date")
-    void infectOnDay() {
-        // given
-        ExampleData data = new ExampleData();
-        when(simulationTimer.getDaysPassed()).thenReturn(323);
-
-        // execute
-        var source = new EnumSampleSpace<>(ContextInfectivityClass.class);
-        source.changeOutcome(ContextInfectivityClass.BIG_UNIVERSITY, 1.0f);
-        agentStateService.infect(data.agent2, Load.DELTA, source, 3);
-        var result = data.agent2.get(HealthStatus.class);
-
-        // assert
-        assertThat(result.getDiseaseLoad()).isEqualTo(Load.DELTA);
-        assertThat(result.getDayOfLastChange()).isEqualTo(320);
-        assertThat(result.getBigUniversitySource()).isEqualTo(1.0f);
     }
 
     @Test

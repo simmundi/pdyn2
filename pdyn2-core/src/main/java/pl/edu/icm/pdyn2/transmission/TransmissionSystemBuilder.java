@@ -9,7 +9,9 @@ import pl.edu.icm.pdyn2.context.ContextsService;
 import pl.edu.icm.pdyn2.immunization.ImmunizationService;
 import pl.edu.icm.pdyn2.immunization.ImmunizationStage;
 import pl.edu.icm.pdyn2.index.AreaClusteredSelectors;
-import pl.edu.icm.pdyn2.model.context.*;
+import pl.edu.icm.pdyn2.model.context.Contamination;
+import pl.edu.icm.pdyn2.model.context.Context;
+import pl.edu.icm.pdyn2.model.context.Inhabitant;
 import pl.edu.icm.pdyn2.model.immunization.Immunization;
 import pl.edu.icm.pdyn2.model.immunization.Load;
 import pl.edu.icm.pdyn2.model.progression.HealthStatus;
@@ -31,7 +33,6 @@ public class TransmissionSystemBuilder {
     private final StatsService statsService;
     private final EnumSampleSpace<Load> relativeAlpha = new EnumSampleSpace<>(Load.class);
     private final RandomForChunkProvider randomForChunkProvider;
-    private final RelativeAlphaConfig relativeAlphaConfig;
 
     @WithFactory
     public TransmissionSystemBuilder(ContextsService contextsService,
@@ -53,7 +54,6 @@ public class TransmissionSystemBuilder {
         this.selectors = selectors;
         this.statsService = statsService;
         this.randomForChunkProvider = randomProvider.getRandomForChunkProvider(TransmissionSystemBuilder.class);
-        this.relativeAlphaConfig = relativeAlphaConfig;
         for (Load currentLoad : Load.viruses()) {
             relativeAlpha.changeOutcome(currentLoad, relativeAlphaConfig.getRelativeAlpha(currentLoad));
         }
@@ -72,19 +72,14 @@ public class TransmissionSystemBuilder {
                     }
                     Immunization immunization = entity.get(Immunization.class);
 
-                    EnumSampleSpace<ContextInfectivityClass> source = new EnumSampleSpace<>(ContextInfectivityClass.class);
                     EnumSampleSpace<Load> infectivity = new EnumSampleSpace<>(Load.class);
                     var contexts = contextsService.findActiveContextsForAgent(entity);
-                    contexts.forEach(context -> {
-                        addContextInfectivity(context, infectivity);
-                        addSourceContext(context, source);
-                    });
+                    contexts.forEach(context -> addContextInfectivity(context, infectivity));
                     infectivity.multiply(relativeAlpha);
 
                     float totalLevel = infectivity.sumOfProbabilities();
                     if (totalLevel > 0) {
                         var probability = 1 - Math.exp(-transmissionConfig.getAlpha() * totalLevel);
-                        source.normalize();
                         infectivity.normalize();
                         var chosenLoad = infectivity.sample(random.nextDouble());
                         if (immunization != null) {
@@ -94,7 +89,7 @@ public class TransmissionSystemBuilder {
                                     simulationTimer.getDaysPassed()));
                         }
                         if (probability > 0 && random.nextDouble() <= probability) {
-                            agentStateService.infect(entity, chosenLoad, source);
+                            agentStateService.infect(entity, chosenLoad);
                             statsService.tickStageChange(Stage.LATENT);
                         }
                     }
@@ -108,17 +103,6 @@ public class TransmissionSystemBuilder {
             var loadInContext = contamination.getLoad();
             var levelInContext = contamination.getLevel() * weight / agentCount;
             infectivity.increaseOutcome(loadInContext, levelInContext);
-        }
-    }
-
-    private void addSourceContext(Context context, EnumSampleSpace<ContextInfectivityClass> sourceContexts) {
-        var weight = transmissionConfig.getTotalWeightForContextType(context.getContextType());
-        var agentCount = context.getAgentCount();
-        for (Contamination contamination : context.getContaminations()) {
-            var loadInContext = contamination.getLoad();
-            var levelInContext = contamination.getLevel() * weight / agentCount;
-            var multipliedLevel = levelInContext * relativeAlphaConfig.getRelativeAlpha(loadInContext);
-            sourceContexts.increaseOutcome(context.getContextType().getInfectivityClass(), multipliedLevel);
         }
     }
 }
