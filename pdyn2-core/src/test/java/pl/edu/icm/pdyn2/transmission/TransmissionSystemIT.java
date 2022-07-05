@@ -90,6 +90,8 @@ class TransmissionSystemIT {
     @Mock
     private RelativeAlphaConfig relativeAlphaConfig;
 
+    private TransmissionService transmissionService;
+
     @Mock
     private AreaClusteredSelectors areaClusteredSelectors;
 
@@ -121,17 +123,14 @@ class TransmissionSystemIT {
         when(randomProvider.getRandomGenerator(TransmissionSystemBuilder.class)).thenReturn(randomGenerator);
         when(randomProvider.getRandomForChunkProvider(TransmissionSystemBuilder.class)).thenReturn(randomForChunkProvider);
         contextsService = new ContextsService(areaIndex);
-        transmissionSystemBuilder = new TransmissionSystemBuilder(contextsService,
-                transmissionConfig,
-                simulationTimer,
-                immunizationService,
-                relativeAlphaConfig,
+        transmissionService = new TransmissionService(contextsService, relativeAlphaConfig, transmissionConfig, simulationTimer, immunizationService);
+        transmissionSystemBuilder = new TransmissionSystemBuilder(
+                transmissionService,
                 agentStateService,
                 areaClusteredSelectors,
                 selectors,
                 statsService,
                 randomProvider);
-
 
         transmissionSystem = transmissionSystemBuilder.buildTransmissionSystem();
 

@@ -5,58 +5,37 @@ import pl.edu.icm.board.util.RandomForChunkProvider;
 import pl.edu.icm.board.util.RandomProvider;
 import pl.edu.icm.pdyn2.AgentStateService;
 import pl.edu.icm.pdyn2.StatsService;
-import pl.edu.icm.pdyn2.context.ContextsService;
-import pl.edu.icm.pdyn2.immunization.ImmunizationService;
-import pl.edu.icm.pdyn2.immunization.ImmunizationStage;
 import pl.edu.icm.pdyn2.index.AreaClusteredSelectors;
-import pl.edu.icm.pdyn2.model.context.Contamination;
-import pl.edu.icm.pdyn2.model.context.Context;
 import pl.edu.icm.pdyn2.model.context.Inhabitant;
-import pl.edu.icm.pdyn2.model.immunization.Immunization;
 import pl.edu.icm.pdyn2.model.immunization.Load;
-import pl.edu.icm.pdyn2.model.progression.HealthStatus;
 import pl.edu.icm.pdyn2.model.progression.Stage;
-import pl.edu.icm.pdyn2.time.SimulationTimer;
 import pl.edu.icm.trurl.ecs.EntitySystem;
 import pl.edu.icm.trurl.ecs.util.EntityIterator;
 import pl.edu.icm.trurl.ecs.util.Selectors;
 import pl.edu.icm.trurl.sampleSpace.EnumSampleSpace;
 
 public class TransmissionSystemBuilder {
-    private final TransmissionConfig transmissionConfig;
-    private final SimulationTimer simulationTimer;
-    private final ImmunizationService immunizationService;
-    private final ContextsService contextsService;
+    private final TransmissionService transmissionService;
     private final AgentStateService agentStateService;
     private final AreaClusteredSelectors areaClusteredSelectors;
     private final Selectors selectors;
     private final StatsService statsService;
-    private final EnumSampleSpace<Load> relativeAlpha = new EnumSampleSpace<>(Load.class);
+
     private final RandomForChunkProvider randomForChunkProvider;
 
     @WithFactory
-    public TransmissionSystemBuilder(ContextsService contextsService,
-                                     TransmissionConfig transmissionConfig,
-                                     SimulationTimer simulationTimer,
-                                     ImmunizationService immunizationService,
-                                     RelativeAlphaConfig relativeAlphaConfig,
+    public TransmissionSystemBuilder(TransmissionService transmissionService,
                                      AgentStateService agentStateService,
                                      AreaClusteredSelectors areaClusteredSelectors,
                                      Selectors selectors,
                                      StatsService statsService,
                                      RandomProvider randomProvider) {
-        this.transmissionConfig = transmissionConfig;
-        this.simulationTimer = simulationTimer;
-        this.immunizationService = immunizationService;
-        this.contextsService = contextsService;
+        this.transmissionService = transmissionService;
         this.agentStateService = agentStateService;
         this.areaClusteredSelectors = areaClusteredSelectors;
         this.selectors = selectors;
         this.statsService = statsService;
         this.randomForChunkProvider = randomProvider.getRandomForChunkProvider(TransmissionSystemBuilder.class);
-        for (Load currentLoad : Load.viruses()) {
-            relativeAlpha.changeOutcome(currentLoad, relativeAlphaConfig.getRelativeAlpha(currentLoad));
-        }
     }
 
     public EntitySystem buildTransmissionSystem() {
@@ -64,45 +43,28 @@ public class TransmissionSystemBuilder {
                         areaClusteredSelectors.personSelector(),
                         selectors.hasComponents(Inhabitant.class)))
                 .parallel()
-                .forEach(randomForChunkProvider, (random, entity) -> {
-                    HealthStatus healthStatus = entity.get(HealthStatus.class);
-                    if (healthStatus.getStage() != Stage.HEALTHY) {
-                        // can't be infected if already infected. Ignore.
+                .forEach(randomForChunkProvider, (random, agent) -> {
+                    if (!transmissionService.consideredForInfection(agent)) {
                         return;
                     }
-                    Immunization immunization = entity.get(Immunization.class);
 
-                    EnumSampleSpace<Load> infectivity = new EnumSampleSpace<>(Load.class);
-                    var contexts = contextsService.findActiveContextsForAgent(entity);
-                    contexts.forEach(context -> addContextInfectivity(context, infectivity));
-                    infectivity.multiply(relativeAlpha);
+                    EnumSampleSpace<Load> exposurePerLoad = transmissionService.gatherExposurePerLoadForAgent(
+                            new EnumSampleSpace<>(Load.class),
+                            agent);
+                    float totalExposure = exposurePerLoad.sumOfProbabilities();
 
-                    float totalLevel = infectivity.sumOfProbabilities();
-                    if (totalLevel > 0) {
-                        var probability = 1 - Math.exp(-transmissionConfig.getAlpha() * totalLevel);
-                        infectivity.normalize();
-                        var chosenLoad = infectivity.sample(random.nextDouble());
-                        if (immunization != null) {
-                            probability *= (1 - immunizationService.getImmunizationCoefficient(immunization,
-                                    ImmunizationStage.LATENTNY,
-                                    chosenLoad,
-                                    simulationTimer.getDaysPassed()));
-                        }
-                        if (probability > 0 && random.nextDouble() <= probability) {
-                            agentStateService.infect(entity, chosenLoad);
+                    if (totalExposure > 0) {
+                        var probability = transmissionService.exposureToProbability(totalExposure);
+                        var chosenLoad = transmissionService.selectLoad(exposurePerLoad, random.nextDouble());
+
+                        var adjustedProbability = transmissionService.adjustProbabilityWithImmunity(probability, chosenLoad, agent);
+
+                        if (adjustedProbability > 0 && random.nextDouble() <= adjustedProbability) {
+                            agentStateService.infect(agent, chosenLoad);
                             statsService.tickStageChange(Stage.LATENT);
                         }
                     }
                 });
     }
 
-    private void addContextInfectivity(Context context, EnumSampleSpace<Load> infectivity) {
-        var weight = transmissionConfig.getTotalWeightForContextType(context.getContextType());
-        var agentCount = context.getAgentCount();
-        for (Contamination contamination : context.getContaminations()) {
-            var loadInContext = contamination.getLoad();
-            var levelInContext = contamination.getLevel() * weight / agentCount;
-            infectivity.increaseOutcome(loadInContext, levelInContext);
-        }
-    }
 }

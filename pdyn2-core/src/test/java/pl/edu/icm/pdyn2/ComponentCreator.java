@@ -10,6 +10,7 @@ import pl.edu.icm.pdyn2.model.behaviour.BehaviourType;
 import pl.edu.icm.pdyn2.model.context.Context;
 import pl.edu.icm.pdyn2.model.context.ContextType;
 import pl.edu.icm.pdyn2.model.context.Inhabitant;
+import pl.edu.icm.pdyn2.model.immunization.Immunization;
 import pl.edu.icm.pdyn2.model.immunization.Load;
 import pl.edu.icm.pdyn2.model.impact.Impact;
 import pl.edu.icm.pdyn2.model.progression.HealthStatus;
@@ -19,6 +20,7 @@ import pl.edu.icm.trurl.ecs.Entity;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Map;
 
 public class ComponentCreator {
 
@@ -51,6 +53,16 @@ public class ComponentCreator {
     public static Context context(ContextType type) {
         Context context = new Context();
         context.setContextType(type);
+        return context;
+    }
+
+    public static Context context(ContextType type, int agents, Map<Load, Float> loads) {
+        Context context = new Context();
+        context.setContextType(type);
+        context.updateAgentCount(agents);
+        for (Map.Entry<Load, Float> entry : loads.entrySet()) {
+            context.changeContaminationLevel(entry.getKey(), entry.getValue());
+        }
         return context;
     }
 
@@ -101,5 +113,10 @@ public class ComponentCreator {
         healthStatus.setDiseaseLoad(load);
         healthStatus.setStage(stage);
         return healthStatus;
+    }
+
+    public static Immunization immunization() {
+        Immunization immunization = new Immunization();
+        return immunization;
     }
 }
