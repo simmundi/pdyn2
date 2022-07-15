@@ -114,7 +114,7 @@ public class TransmissionService {
         var agentCount = context.getAgentCount();
         for (Contamination contamination : context.getContaminations()) {
             var loadInContext = contamination.getLoad();
-            var levelInContext = contamination.getLevel() * weight / agentCount;
+            var levelInContext = agentCount > 0 ? contamination.getLevel() * weight / agentCount : 0.0f;
             infectivity.increaseOutcome(loadInContext, levelInContext);
         }
     }
