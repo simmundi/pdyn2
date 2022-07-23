@@ -122,10 +122,7 @@ public class AgentStateService {
                 if (behaviour.getType() == BehaviourType.SELF_ISOLATION) {
                     behaviour.transitionTo(BehaviourType.ROUTINE, simulationTimer.getDaysPassed());
                 }
-                Immunization immunization = agentEntity.getOrCreate(Immunization.class);
-                immunization
-                        .getEvents()
-                        .add(createEventFromHealth(healthStatus));
+                addImmunizationEvent(agentEntity, createEventFromHealth(healthStatus));
                 break;
             case HOSPITALIZED_NO_ICU:
                 // thru
@@ -192,6 +189,13 @@ public class AgentStateService {
 
         behaviour.transitionTo(BehaviourType.SELF_ISOLATION, simulationTimer.getDaysPassed());
         return true;
+    }
+
+    public void addImmunizationEvent(Entity agentEntity, ImmunizationEvent immunizationEvent) {
+        Immunization immunization = agentEntity.getOrCreate(Immunization.class);
+        immunization
+                .getEvents()
+                .add(immunizationEvent);
     }
 
     public void changeLoad(Entity agentEntity, Load targetLoad) {

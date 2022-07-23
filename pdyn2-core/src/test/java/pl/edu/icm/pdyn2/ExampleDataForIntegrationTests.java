@@ -33,11 +33,12 @@ import pl.edu.icm.trurl.ecs.Entity;
 import pl.edu.icm.trurl.ecs.Session;
 import pl.edu.icm.trurl.ecs.util.Selectors;
 import pl.edu.icm.trurl.ecs.util.SelectorsFactory;
+import pl.edu.icm.trurl.ecs.util.StaticSelectors;
+import pl.edu.icm.trurl.ecs.util.StaticSelectorsFactory;
 import pl.edu.icm.trurl.store.array.ArrayStoreFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static pl.edu.icm.pdyn2.ComponentCreator.*;
@@ -150,9 +151,9 @@ public class ExampleDataForIntegrationTests {
         agentA = session.createEntity(person(18, Person.Sex.M),
                 inhabitant(householdContext3, workplace, school2), health(Load.WILD, Stage.HEALTHY), behaviour(BehaviourType.ROUTINE));
         allAgents = List.of(agent1, agent2, agent3, agent4, agent5, agent6, agent7, agent8, agent9, agentA);
-        householdContext1.add(household(Set.of(agent1, agent2, agent3)));
-        householdContext2.add(household(Set.of(agent4, agent5, agent6)));
-        householdContext3.add(household(Set.of(agent7, agent8, agent9, agentA)));
+        householdContext1.add(household(List.of(agent1, agent2, agent3)));
+        householdContext2.add(household(List.of(agent4, agent5, agent6)));
+        householdContext3.add(household(List.of(agent7, agent8, agent9, agentA)));
     }
 
     public void createStreets(Session session) {
