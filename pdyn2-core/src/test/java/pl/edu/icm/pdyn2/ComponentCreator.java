@@ -56,7 +56,7 @@ public class ComponentCreator {
         return context;
     }
 
-    public static Context context(ContextType type, int agents, Map<Load, Float> loads) {
+    public static Context context(ContextType type, float agents, Map<Load, Float> loads) {
         Context context = new Context();
         context.setContextType(type);
         context.updateAgentCount(agents);

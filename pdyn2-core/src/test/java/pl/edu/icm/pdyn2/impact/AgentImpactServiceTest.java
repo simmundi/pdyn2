@@ -21,6 +21,7 @@ import pl.edu.icm.pdyn2.model.impact.Impact;
 import pl.edu.icm.pdyn2.model.progression.Stage;
 import pl.edu.icm.trurl.ecs.Entity;
 
+import java.util.Map;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.*;
@@ -64,7 +65,7 @@ class AgentImpactServiceTest {
     }
 
     @Test
-    @DisplayName("Should update impact if nothing has changed")
+    @DisplayName("Should update impact if something has changed")
     void updateImpact() {
         // given
         Entity entity = entityMocker.entity(
@@ -72,22 +73,26 @@ class AgentImpactServiceTest {
                 behaviour(BehaviourType.ROUTINE),
                 health(Load.WILD, Stage.INFECTIOUS_SYMPTOMATIC),
                 person(34, Person.Sex.M));
-        Context context = ComponentCreator.context(ContextType.BIG_UNIVERSITY);
-        context.changeContaminationLevel(Load.WILD, 0.1f);
-        context.updateAgentCount(123);
+        Context uni = ComponentCreator.context(ContextType.BIG_UNIVERSITY, 123, Map.of(Load.WILD, 0.1f));
+        Context street = ComponentCreator.context(ContextType.STREET_20, 10.5f, Map.of(Load.WILD, 1.05f));
 
-        when(contextFractionService.calculateLoadFractionFor(entity.get(Person.class), context)).thenReturn(1f);
+        when(contextFractionService.calculateInfluenceFractionFor(entity.get(Person.class), uni)).thenReturn(1f);
+        when(contextFractionService.calculateInfluenceFractionFor(entity.get(Person.class), street)).thenReturn(0.5f);
         when(stageShareConfig.getInfluenceOf(Stage.INFECTIOUS_ASYMPTOMATIC)).thenReturn(0.1f);
         when(stageShareConfig.getInfluenceOf(Stage.INFECTIOUS_SYMPTOMATIC)).thenReturn(1f);
         when(contextsService.findActiveContextsForAgent(entity, entity.get(Impact.class))).thenReturn(
-                Stream.of(context), Stream.of(context));
+                Stream.of(uni, street), Stream.of(uni, street));
 
         // execute
         agentImpactService.updateImpact(entity);
 
         // assert
-        assertThat(context.getContaminations()).hasSize(1);
-        assertThat(context.getAgentCount()).isEqualTo(123);
-        assertThat(context.getContaminationByLoad(Load.WILD).getLevel()).isEqualTo(1f);
+        assertThat(uni.getContaminations()).hasSize(1);
+        assertThat(uni.getAgentCount()).isEqualTo(123);
+        assertThat(uni.getContaminationByLoad(Load.WILD).getLevel()).isEqualTo(1f);
+
+        assertThat(street.getContaminations()).hasSize(1);
+        assertThat(street.getAgentCount()).isEqualTo(10.5f);
+        assertThat(street.getContaminationByLoad(Load.WILD).getLevel()).isEqualTo(1.5f);
     }
 }

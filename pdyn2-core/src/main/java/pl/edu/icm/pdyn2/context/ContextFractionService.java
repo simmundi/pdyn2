@@ -24,7 +24,7 @@ public class ContextFractionService {
     }
 
     /**
-     * Returns fraction (between 0 and 1) of person's viral load to be taken into account
+     * Returns fraction (between 0 and 1) of person's viral load and count to be taken into account
      * in the given context.
      *
      * The current implementation generally returns 1, except for street contexts.
@@ -35,7 +35,7 @@ public class ContextFractionService {
      * @param context
      * @return
      */
-    public float calculateLoadFractionFor(Person person, Context context) {
+    public float calculateInfluenceFractionFor(Person person, Context context) {
         AgeRange ageRange = AgeRange.of(person.getAge());
         return fractions[idxFor(ageRange, context.getContextType())];
     }
@@ -55,8 +55,9 @@ public class ContextFractionService {
             EnumSampleSpace<ContextType> sampleSpace = new EnumSampleSpace<>(ContextType.class);
             int ageBin = ageRange.ordinal();
             for (ContextType streetContext : ContextType.streetContexts()) {
-                int distance = Math.abs(ageBin - (streetContext.ordinal() - ContextType.STREET_00.ordinal()));
-                sampleSpace.changeOutcome(streetContext, (float) Math.exp( - distance / 2.0));
+                int distance = ageBin - (streetContext.ordinal() - ContextType.STREET_00.ordinal());
+                int distanceSquared = distance * distance;
+                sampleSpace.changeOutcome(streetContext, (float) Math.exp( - distanceSquared / 2.0));
             }
             sampleSpace.normalize();
 

@@ -55,9 +55,10 @@ public class AgentImpactService {
         float infectionDelta = stageShareConfig.getInfluenceOf(currentStage) * sign;
 
         contextsService.findActiveContextsForAgent(agentEntity, impact).forEach(c -> {
-            c.updateAgentCount(activityDelta);
+            float influenceFraction = contextFractionService.calculateInfluenceFractionFor(person, c);
+            c.updateAgentCount(activityDelta * influenceFraction);
             if (load != null) {
-                float scaledInfectionDelta = infectionDelta * contextFractionService.calculateLoadFractionFor(person, c);
+                float scaledInfectionDelta = infectionDelta * influenceFraction;
                 c.changeContaminationLevel(load, scaledInfectionDelta);
             }
         });

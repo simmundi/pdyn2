@@ -15,6 +15,8 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.*;
 
 public class AgentImpactServiceIT {
+    private final static Offset<Float> VERY_CLOSE = Offset.offset(0.000001f);
+
     ExampleDataForIntegrationTests data = new ExampleDataForIntegrationTests();
     AgentImpactService agentImpactService = data.agentImpactService;
     AgentStateService agentStateService = data.agentStateService;
@@ -28,9 +30,9 @@ public class AgentImpactServiceIT {
         }
 
         // assert
-        assertThat(agentCount(data.streetsA)).isEqualTo(6 * 10);
-        assertThat(agentCount(data.streetsB)).isEqualTo(10 * 10);
-        assertThat(agentCount(data.streetsC)).isEqualTo(4 * 10);
+        assertThat(agentCount(data.streetsA)).isCloseTo(6, VERY_CLOSE);
+        assertThat(agentCount(data.streetsB)).isCloseTo(10, VERY_CLOSE);
+        assertThat(agentCount(data.streetsC)).isCloseTo(4, VERY_CLOSE);
 
         assertThat(agentCount(data.workplace)).isEqualTo(1);
 
@@ -60,16 +62,15 @@ public class AgentImpactServiceIT {
         }
 
         // assert
-        assertThat(agentCount(data.streetsA)).isEqualTo(6 * 10);
-        assertThat(agentCount(data.streetsB)).isEqualTo(10 * 10);
-        assertThat(agentCount(data.streetsC)).isEqualTo(4 * 10);
+        assertThat(agentCount(data.streetsA)).isCloseTo(6, VERY_CLOSE);
+        assertThat(agentCount(data.streetsB)).isCloseTo(10, VERY_CLOSE);
+        assertThat(agentCount(data.streetsC)).isCloseTo(4, VERY_CLOSE);
 
-        Offset<Float> veryClose = Offset.offset(0.000001f);
         assertThat(contaminationLevel(data.householdContext1, Load.WILD)).isEqualTo(2f);
         assertThat(contaminationLevel(data.householdContext2, Load.WILD)).isZero();
         assertThat(contaminationLevel(data.workplace, Load.WILD)).isZero();
-        assertThat(contaminationLevel(data.streetsA, Load.WILD)).isCloseTo(2f, veryClose);
-        assertThat(contaminationLevel(data.streetsB, Load.WILD)).isCloseTo(2f, veryClose);
+        assertThat(contaminationLevel(data.streetsA, Load.WILD)).isCloseTo(2f, VERY_CLOSE);
+        assertThat(contaminationLevel(data.streetsB, Load.WILD)).isCloseTo(2f, VERY_CLOSE);
         assertThat(contaminationLevel(data.streetsC, Load.WILD)).isZero();
         assertThat(contaminationLevel(data.school1, Load.WILD)).isEqualTo(2f);
         assertThat(contaminationLevel(data.school1, Load.DELTA)).isZero();

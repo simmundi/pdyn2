@@ -36,10 +36,10 @@ class ContextFractionServiceTest {
         var university = ComponentCreator.context(ContextType.UNIVERSITY);
 
         // execute
-        var householdFraction = fractionService.calculateLoadFractionFor(person, household);
-        var schoolFraction = fractionService.calculateLoadFractionFor(person, school);
-        var workspaceFraction = fractionService.calculateLoadFractionFor(person, workspace);
-        var universityFraction = fractionService.calculateLoadFractionFor(person, university);
+        var householdFraction = fractionService.calculateInfluenceFractionFor(person, household);
+        var schoolFraction = fractionService.calculateInfluenceFractionFor(person, school);
+        var workspaceFraction = fractionService.calculateInfluenceFractionFor(person, workspace);
+        var universityFraction = fractionService.calculateInfluenceFractionFor(person, university);
 
         // assert
         assertThat(householdFraction).isEqualTo(1);
@@ -59,8 +59,8 @@ class ContextFractionServiceTest {
         var street60 = ComponentCreator.context(ContextType.STREET_60);
 
         // execute
-        var mainFraction = fractionService.calculateLoadFractionFor(agent, street60);
-        var fractions = streets.stream().mapToDouble(context -> fractionService.calculateLoadFractionFor(agent, context))
+        var mainFraction = fractionService.calculateInfluenceFractionFor(agent, street60);
+        var fractions = streets.stream().mapToDouble(context -> fractionService.calculateInfluenceFractionFor(agent, context))
                 .toArray();
 
         // assert
