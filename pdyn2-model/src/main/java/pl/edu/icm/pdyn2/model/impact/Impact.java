@@ -69,4 +69,13 @@ public class Impact {
     public int hashCode() {
         return Objects.hash(type, stage, load);
     }
+
+    @Override
+    public String toString() {
+        return "Impact{" +
+                "type=" + type +
+                ", stage=" + stage +
+                ", load=" + load +
+                '}';
+    }
 }

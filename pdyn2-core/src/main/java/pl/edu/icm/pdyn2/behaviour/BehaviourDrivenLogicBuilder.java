@@ -1,6 +1,6 @@
 package pl.edu.icm.pdyn2.behaviour;
 
-import net.snowyhollows.bento2.annotation.WithFactory;
+import net.snowyhollows.bento.annotation.WithFactory;
 import pl.edu.icm.board.util.RandomForChunkProvider;
 import pl.edu.icm.board.util.RandomProvider;
 import pl.edu.icm.pdyn2.index.AreaClusteredSelectors;

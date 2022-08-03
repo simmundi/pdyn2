@@ -1,6 +1,6 @@
 package pl.edu.icm.pdyn2.administration;
 
-import net.snowyhollows.bento2.annotation.WithFactory;
+import net.snowyhollows.bento.annotation.WithFactory;
 import pl.edu.icm.pdyn2.index.AreaClusteredSelectors;
 import pl.edu.icm.pdyn2.model.progression.HealthStatus;
 import pl.edu.icm.pdyn2.model.progression.HealthStatusMapper;

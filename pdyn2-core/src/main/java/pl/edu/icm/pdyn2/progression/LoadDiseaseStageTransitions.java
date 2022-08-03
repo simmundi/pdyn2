@@ -1,5 +1,6 @@
 package pl.edu.icm.pdyn2.progression;
 
+import net.snowyhollows.bento.config.WorkDir;
 import pl.edu.icm.board.model.Person;
 import pl.edu.icm.pdyn2.immunization.ImmunizationService;
 import pl.edu.icm.pdyn2.immunization.ImmunizationStage;
@@ -11,7 +12,6 @@ import pl.edu.icm.pdyn2.time.SimulationTimer;
 import pl.edu.icm.trurl.ecs.Entity;
 import pl.edu.icm.trurl.sampleSpace.EnumSampleSpace;
 import pl.edu.icm.trurl.util.EnumTable;
-import pl.edu.icm.trurl.util.Filesystem;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,12 +30,12 @@ public class LoadDiseaseStageTransitions {
     public LoadDiseaseStageTransitions(String infectionTransitionsFilename,
                                        ImmunizationService immunizationService,
                                        SimulationTimer simulationTimer,
-                                       Filesystem filesystem,
+                                       WorkDir workDir,
                                        Load load) {
         this.immunizationService = immunizationService;
         this.simulationTimer = simulationTimer;
         this.load = load;
-        try (InputStream stream = filesystem.openForReading(new File(infectionTransitionsFilename))) {
+        try (InputStream stream = workDir.openForReading(new File(infectionTransitionsFilename))) {
             Scanner scanner = new Scanner(stream);
             scanner.useLocale(Locale.ENGLISH);
             while (scanner.hasNext()) { // table for age group

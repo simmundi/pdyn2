@@ -2,14 +2,15 @@ package pl.edu.icm.pdyn2.sowing;
 
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
-import net.snowyhollows.bento2.annotation.WithFactory;
+import net.snowyhollows.bento.annotation.WithFactory;
+import net.snowyhollows.bento.config.WorkDir;
 import org.apache.commons.math3.random.RandomGenerator;
 import pl.edu.icm.board.geography.commune.AdministrationAreaType;
-import pl.edu.icm.board.util.FileToStreamService;
 import pl.edu.icm.board.util.RandomProvider;
 import pl.edu.icm.trurl.store.array.ArrayStore;
 import pl.edu.icm.trurl.util.Status;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -19,16 +20,16 @@ public class InfectedLoaderFromDistribution {
 
     private final String sowingFromDistributionFilename;
     private final RandomGenerator randomGenerator;
-    private final FileToStreamService fileToStreamService;
+    private final WorkDir fileToStreamService;
     private SowingDistributionRecordFromCsvMapper mapper;
 
     @WithFactory
     public InfectedLoaderFromDistribution(String sowingFromDistributionFilename,
                                           RandomProvider randomProvider,
-                                          FileToStreamService fileToStreamService) {
+                                          WorkDir workDir) {
         this.sowingFromDistributionFilename = sowingFromDistributionFilename;
         this.randomGenerator = randomProvider.getRandomGenerator(InfectedLoaderFromDistribution.class);
-        this.fileToStreamService = fileToStreamService;
+        this.fileToStreamService = workDir;
     }
 
     private void load() throws IOException {
@@ -43,7 +44,7 @@ public class InfectedLoaderFromDistribution {
 
             CsvParser csvParser = new CsvParser(csvParserSettings);
             AtomicInteger counter = new AtomicInteger(0);
-            csvParser.iterateRecords(fileToStreamService.filename(sowingFromDistributionFilename),
+            csvParser.iterateRecords(fileToStreamService.openForReading(new File(sowingFromDistributionFilename)),
                     StandardCharsets.UTF_8).forEach(row -> {
                 SowingDistributionRecordFromCsv sowingDistributionRecordFromCsv = new SowingDistributionRecordFromCsv();
                 sowingDistributionRecordFromCsv.setAdministrationAreaType(row.getString("type"));

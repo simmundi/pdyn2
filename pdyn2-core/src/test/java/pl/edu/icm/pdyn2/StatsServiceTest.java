@@ -1,10 +1,13 @@
 package pl.edu.icm.pdyn2;
 
+import net.snowyhollows.bento.config.DefaultWorkDir;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.junit.jupiter.MockitoExtension;
+import pl.edu.icm.em.common.DebugTextFileService;
 import pl.edu.icm.pdyn2.model.progression.Stage;
 import tech.tablesaw.api.Table;
 
@@ -17,16 +20,18 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 class StatsServiceTest {
 
     TemporaryFolder folder = new TemporaryFolder();
+    DebugTextFileService debugFileService;
 
     @BeforeEach
     void before() throws IOException {
         folder.create();
+        debugFileService = new DebugTextFileService(new DefaultWorkDir(folder.getRoot()));
     }
 
     @Test
     void createStatsOutputFileShouldNotAcceptSecondFile() {
         //given
-        var statsService = new StatsService();
+        var statsService = new StatsService(debugFileService);
         //execute
         statsService.createStatsOutputFile(folder.getRoot() + "/disease_scenario.csv");
         //assert
@@ -38,7 +43,7 @@ class StatsServiceTest {
     @Test
     void writeDayToStatsOutputFileShouldThrowNullPointerException() {
         //given
-        var statsService = new StatsService();
+        var statsService = new StatsService(debugFileService);
         //execute and assert
         assertThatThrownBy(statsService::writeDayToStatsOutputFile)
                 .isInstanceOf(NullPointerException.class);
@@ -47,7 +52,7 @@ class StatsServiceTest {
     @Test
     void writeStatsCorrectly() throws IOException {
         //given
-        var statsService = new StatsService();
+        var statsService = new StatsService(debugFileService);
         var filename = folder.getRoot() + "/d_s.csv";
         //execute
         statsService.createStatsOutputFile(filename);

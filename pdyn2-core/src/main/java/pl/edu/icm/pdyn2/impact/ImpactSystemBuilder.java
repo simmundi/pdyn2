@@ -1,6 +1,6 @@
 package pl.edu.icm.pdyn2.impact;
 
-import net.snowyhollows.bento2.annotation.WithFactory;
+import net.snowyhollows.bento.annotation.WithFactory;
 import pl.edu.icm.pdyn2.index.AreaClusteredSelectors;
 import pl.edu.icm.trurl.ecs.EntitySystem;
 import pl.edu.icm.trurl.ecs.util.EntityIterator;

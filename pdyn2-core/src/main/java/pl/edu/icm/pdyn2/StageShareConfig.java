@@ -1,6 +1,6 @@
 package pl.edu.icm.pdyn2;
 
-import net.snowyhollows.bento2.annotation.WithFactory;
+import net.snowyhollows.bento.annotation.WithFactory;
 import pl.edu.icm.pdyn2.model.progression.Stage;
 
 public class StageShareConfig {

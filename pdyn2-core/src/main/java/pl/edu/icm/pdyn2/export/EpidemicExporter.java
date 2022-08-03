@@ -1,6 +1,7 @@
 package pl.edu.icm.pdyn2.export;
 
-import net.snowyhollows.bento2.annotation.WithFactory;
+import net.snowyhollows.bento.annotation.WithFactory;
+import net.snowyhollows.bento.config.WorkDir;
 import pl.edu.icm.board.Board;
 import pl.edu.icm.board.geography.KilometerGridCell;
 import pl.edu.icm.board.model.Location;
@@ -18,8 +19,6 @@ import pl.edu.icm.pdyn2.model.progression.Stage;
 import pl.edu.icm.pdyn2.progression.DiseaseStageTransitionsService;
 import pl.edu.icm.trurl.ecs.util.EntityIterator;
 import pl.edu.icm.trurl.ecs.util.Selectors;
-import pl.edu.icm.trurl.util.DefaultFilesystem;
-import pl.edu.icm.trurl.util.Filesystem;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -34,37 +33,28 @@ import java.util.stream.Collectors;
 
 public class EpidemicExporter {
     private final Board board;
-    private final Filesystem filesystem;
+    private final WorkDir workDir;
     private final String diseaseExportFilename;
     private final DiseaseStageTransitionsService transitionsService;
     private final Selectors selectors;
 
+
     @WithFactory
     public EpidemicExporter(String diseaseExportFilename,
                             Board board,
-                            DiseaseStageTransitionsService transitionsService, Selectors selectors) {
-        this.diseaseExportFilename = diseaseExportFilename;
-        this.board = board;
-        this.selectors = selectors;
-        this.filesystem = new DefaultFilesystem();
-        this.transitionsService = transitionsService;
-    }
-
-    public EpidemicExporter(String diseaseExportFilename,
-                            Board board,
-                            Filesystem filesystem,
+                            WorkDir workDir,
                             DiseaseStageTransitionsService transitionsService,
                             Selectors selectors) {
         this.diseaseExportFilename = diseaseExportFilename;
         this.board = board;
-        this.filesystem = filesystem;
+        this.workDir = workDir;
         this.transitionsService = transitionsService;
         this.selectors = selectors;
     }
 
     public void export() {
         try {
-            OutputStream outputStream = this.filesystem.openForWriting(new File(diseaseExportFilename));
+            OutputStream outputStream = this.workDir.openForWriting(new File(diseaseExportFilename));
             OutputStreamWriter streamWriter = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8);
             BufferedWriter bufferedWriter = new BufferedWriter(streamWriter);
             bufferedWriter.write("id,dzien_zakazenia,miejsce_zakazenia,odmiana_wirusa," +

@@ -1,6 +1,6 @@
 package pl.edu.icm.pdyn2.progression;
 
-import net.snowyhollows.bento2.annotation.WithFactory;
+import net.snowyhollows.bento.annotation.WithFactory;
 import pl.edu.icm.board.model.Person;
 import pl.edu.icm.board.util.RandomForChunkProvider;
 import pl.edu.icm.board.util.RandomProvider;

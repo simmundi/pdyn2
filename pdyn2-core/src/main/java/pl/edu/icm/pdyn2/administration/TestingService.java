@@ -1,7 +1,7 @@
 package pl.edu.icm.pdyn2.administration;
 
 import com.google.common.base.Preconditions;
-import net.snowyhollows.bento2.annotation.WithFactory;
+import net.snowyhollows.bento.annotation.WithFactory;
 import org.apache.commons.math3.random.RandomGenerator;
 import pl.edu.icm.board.model.Household;
 import pl.edu.icm.board.util.RandomProvider;

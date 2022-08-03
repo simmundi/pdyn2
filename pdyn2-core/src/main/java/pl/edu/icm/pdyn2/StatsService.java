@@ -1,10 +1,10 @@
 package pl.edu.icm.pdyn2;
 
-import net.snowyhollows.bento2.annotation.WithFactory;
+import net.snowyhollows.bento.annotation.WithFactory;
+import pl.edu.icm.em.common.DebugTextFile;
+import pl.edu.icm.em.common.DebugTextFileService;
 import pl.edu.icm.pdyn2.model.progression.Stage;
-import pl.edu.icm.trurl.util.DebugFile;
 
-import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -24,11 +24,13 @@ public class StatsService {
     private final EnumMap<Stage, AtomicInteger> statsAll = new EnumMap<>(Stage.class);
     private final EnumMap<Stage, AtomicInteger> statsDailyNew = new EnumMap<>(Stage.class);
     private final Map<String, AtomicInteger> additionalStatistics = new HashMap<>();
-    private DebugFile debugFile;
+    private final DebugTextFileService debugFileService;
+    private DebugTextFile debugTextFile;
 
 
     @WithFactory
-    public StatsService() {
+    public StatsService(DebugTextFileService debugFileService) {
+        this.debugFileService = debugFileService;
         for (Stage stage : Stage.values()) {
             statsAll.put(stage, new AtomicInteger(0));
             statsDailyNew.put(stage, new AtomicInteger(0));
@@ -57,24 +59,20 @@ public class StatsService {
     }
 
     public void createStatsOutputFile(String simulationStatsOutputFilename) {
-        checkState(debugFile == null, "Output file has already been created");
-        try {
-            debugFile = DebugFile.create(simulationStatsOutputFilename);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+        checkState(debugTextFile == null, "Output file has already been created");
+            debugTextFile = debugFileService.createTextFile(simulationStatsOutputFilename);
         var d1_header = concat(
                 Stream.of(Stage.values()).map(Enum::name),
                 additionalStatistics.keySet().stream().map(String::toUpperCase)
         ).collect(joining(",d1_", "d1_", ","));
         var headerContinued = Stream.of(Stage.values()).map(Enum::name)
                 .collect(joining(",", "", ""));
-        debugFile.println(d1_header + headerContinued);
-        debugFile.flush();
+        debugTextFile.println(d1_header + headerContinued);
+        debugTextFile.flush();
     }
 
     public void writeDayToStatsOutputFile() {
-        checkNotNull(debugFile, "Output file has not been created");
+        checkNotNull(debugFileService, "Output file has not been created");
         var line = concat(
                 concat(
                         Stream.of(Stage.values()).map(stage -> String.valueOf(statsDailyNew.get(stage))),
@@ -82,8 +80,8 @@ public class StatsService {
                 ),
                 Stream.of(Stage.values()).map(stage -> String.valueOf(statsAll.get(stage)))
         ).collect(joining(",", "", ""));
-        debugFile.println(line);
-        debugFile.flush();
+        debugTextFile.println(line);
+        debugTextFile.flush();
     }
 
     /**

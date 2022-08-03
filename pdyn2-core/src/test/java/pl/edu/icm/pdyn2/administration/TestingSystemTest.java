@@ -62,7 +62,7 @@ class TestingSystemTest {
         // given
         when(eligibleForTestsSelector.chunks()).thenReturn(Stream.of(chunk(2,3,10,15)));
         when(sessionFactory.withModeAndCount(any(), anyInt())).thenReturn(sessionFactory);
-        when(sessionFactory.create()).thenReturn(session);
+        when(sessionFactory.create(anyInt())).thenReturn(session);
         when(session.getEntity(anyInt())).thenReturn(entity);
 
         // execute

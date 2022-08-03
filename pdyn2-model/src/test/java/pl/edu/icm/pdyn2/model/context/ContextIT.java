@@ -124,6 +124,27 @@ public class ContextIT {
     }
 
     @Test
+    @DisplayName("should accumulate level and normalize everything")
+    void multipleChanges() {
+        // given
+        Context context = context(HOUSEHOLD, 10, contamination(10, WILD));
+
+        // execute
+        context.changeContaminationLevel(WILD, 23);
+        context.changeContaminationLevel(WILD, 230);
+        context.changeContaminationLevel(WILD, 2300);
+        context.changeContaminationLevel(OMICRON, 100);
+        context.changeContaminationLevel(BA2, 200);
+        context.changeContaminationLevel(OMICRON, -100);
+
+        // assert
+        assertThat(context.getContaminations()).hasSize(3);
+        assertThat(context.getContaminationByLoad(WILD).getLevel()).isEqualTo(10 + 23 + 230 + 2300);
+        assertThat(context.getContaminationByLoad(OMICRON).getLevel()).isZero();
+        assertThat(context.getContaminationByLoad(BA2).getLevel()).isEqualTo(200);
+    }
+
+    @Test
     @DisplayName("Should normalize: sort contaminations by load and remove empty")
     void normalize() {
         // given

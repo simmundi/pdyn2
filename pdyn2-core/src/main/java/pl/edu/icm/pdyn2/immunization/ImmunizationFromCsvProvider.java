@@ -1,10 +1,11 @@
 package pl.edu.icm.pdyn2.immunization;
 
-import net.snowyhollows.bento2.annotation.WithFactory;
-import pl.edu.icm.board.util.FileToStreamService;
+import net.snowyhollows.bento.annotation.WithFactory;
+import net.snowyhollows.bento.config.WorkDir;
 import pl.edu.icm.pdyn2.model.immunization.Load;
 import pl.edu.icm.trurl.util.Status;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,7 +31,7 @@ public class ImmunizationFromCsvProvider {
     private final List<Load> diseaseLabelsList = new ArrayList<>();
 
     @WithFactory
-    public ImmunizationFromCsvProvider(FileToStreamService fileToStreamService,
+    public ImmunizationFromCsvProvider(WorkDir fileToStreamService,
                                        String sFunctionLatentnyObjawowyFilename,
                                        String sFunctionHospitalizowanyBezOiomFilename,
                                        String sFunctionHospitalizowanyPrzedOiomFilename,
@@ -45,18 +46,14 @@ public class ImmunizationFromCsvProvider {
         this.crossImmunityObjawowyFilename = crossImmunityObjawowyFilename;
         this.crossImmunityHospitalizowanyBezOiomFilename = crossImmunityHospitalizowanyBezOiomFilename;
         this.crossImmunityHospitalizowanyPrzedOiomFilename = crossImmunityHospitalizowanyPrzedOiomFilename;
-        try {
-            sFunctionStream.add(0, fileToStreamService.filename(sFunctionLatentnyObjawowyFilename));
-            sFunctionStream.add(1, fileToStreamService.filename(sFunctionHospitalizowanyBezOiomFilename));
-            sFunctionStream.add(2, fileToStreamService.filename(sFunctionHospitalizowanyPrzedOiomFilename));
-            crossImmunityStream.add(0, fileToStreamService.filename(crossImmunityLatentnyFilename));
-            crossImmunityStream.add(1, fileToStreamService.filename(crossImmunityObjawowyFilename));
-            crossImmunityStream.add(2, fileToStreamService.filename(crossImmunityHospitalizowanyBezOiomFilename));
-            crossImmunityStream.add(3, fileToStreamService.filename(crossImmunityHospitalizowanyPrzedOiomFilename));
 
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+        sFunctionStream.add(0, fileToStreamService.openForReading(new File(sFunctionLatentnyObjawowyFilename)));
+        sFunctionStream.add(1, fileToStreamService.openForReading(new File(sFunctionHospitalizowanyBezOiomFilename)));
+        sFunctionStream.add(2, fileToStreamService.openForReading(new File(sFunctionHospitalizowanyPrzedOiomFilename)));
+        crossImmunityStream.add(0, fileToStreamService.openForReading(new File(crossImmunityLatentnyFilename)));
+        crossImmunityStream.add(1, fileToStreamService.openForReading(new File(crossImmunityObjawowyFilename)));
+        crossImmunityStream.add(2, fileToStreamService.openForReading(new File(crossImmunityHospitalizowanyBezOiomFilename)));
+        crossImmunityStream.add(3, fileToStreamService.openForReading(new File(crossImmunityHospitalizowanyPrzedOiomFilename)));
 
         for (int i = 0; i < 3; i++) {
             sFunction.add(new ArrayList<>());

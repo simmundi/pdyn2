@@ -1,13 +1,12 @@
 package pl.edu.icm.pdyn2.immunization;
 
-import net.snowyhollows.bento2.annotation.WithFactory;
+import net.snowyhollows.bento.annotation.WithFactory;
 import pl.edu.icm.pdyn2.model.immunization.Immunization;
 import pl.edu.icm.pdyn2.model.immunization.ImmunizationEvent;
 import pl.edu.icm.pdyn2.model.immunization.Load;
 
 import java.util.EnumMap;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.function.IntToDoubleFunction;
 
 import static java.lang.Math.max;
@@ -108,19 +107,12 @@ public class ImmunizationStrategyFromPdyn1Rewritten implements ImmunizationStrat
             return coefficient;
         }
 
-        try {
-            for (ImmunizationEvent event : immunization.getEvents()) {
-                var immunizationLoad = event.getLoad();
-                if (immunizationLoad == null || event.getDay() == Integer.MIN_VALUE) {
-                    continue;
-                }
-                var days = day - event.getDay();
-                coefficient = Float.max(coefficient, (float) (crossImmunity.get(immunizationStage).get(immunizationLoad).get(load) *
-                        sFunction.get(immunizationStage).get(immunizationLoad).applyAsDouble(days)));
-            }
-            return coefficient;
-        } catch (NullPointerException npe) {
-            return 0;
+        for (ImmunizationEvent event : immunization.getEvents()) {
+            var immunizationLoad = event.getLoad();
+            var days = day - event.getDay();
+            coefficient = Float.max(coefficient, (float) (crossImmunity.get(immunizationStage).get(immunizationLoad).get(load) *
+                    sFunction.get(immunizationStage).get(immunizationLoad).applyAsDouble(days)));
         }
+        return coefficient;
     }
 }

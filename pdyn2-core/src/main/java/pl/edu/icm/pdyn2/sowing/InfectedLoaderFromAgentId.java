@@ -1,8 +1,9 @@
 package pl.edu.icm.pdyn2.sowing;
 
-import net.snowyhollows.bento2.annotation.WithFactory;
-import pl.edu.icm.board.util.FileToStreamService;
+import net.snowyhollows.bento.annotation.WithFactory;
+import net.snowyhollows.bento.config.WorkDir;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -11,16 +12,12 @@ import java.util.Scanner;
 
 public class InfectedLoaderFromAgentId {
     private final String sowingFilename;
-    private InputStream inputStream;
+    private InputStream workDir;
 
     @WithFactory
-    public InfectedLoaderFromAgentId(FileToStreamService fileToStreamService, String sowingFilename) {
+    public InfectedLoaderFromAgentId(WorkDir workDir, String sowingFilename) {
         this.sowingFilename = sowingFilename;
-        try {
-            this.inputStream = fileToStreamService.filename(sowingFilename);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+        this.workDir = workDir.openForReading(new File(sowingFilename));
     }
 
     public String getSowingFilename() {
@@ -29,7 +26,7 @@ public class InfectedLoaderFromAgentId {
 
     public List<InfectedAgentFromCsv> readInfected() throws FileNotFoundException {
         List<InfectedAgentFromCsv> infectedList = new ArrayList<>();
-        Scanner myReader = new Scanner(this.inputStream);
+        Scanner myReader = new Scanner(this.workDir);
         int expectedInfectedCount = 0;
         int realInfectedCount = 0;
         if (myReader.hasNextLine()) {

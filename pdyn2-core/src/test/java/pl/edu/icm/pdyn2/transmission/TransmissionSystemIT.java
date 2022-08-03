@@ -102,7 +102,7 @@ class TransmissionSystemIT {
         EngineConfiguration engineConfiguration = new EngineConfiguration();
         engineConfiguration.setStoreFactory(new TablesawStoreFactory());
         CsvWriter csvWriter = new CsvWriter();
-        board = new Board(engineConfiguration, csvWriter);
+        board = new Board(engineConfiguration, csvWriter, null, null);
         board.require(
                 Area.class,
                 Location.class,

@@ -1,6 +1,9 @@
 package pl.edu.icm.pdyn2;
 
-import net.snowyhollows.bento2.Bento;
+import net.snowyhollows.bento.Bento;
+import net.snowyhollows.bento.config.WorkDir;
+import net.snowyhollows.bento.config.WorkDirFactory;
+import org.mockito.Mockito;
 import pl.edu.icm.board.geography.KilometerGridCell;
 import pl.edu.icm.board.model.Area;
 import pl.edu.icm.board.model.Household;
@@ -77,6 +80,7 @@ public class ExampleDataForIntegrationTests {
     public final int cols = 100;
     public final int rows = 100;
     public List<Entity> allAgents;
+    public final WorkDir workDir = Mockito.mock(WorkDir.class);
 
     public ExampleDataForIntegrationTests() {
         config = Bento.createRoot();
@@ -86,6 +90,7 @@ public class ExampleDataForIntegrationTests {
         config.register("simulationStartDate", "1977-04-01");
         config.register("asymptomaticInfluenceShare", 0.1);
         config.register("symptomaticInfluenceShare", 1.0);
+        config.register(WorkDirFactory.IT, workDir);
         agentStateService = config.get(AgentStateServiceFactory.IT);
         contextsService = config.get(ContextsServiceFactory.IT);
         agentImpactService = config.get(AgentImpactServiceFactory.IT);
@@ -94,7 +99,7 @@ public class ExampleDataForIntegrationTests {
         selectors = config.get(SelectorsFactory.IT);
 
         EngineConfiguration engineConfig = config.get(EngineConfigurationFactory.IT);
-        engineConfig.setStoreFactory(new ArrayStoreFactory(1000));
+        engineConfig.setStoreFactory(new ArrayStoreFactory());
         engineConfig.addComponentClasses(
                 Person.class,
                 Location.class,

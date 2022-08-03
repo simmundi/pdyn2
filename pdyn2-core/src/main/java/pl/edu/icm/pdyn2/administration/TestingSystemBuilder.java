@@ -1,6 +1,6 @@
 package pl.edu.icm.pdyn2.administration;
 
-import net.snowyhollows.bento2.annotation.WithFactory;
+import net.snowyhollows.bento.annotation.WithFactory;
 import pl.edu.icm.pdyn2.isolation.IsolationService;
 import pl.edu.icm.trurl.ecs.EntitySystem;
 

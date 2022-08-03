@@ -1,6 +1,6 @@
 package pl.edu.icm.pdyn2.quarantine;
 
-import net.snowyhollows.bento2.annotation.WithFactory;
+import net.snowyhollows.bento.annotation.WithFactory;
 
 public class QuarantineConfig {
     private final int quarantineLengthDays;

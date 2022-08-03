@@ -1,6 +1,6 @@
 package pl.edu.icm.pdyn2.quarantine;
 
-import net.snowyhollows.bento2.annotation.WithFactory;
+import net.snowyhollows.bento.annotation.WithFactory;
 import pl.edu.icm.pdyn2.AgentStateService;
 import pl.edu.icm.pdyn2.StatsService;
 import pl.edu.icm.pdyn2.model.behaviour.Behaviour;

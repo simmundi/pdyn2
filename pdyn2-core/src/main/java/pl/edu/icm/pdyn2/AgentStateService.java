@@ -1,7 +1,7 @@
 package pl.edu.icm.pdyn2;
 
 import com.google.common.base.Preconditions;
-import net.snowyhollows.bento2.annotation.WithFactory;
+import net.snowyhollows.bento.annotation.WithFactory;
 import pl.edu.icm.board.model.Person;
 import pl.edu.icm.pdyn2.context.ContextFractionService;
 import pl.edu.icm.pdyn2.context.ContextsService;

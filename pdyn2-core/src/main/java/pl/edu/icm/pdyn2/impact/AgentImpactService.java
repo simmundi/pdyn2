@@ -1,6 +1,6 @@
 package pl.edu.icm.pdyn2.impact;
 
-import net.snowyhollows.bento2.annotation.WithFactory;
+import net.snowyhollows.bento.annotation.WithFactory;
 import pl.edu.icm.board.model.Person;
 import pl.edu.icm.pdyn2.StageShareConfig;
 import pl.edu.icm.pdyn2.StatsService;
@@ -64,4 +64,3 @@ public class AgentImpactService {
         });
     }
 }
-

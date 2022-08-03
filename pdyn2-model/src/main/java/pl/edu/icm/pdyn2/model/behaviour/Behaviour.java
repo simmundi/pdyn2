@@ -27,4 +27,12 @@ public class Behaviour {
     void setType(BehaviourType type) {
         this.type = type;
     }
+
+    @Override
+    public String toString() {
+        return "Behaviour{" +
+                "dayOfLastChange=" + dayOfLastChange +
+                ", type=" + type +
+                '}';
+    }
 }

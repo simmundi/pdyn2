@@ -1,6 +1,6 @@
 package pl.edu.icm.pdyn2.sowing;
 
-import net.snowyhollows.bento2.annotation.WithFactory;
+import net.snowyhollows.bento.annotation.WithFactory;
 
 import static com.google.common.base.Preconditions.checkState;
 

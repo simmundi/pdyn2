@@ -2,11 +2,12 @@ package pl.edu.icm.pdyn2.importer;
 
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
-import net.snowyhollows.bento2.annotation.WithFactory;
-import pl.edu.icm.board.util.FileToStreamService;
+import net.snowyhollows.bento.annotation.WithFactory;
+import net.snowyhollows.bento.config.WorkDir;
 import pl.edu.icm.trurl.store.array.ArrayStore;
 import pl.edu.icm.trurl.util.Status;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -16,12 +17,12 @@ import java.util.function.Consumer;
 
 public class ImmunizationEventsLoaderFromAgentId {
     private ImportedImmunizationEventMapper mapper;
-    private final FileToStreamService fileToStreamService;
+    private final WorkDir workDir;
     private int capacity;
 
     @WithFactory
-    public ImmunizationEventsLoaderFromAgentId(FileToStreamService fileToStreamService) {
-        this.fileToStreamService = fileToStreamService;
+    public ImmunizationEventsLoaderFromAgentId(WorkDir workDir) {
+        this.workDir = workDir;
     }
 
     private void load(String filename) throws IOException {
@@ -36,7 +37,7 @@ public class ImmunizationEventsLoaderFromAgentId {
         csvParserSettings.setHeaderExtractionEnabled(true);
         CsvParser csvParser = new CsvParser(csvParserSettings);
 
-        var stream = fileToStreamService.filename(filename);
+        var stream = workDir.openForReading(new File(filename));
         stream.mark(Integer.MAX_VALUE);
         capacity = checkCapacity(csvParser, stream);
         stream.reset();

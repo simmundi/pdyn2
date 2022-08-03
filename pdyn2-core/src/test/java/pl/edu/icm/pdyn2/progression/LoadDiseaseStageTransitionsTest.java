@@ -1,5 +1,6 @@
 package pl.edu.icm.pdyn2.progression;
 
+import net.snowyhollows.bento.config.WorkDir;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,9 +14,6 @@ import pl.edu.icm.pdyn2.model.immunization.Load;
 import pl.edu.icm.pdyn2.model.progression.Stage;
 import pl.edu.icm.pdyn2.time.SimulationTimer;
 import pl.edu.icm.trurl.ecs.Entity;
-import pl.edu.icm.trurl.util.Filesystem;
-
-import java.io.FileNotFoundException;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -35,7 +33,7 @@ class LoadDiseaseStageTransitionsTest {
     private SimulationTimer simulationTimer;
 
     @Mock
-    private Filesystem filesystem;
+    private WorkDir workDir;
 
     @Mock
     Entity entity1;
@@ -45,12 +43,12 @@ class LoadDiseaseStageTransitionsTest {
 
     @BeforeEach
     void before() {
-        when(filesystem.openForReading(any())).thenReturn(
+        when(workDir.openForReading(any())).thenReturn(
                 LoadDiseaseStageTransitionsTest.class.getResourceAsStream("/stanCzasTest.txt"));
         loadDiseaseStageTransitions = new LoadDiseaseStageTransitions("stanCzasTest.txt",
                 immunizationService,
                 simulationTimer,
-                filesystem,
+                workDir,
                 Load.OMICRON);
         when(immunizationService.getImmunizationCoefficient(any(),
                 eq(ImmunizationStage.OBJAWOWY), any(), anyInt())).thenReturn(1.0f);

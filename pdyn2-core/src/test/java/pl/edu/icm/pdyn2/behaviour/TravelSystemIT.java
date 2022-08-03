@@ -74,7 +74,7 @@ class TravelSystemIT {
         // given
         when(areaClusteredSelectors.personSelector()).thenReturn(new RangeSelector(0, 100, 10));
         when(sessionFactory.withModeAndCount(any(), anyInt())).thenReturn(sessionFactory);
-        when(sessionFactory.create()).thenReturn(session);
+        when(sessionFactory.create(anyInt())).thenReturn(session);
         when(session.getEntity(anyInt())).thenReturn(entity);
         when(entity.get(Behaviour.class)).thenReturn(behaviour);
         when(engine.getMapperSet()).thenReturn(mapperSet);

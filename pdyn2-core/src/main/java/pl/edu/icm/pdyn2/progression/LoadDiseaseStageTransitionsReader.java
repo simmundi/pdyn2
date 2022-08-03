@@ -1,27 +1,22 @@
 package pl.edu.icm.pdyn2.progression;
 
-import net.snowyhollows.bento2.annotation.WithFactory;
+import net.snowyhollows.bento.annotation.WithFactory;
+import net.snowyhollows.bento.config.WorkDir;
 import pl.edu.icm.pdyn2.immunization.ImmunizationService;
 import pl.edu.icm.pdyn2.model.immunization.Load;
 import pl.edu.icm.pdyn2.time.SimulationTimer;
-import pl.edu.icm.trurl.util.DefaultFilesystem;
-import pl.edu.icm.trurl.util.Filesystem;
 
 public class LoadDiseaseStageTransitionsReader {
     private final ImmunizationService immunizationService;
     private final SimulationTimer simulationTimer;
-    private final Filesystem filesystem;
+    private final WorkDir workDir;
 
 
     @WithFactory
-    public LoadDiseaseStageTransitionsReader(ImmunizationService immunizationService, SimulationTimer simulationTimer) {
-        this(immunizationService, simulationTimer, new DefaultFilesystem());
-    }
-
-    public LoadDiseaseStageTransitionsReader(ImmunizationService immunizationService, SimulationTimer simulationTimer, Filesystem filesystem) {
+    public LoadDiseaseStageTransitionsReader(ImmunizationService immunizationService, SimulationTimer simulationTimer, WorkDir workDir) {
         this.immunizationService = immunizationService;
         this.simulationTimer = simulationTimer;
-        this.filesystem = filesystem;
+        this.workDir = workDir;
     }
 
     public LoadDiseaseStageTransitions readFromFile(String absolutePath, Load load) {
@@ -29,7 +24,7 @@ public class LoadDiseaseStageTransitionsReader {
                     absolutePath,
                     immunizationService,
                     simulationTimer,
-                    filesystem,
+                workDir,
                     load);
     }
 }

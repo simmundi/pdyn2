@@ -1,6 +1,6 @@
 package pl.edu.icm.pdyn2.transmission;
 
-import net.snowyhollows.bento2.annotation.WithFactory;
+import net.snowyhollows.bento.annotation.WithFactory;
 import pl.edu.icm.board.util.RandomForChunkProvider;
 import pl.edu.icm.board.util.RandomProvider;
 import pl.edu.icm.pdyn2.AgentStateService;
@@ -51,12 +51,11 @@ public class TransmissionSystemBuilder {
                     EnumSampleSpace<Load> exposurePerLoad = transmissionService.gatherExposurePerLoadForAgent(
                             new EnumSampleSpace<>(Load.class),
                             agent);
-                    float totalExposure = exposurePerLoad.sumOfProbabilities();
+                    float totalExposure = exposurePerLoad.sumOfProbabilities(); // TODO sumValues?
 
                     if (totalExposure > 0) {
                         var probability = transmissionService.exposureToProbability(totalExposure);
                         var chosenLoad = transmissionService.selectLoad(exposurePerLoad, random.nextDouble());
-
                         var adjustedProbability = transmissionService.adjustProbabilityWithImmunity(probability, chosenLoad, agent);
 
                         if (adjustedProbability > 0 && random.nextDouble() <= adjustedProbability) {

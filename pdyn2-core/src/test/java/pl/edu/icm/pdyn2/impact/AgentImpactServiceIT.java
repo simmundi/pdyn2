@@ -55,6 +55,9 @@ public class AgentImpactServiceIT {
         agentStateService.infect(data.agent3, Load.WILD);
         agentStateService.progressToDiseaseStage(data.agent3, Stage.INFECTIOUS_SYMPTOMATIC);
 
+        agentStateService.infect(data.agent4, Load.OMICRON);
+        agentStateService.progressToDiseaseStage(data.agent4, Stage.INFECTIOUS_SYMPTOMATIC);
+
         // execute
 
         for (Entity agent : data.allAgents) {

@@ -1,5 +1,6 @@
 package pl.edu.icm.pdyn2.export;
 
+import net.snowyhollows.bento.config.WorkDir;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,14 +19,12 @@ import pl.edu.icm.pdyn2.administration.TestingService;
 import pl.edu.icm.pdyn2.model.immunization.Load;
 import pl.edu.icm.pdyn2.model.progression.Stage;
 import pl.edu.icm.pdyn2.progression.DiseaseStageTransitionsService;
-import pl.edu.icm.trurl.util.Filesystem;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.ArgumentMatchers.any;
+import static org.assertj.core.api.AssertionsForClassTypes.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -37,8 +36,7 @@ public class ExportIT {
     private DiseaseStageTransitionsService transitionsService;
     @Mock
     private StatsService statsService;
-    @Mock
-    Filesystem filesystem;
+    WorkDir workDir = data.workDir;
     @Mock
     private Board board;
     @Captor
@@ -52,7 +50,7 @@ public class ExportIT {
     public void before() throws FileNotFoundException {
         when(board.getEngine()).thenReturn(data.session.getEngine());
         results = new ByteArrayOutputStream();
-        when(filesystem.openForWriting(file.capture())).thenReturn(results);
+        when(workDir.openForWriting(file.capture())).thenReturn(results);
 
         when(transitionsService.durationOf(Load.WILD, Stage.INFECTIOUS_SYMPTOMATIC, 18)).thenReturn(6);
         when(transitionsService.durationOf(Load.WILD, Stage.LATENT, 18)).thenReturn(7);
@@ -75,7 +73,7 @@ public class ExportIT {
         // given
         exporter = new EpidemicExporter("exportTest.csv",
                 board,
-                filesystem,
+                workDir,
                 transitionsService,
                 data.selectors);
 

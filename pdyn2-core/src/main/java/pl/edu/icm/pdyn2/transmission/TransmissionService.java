@@ -1,6 +1,6 @@
 package pl.edu.icm.pdyn2.transmission;
 
-import net.snowyhollows.bento2.annotation.WithFactory;
+import net.snowyhollows.bento.annotation.WithFactory;
 import pl.edu.icm.pdyn2.context.ContextsService;
 import pl.edu.icm.pdyn2.immunization.ImmunizationService;
 import pl.edu.icm.pdyn2.immunization.ImmunizationStage;

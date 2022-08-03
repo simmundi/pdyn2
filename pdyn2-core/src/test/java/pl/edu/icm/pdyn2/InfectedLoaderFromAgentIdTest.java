@@ -1,12 +1,13 @@
 package pl.edu.icm.pdyn2;
 
+import net.snowyhollows.bento.config.WorkDir;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import pl.edu.icm.board.util.FileToStreamService;
 import pl.edu.icm.pdyn2.sowing.InfectedLoaderFromAgentId;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -17,14 +18,14 @@ import static org.mockito.Mockito.when;
 class InfectedLoaderFromAgentIdTest {
 
     @Mock
-    FileToStreamService streamService;
+    WorkDir streamService;
 
     InfectedLoaderFromAgentId infectedLoaderFromAgentId;
 
     @Test
     void readInfected() throws FileNotFoundException {
-        when(this.streamService.filename("1")).thenReturn(InfectedLoaderFromAgentIdTest.class.getResourceAsStream("/initialSowingCorrect.dat"));
-        when(this.streamService.filename("2")).thenReturn(InfectedLoaderFromAgentIdTest.class.getResourceAsStream("/initialSowingWrongCount.dat"));
+        when(this.streamService.openForReading(new File("1"))).thenReturn(InfectedLoaderFromAgentIdTest.class.getResourceAsStream("/initialSowingCorrect.dat"));
+        when(this.streamService.openForReading(new File("2"))).thenReturn(InfectedLoaderFromAgentIdTest.class.getResourceAsStream("/initialSowingWrongCount.dat"));
         infectedLoaderFromAgentId = new InfectedLoaderFromAgentId(this.streamService, "1");
         var list = infectedLoaderFromAgentId.readInfected();
         assertEquals(list.size(), 11);

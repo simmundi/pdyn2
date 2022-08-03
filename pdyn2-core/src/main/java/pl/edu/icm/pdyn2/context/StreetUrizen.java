@@ -1,6 +1,6 @@
 package pl.edu.icm.pdyn2.context;
 
-import net.snowyhollows.bento2.annotation.WithFactory;
+import net.snowyhollows.bento.annotation.WithFactory;
 import pl.edu.icm.board.geography.KilometerGridCell;
 import pl.edu.icm.board.model.Area;
 import pl.edu.icm.board.model.Location;
@@ -22,7 +22,6 @@ public class StreetUrizen {
     private final Selectors selectors;
 
     public final static ContextType[] STREET_CONTEXTS = ContextType.streetContexts();
-
     @WithFactory
     public StreetUrizen(EngineConfiguration engineConfiguration, Selectors selectors) {
         this.engineConfiguration = engineConfiguration;

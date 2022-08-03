@@ -1,6 +1,6 @@
 package pl.edu.icm.pdyn2.time;
 
-import net.snowyhollows.bento2.annotation.WithFactory;
+import net.snowyhollows.bento.annotation.WithFactory;
 import pl.edu.icm.trurl.ecs.EntitySystem;
 
 import java.time.DayOfWeek;

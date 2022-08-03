@@ -33,7 +33,8 @@ class StreetUrizenIT {
 
     @BeforeEach
     void before() {
-        engineConfiguration = new EngineConfiguration(new TablesawStoreFactory());
+        engineConfiguration = new EngineConfiguration();
+        engineConfiguration.setStoreFactory(new TablesawStoreFactory());
         selectors = new Selectors(engineConfiguration);
         engineConfiguration.addComponentClasses(Area.class, Location.class, Context.class);
         engineConfiguration.getEngine().execute(ctx -> {

@@ -1,6 +1,6 @@
 package pl.edu.icm.pdyn2.administration;
 
-import net.snowyhollows.bento2.annotation.WithFactory;
+import net.snowyhollows.bento.annotation.WithFactory;
 
 public class TestingConfig {
     private final float baseProbabilityOfTest;

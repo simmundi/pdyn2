@@ -1,12 +1,12 @@
 package pl.edu.icm.pdyn2.importer;
 
+import net.snowyhollows.bento.config.WorkDir;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.edu.icm.board.Board;
-import pl.edu.icm.board.util.FileToStreamService;
 import pl.edu.icm.pdyn2.AgentStateService;
 import pl.edu.icm.pdyn2.ExampleDataForIntegrationTests;
 import pl.edu.icm.pdyn2.model.immunization.Immunization;
@@ -14,6 +14,7 @@ import pl.edu.icm.pdyn2.model.immunization.Load;
 import pl.edu.icm.pdyn2.model.progression.Stage;
 import pl.edu.icm.pdyn2.progression.DiseaseStageTransitionsService;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -28,13 +29,13 @@ public class ImporterIT {
     @Mock
     private Board board;
     @Mock
-    private FileToStreamService fileToStreamService;
+    private WorkDir workDir;
 
     ImmunizationEventsImporterFromAgentId importer;
 
     @BeforeEach
     public void before() throws FileNotFoundException {
-        when(fileToStreamService.filename("/importerTest.csv")).thenReturn(ImporterIT.class
+        when(workDir.openForReading(new File("/importerTest.csv"))).thenReturn(ImporterIT.class
                 .getResourceAsStream("/importerTest.csv"));
         when(board.getEngine()).thenReturn(data.session.getEngine());
 
@@ -56,7 +57,7 @@ public class ImporterIT {
 
     @Test
     public void test() {
-        var loader = new ImmunizationEventsLoaderFromAgentId(fileToStreamService);
+        var loader = new ImmunizationEventsLoaderFromAgentId(workDir);
         importer = new ImmunizationEventsImporterFromAgentId(loader,
                 board,
                 data.selectors,

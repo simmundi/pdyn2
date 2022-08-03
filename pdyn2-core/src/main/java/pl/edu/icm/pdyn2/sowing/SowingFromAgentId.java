@@ -1,6 +1,6 @@
 package pl.edu.icm.pdyn2.sowing;
 
-import net.snowyhollows.bento2.annotation.WithFactory;
+import net.snowyhollows.bento.annotation.WithFactory;
 import pl.edu.icm.board.Board;
 import pl.edu.icm.board.model.Household;
 import pl.edu.icm.pdyn2.AgentStateService;

@@ -1,6 +1,6 @@
 package pl.edu.icm.pdyn2.transmission;
 
-import net.snowyhollows.bento2.annotation.WithFactory;
+import net.snowyhollows.bento.annotation.WithFactory;
 import pl.edu.icm.pdyn2.model.context.ContextInfectivityClass;
 import pl.edu.icm.pdyn2.model.context.ContextType;
 

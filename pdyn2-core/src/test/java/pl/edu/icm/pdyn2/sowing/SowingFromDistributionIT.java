@@ -1,5 +1,6 @@
 package pl.edu.icm.pdyn2.sowing;
 
+import net.snowyhollows.bento.config.WorkDir;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,7 +11,6 @@ import pl.edu.icm.board.geography.commune.AdministrationAreaType;
 import pl.edu.icm.board.geography.commune.Commune;
 import pl.edu.icm.board.geography.commune.CommuneManager;
 import pl.edu.icm.board.geography.commune.PopulationService;
-import pl.edu.icm.board.util.FileToStreamService;
 import pl.edu.icm.board.util.RandomProvider;
 import pl.edu.icm.pdyn2.AgentStateService;
 import pl.edu.icm.pdyn2.ExampleDataForIntegrationTests;
@@ -20,8 +20,8 @@ import pl.edu.icm.pdyn2.administration.TestingService;
 import pl.edu.icm.pdyn2.model.progression.HealthStatus;
 import pl.edu.icm.pdyn2.model.progression.Stage;
 import pl.edu.icm.pdyn2.progression.DiseaseStageTransitionsService;
-import pl.edu.icm.pdyn2.time.SimulationTimer;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -34,7 +34,7 @@ public class SowingFromDistributionIT {
     private final ExampleDataForIntegrationTests data = new ExampleDataForIntegrationTests();
     private final RandomProvider randomProvider = new MockRandomProvider();
     @Mock
-    private final FileToStreamService fileToStreamService = new FileToStreamService();
+    private WorkDir workDir;
     @Mock
     private SowingStrategyProvider sowingStrategyProvider;
     @Mock
@@ -55,7 +55,7 @@ public class SowingFromDistributionIT {
     @BeforeEach
     public void before() throws FileNotFoundException {
         when(board.getEngine()).thenReturn(data.session.getEngine());
-        when(fileToStreamService.filename("/sowingDistributionTest.csv")).thenReturn(SowingFromDistributionIT.class
+        when(workDir.openForReading(new File("/sowingDistributionTest.csv"))).thenReturn(SowingFromDistributionIT.class
                 .getResourceAsStream("/sowingDistributionTest.csv"));
         when(diseaseStageTransitionsService.durationOf(any(), any(), anyInt())).thenReturn(5);
         when(populationService.typeFromLocation(any())).thenReturn(AdministrationAreaType.VILLAGE);
@@ -72,7 +72,7 @@ public class SowingFromDistributionIT {
         // given
         var loader = new InfectedLoaderFromDistribution("/sowingDistributionTest.csv",
                 randomProvider,
-                fileToStreamService);
+                workDir);
 
         var sowingFromDistribution = new SowingFromDistribution(sowingStrategyProvider,
                 loader,

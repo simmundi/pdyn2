@@ -1,21 +1,21 @@
 package pl.edu.icm.pdyn2.progression;
 
+import net.snowyhollows.bento.config.WorkDir;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import pl.edu.icm.pdyn2.StatsService;
 import pl.edu.icm.pdyn2.model.immunization.Load;
 import pl.edu.icm.pdyn2.model.progression.Stage;
-import pl.edu.icm.trurl.util.Filesystem;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.util.stream.Stream;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.endsWith;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -25,7 +25,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class DiseaseStageTransitionsServiceTest {
     @Mock
-    Filesystem filesystem;
+    WorkDir filesystem;
     @Mock
     LoadDiseaseStageTransitionsReader reader;
     @Mock

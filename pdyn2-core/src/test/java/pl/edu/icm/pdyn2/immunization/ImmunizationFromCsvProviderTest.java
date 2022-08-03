@@ -1,13 +1,14 @@
 package pl.edu.icm.pdyn2.immunization;
 
+import net.snowyhollows.bento.config.WorkDir;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import pl.edu.icm.board.util.FileToStreamService;
 import pl.edu.icm.pdyn2.model.immunization.Load;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
@@ -18,17 +19,17 @@ import static org.junit.jupiter.api.Assertions.*;
 class ImmunizationFromCsvProviderTest {
 
     @Mock
-    private FileToStreamService streamService = new FileToStreamService();
+    private WorkDir workDir;
 
     private ImmunizationFromCsvProvider immunizationFromCsvProvider;
 
     @BeforeEach
     void setUp() throws FileNotFoundException {
-        when(this.streamService.filename("sFunctionTest.csv")).thenReturn(ImmunizationFromCsvProviderTest.class.getResourceAsStream("/sFunctionTest.csv"));
-        when(this.streamService.filename("crossImmunityTest.csv")).thenReturn(ImmunizationFromCsvProviderTest.class.getResourceAsStream("/crossImmunityTest.csv"));
-        when(this.streamService.filename("crossImmunityTest2.csv")).thenReturn(ImmunizationFromCsvProviderTest.class.getResourceAsStream("/crossImmunityTest2.csv"));
+        when(this.workDir.openForReading(new File("sFunctionTest.csv"))).thenReturn(ImmunizationFromCsvProviderTest.class.getResourceAsStream("/sFunctionTest.csv"));
+        when(this.workDir.openForReading(new File("crossImmunityTest.csv"))).thenReturn(ImmunizationFromCsvProviderTest.class.getResourceAsStream("/crossImmunityTest.csv"));
+        when(this.workDir.openForReading(new File("crossImmunityTest2.csv"))).thenReturn(ImmunizationFromCsvProviderTest.class.getResourceAsStream("/crossImmunityTest2.csv"));
 
-        immunizationFromCsvProvider = new ImmunizationFromCsvProvider(streamService,
+        immunizationFromCsvProvider = new ImmunizationFromCsvProvider(workDir,
                 "sFunctionTest.csv",
                 "sFunctionTest.csv",
                 "sFunctionTest.csv",

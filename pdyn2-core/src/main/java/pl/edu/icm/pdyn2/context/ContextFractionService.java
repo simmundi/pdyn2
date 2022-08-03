@@ -1,6 +1,6 @@
 package pl.edu.icm.pdyn2.context;
 
-import net.snowyhollows.bento2.annotation.WithFactory;
+import net.snowyhollows.bento.annotation.WithFactory;
 import pl.edu.icm.board.model.Person;
 import pl.edu.icm.pdyn2.model.AgeRange;
 import pl.edu.icm.pdyn2.model.context.Context;

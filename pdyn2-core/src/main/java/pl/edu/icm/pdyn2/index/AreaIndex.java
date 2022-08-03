@@ -1,6 +1,6 @@
 package pl.edu.icm.pdyn2.index;
 
-import net.snowyhollows.bento2.annotation.WithFactory;
+import net.snowyhollows.bento.annotation.WithFactory;
 import pl.edu.icm.board.geography.KilometerGridCell;
 import pl.edu.icm.board.model.Area;
 import pl.edu.icm.trurl.ecs.EngineConfiguration;
