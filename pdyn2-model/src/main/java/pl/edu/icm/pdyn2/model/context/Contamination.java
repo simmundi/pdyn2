@@ -7,6 +7,7 @@ import pl.edu.icm.trurl.ecs.mapper.feature.RequiresSetup;
 
 @WithMapper
 public final class Contamination implements RequiresSetup {
+    private final static float PRECISION = 1000f;
     private Load load;
     private float level;
     @NotMapped private float originalLevel;
@@ -36,7 +37,8 @@ public final class Contamination implements RequiresSetup {
     }
 
     float changeLevel(float delta) {
-        return this.level += delta;
+        this.level += delta;
+        return this.level = Math.round(level * PRECISION) / PRECISION;
     }
 
     float getTotalLevelChange() { return this.level - this.originalLevel; }
@@ -44,5 +46,13 @@ public final class Contamination implements RequiresSetup {
     @Override
     public void setup() {
         this.originalLevel = level;
+    }
+
+    @Override
+    public String toString() {
+        return "Contamination{" +
+                "load=" + load +
+                ", level=" + level +
+                '}';
     }
 }

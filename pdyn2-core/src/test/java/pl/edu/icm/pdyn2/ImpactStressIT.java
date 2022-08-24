@@ -1,6 +1,5 @@
 package pl.edu.icm.pdyn2;
 
-import org.assertj.core.api.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import pl.edu.icm.board.model.Household;
@@ -23,18 +22,34 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
-import static pl.edu.icm.pdyn2.ComponentCreator.*;
+import static org.assertj.core.api.Assertions.*;
+import static pl.edu.icm.pdyn2.ComponentCreator.behaviour;
+import static pl.edu.icm.pdyn2.ComponentCreator.context;
+import static pl.edu.icm.pdyn2.ComponentCreator.health;
+import static pl.edu.icm.pdyn2.ComponentCreator.household;
+import static pl.edu.icm.pdyn2.ComponentCreator.inhabitant;
+import static pl.edu.icm.pdyn2.ComponentCreator.person;
+import static pl.edu.icm.pdyn2.ComponentCreator.travel;
 
 public class ImpactStressIT {
     public static final int AGENT_COUNT = 1000;
+    public static final int TOTAL_TEST_TIME_IN_MILLIS = 10000;
     EmptyDataForIntegrationTests data = new EmptyDataForIntegrationTests();
     BehaviourType[] behaviours = { BehaviourType.ROUTINE, BehaviourType.PRIVATE_TRAVEL, BehaviourType.HOSPITALIZED };
     Load[] loads = { Load.WILD, Load.ALPHA, Load.OMICRON };
-    Stage[] stages = { Stage.HEALTHY, Stage.INFECTIOUS_SYMPTOMATIC };
+    Stage[] stages = { Stage.HEALTHY, Stage.INFECTIOUS_SYMPTOMATIC, Stage.INFECTIOUS_ASYMPTOMATIC };
+
+    Random random = new Random(0);
 
     @Test
     @DisplayName("Should keep contexts consistent in a congested scenario")
     public void stressTest() {
+
+        // given
+
+        // First, build two households: "home" and "resort";
+        // put all the AGENT_COUNT agents in the "home" household,
+        // make them eligible to travel to the "resort".
         data.engine.execute(s -> {
             Session session = s.create();
 
@@ -55,52 +70,77 @@ public class ImpactStressIT {
             session.close();
         });
 
-        AtomicInteger counter = new AtomicInteger();
-
+        // execute
+        // calculate initial count of agents
         processAgentsSingleFile(entity -> {
             data.agentImpactService.updateImpact(entity);
-            counter.incrementAndGet();
         });
         Context context = getContextFromEntityId(0);
-        Assertions.assertThat(context.getAgentCount()).isEqualTo(AGENT_COUNT);
+        float initialAgentCount = context.getAgentCount();
 
         AtomicInteger rounds = new AtomicInteger(0);
         long lastTime = 0;
         long firstTime = System.currentTimeMillis();
+
+        // repeat for TOTAL_TIME milliseconds (see `break` below)
         do {
+            long currentTimeMillis = System.currentTimeMillis();
+
+            // randomize state of agents (sequentially)
             processAgentsSingleFile(entity -> {
                 randomizeAgent(entity);
             });
-            int absentCount = getAbsentCount();
+
+            // Process the impact logic
             processAgents(entity -> {
+                // multiple threads continually update just two households.
+                // This is the piece we are actually testing.
                 data.agentImpactService.updateImpact(entity);
             });
-            Context context1 = getContextFromEntityId(0);
-            Context context2 = getContextFromEntityId(1);
-            float sum = context1.getAgentCount() + context2.getAgentCount() + absentCount;
-            Assertions.assertThat(sum).isEqualTo(AGENT_COUNT);
+
+            // count agents: hospitalized, at home and in resort.
+            int hospitalizedCount = getHospitalizedCount();
+            float countAtHome = getContextFromEntityId(0).getAgentCount();
+            float countAtResort = getContextFromEntityId(1).getAgentCount();
+            assertThat(countAtHome + countAtResort + hospitalizedCount).isEqualTo(AGENT_COUNT);
+
+            // if this was really random, the tests below could fail (but we control the seed)
+            assertThat(countAtHome).isGreaterThan(0);
+            assertThat(countAtResort).isGreaterThan(0);
+            assertThat(hospitalizedCount).isGreaterThan(0);
             rounds.incrementAndGet();
-            long currentTimeMillis = System.currentTimeMillis();
+
+            // display some handy debug data (useful when tweaking the test manually)
             if (currentTimeMillis - lastTime > 1000) {
                 System.out.println("executed in total: " + rounds.get());
+
                 lastTime = currentTimeMillis;
+                System.out.println("home: " + getContextFromEntityId(0));
+                System.out.println("resort: " + getContextFromEntityId(1));
+                System.out.println("hospitalized: " + hospitalizedCount);
             }
-            if (currentTimeMillis - 10000 > firstTime) {
+
+            if (currentTimeMillis - TOTAL_TEST_TIME_IN_MILLIS > firstTime) {
                 break;
             }
         } while (true);
 
-        counter.set(0);
+        // all agents recover and return to routing
         processAgents(entity -> {
             cleanAgent(entity);
             data.agentImpactService.updateImpact(entity);
-            counter.incrementAndGet();
         });
-        Context context2 = getContextFromEntityId(0);
-        Assertions.assertThat(context2.getAgentCount()).isEqualTo(AGENT_COUNT);
+
+        // assert
+        Context homeContext = getContextFromEntityId(0);
+        float finalAgentCount = homeContext.getAgentCount();
+
+        assertThat(initialAgentCount).isEqualTo(AGENT_COUNT);
+        assertThat(finalAgentCount).isEqualTo(AGENT_COUNT);
+        assertThat(homeContext.getContaminations()).isEmpty();
     }
 
-    private int getAbsentCount() {
+    private int getHospitalizedCount() {
         BehaviourMapper behaviourMapper = (BehaviourMapper) data.engine.getMapperSet().classToMapper(Behaviour.class);
         int count = data.engine.getCount();
         int absentCount = 0;
@@ -135,7 +175,6 @@ public class ImpactStressIT {
     }
 
     private void randomizeAgent(Entity agent) {
-        Random random = new Random();
         modifyAgent(agent, behaviours[random.nextInt(behaviours.length)],
                 stages[random.nextInt(stages.length)],
                 loads[random.nextInt(loads.length)]);
