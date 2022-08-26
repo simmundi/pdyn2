@@ -6,6 +6,7 @@ import pl.edu.icm.pdyn2.immunization.ImmunizationService;
 import pl.edu.icm.pdyn2.immunization.ImmunizationStage;
 import pl.edu.icm.pdyn2.model.context.Contamination;
 import pl.edu.icm.pdyn2.model.context.Context;
+import pl.edu.icm.pdyn2.model.context.ContextType;
 import pl.edu.icm.pdyn2.model.immunization.Immunization;
 import pl.edu.icm.pdyn2.model.immunization.Load;
 import pl.edu.icm.pdyn2.model.progression.HealthStatus;
@@ -65,8 +66,23 @@ public class TransmissionService {
      */
     public EnumSampleSpace<Load> gatherExposurePerLoadForAgent(EnumSampleSpace<Load> infectivity, Entity entity) {
         var contexts = contextsService.findActiveContextsForAgent(entity);
-        contexts.forEach(context -> addContextInfectivity(context, infectivity));
+        contexts.forEach(context -> addContextInfectivityPerLoad(context, infectivity));
         infectivity.multiply(relativeAlpha);
+        return infectivity;
+    }
+
+    /**
+     * Updates the given infectivity object using contexts which are active for the given agent
+     * (i.e. a DEAD agent will not interact with any contexts, QUARANTINED agent will interact
+     * only with their home context, ROUTINE agent will interact with schools / work / streets etc.
+     *
+     * @param infectivity map from contextType type (e.g. HOUSEHOLD) to float representing the "total viral load"
+     * @param entity      the agent entity
+     * @return
+     */
+    public EnumSampleSpace<ContextType> gatherExposurePerContextForAgent(EnumSampleSpace<ContextType> infectivity, Entity entity) {
+        var contexts = contextsService.findActiveContextsForAgent(entity);
+        contexts.forEach(context -> addContextInfectivityPerType(context, infectivity));
         return infectivity;
     }
 
@@ -119,7 +135,7 @@ public class TransmissionService {
         return probability * coefficient;
     }
 
-    private void addContextInfectivity(Context context, EnumSampleSpace<Load> infectivity) {
+    private void addContextInfectivityPerLoad(Context context, EnumSampleSpace<Load> infectivity) {
         var weight = transmissionConfig.getTotalWeightForContextType(context.getContextType());
         var agentCount = context.getAgentCount();
         for (Contamination contamination : context.getContaminations()) {
@@ -127,6 +143,17 @@ public class TransmissionService {
             var levelInContext = contamination.getLevel() * weight / agentCount;
             infectivity.increaseOutcome(loadInContext, levelInContext);
         }
+    }
+
+    private void addContextInfectivityPerType(Context context, EnumSampleSpace<ContextType> infectivity) {
+        var weight = transmissionConfig.getTotalWeightForContextType(context.getContextType());
+        var agentCount = context.getAgentCount();
+        var contextType = context.getContextType();
+        float levelInContext = 0.0f;
+        for (Contamination contamination : context.getContaminations()) {
+            levelInContext += relativeAlpha.getProbability(contamination.getLoad()) * contamination.getLevel() * weight / agentCount;
+        }
+        infectivity.increaseOutcome(contextType, levelInContext);
     }
 
 }

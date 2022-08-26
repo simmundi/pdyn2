@@ -11,6 +11,7 @@ import pl.edu.icm.pdyn2.model.behaviour.Behaviour;
 import pl.edu.icm.pdyn2.model.context.Context;
 import pl.edu.icm.pdyn2.model.context.Inhabitant;
 import pl.edu.icm.pdyn2.model.immunization.Immunization;
+import pl.edu.icm.pdyn2.model.immunization.ImmunizationSource;
 import pl.edu.icm.pdyn2.model.impact.Impact;
 import pl.edu.icm.pdyn2.model.progression.HealthStatus;
 import pl.edu.icm.pdyn2.model.travel.Travel;
@@ -40,6 +41,7 @@ public class Pdyn2ComponentAccessor implements ComponentAccessor {
         if (componentClass == MedicalHistory.class) return 10;
         if (componentClass == AdministrationUnit.class) return 11;
         if (componentClass == Impact.class) return 12;
+        if (componentClass == ImmunizationSource.class) return 13;
         throw new IllegalArgumentException("No support for " + componentClass);
     }
 
@@ -72,6 +74,8 @@ public class Pdyn2ComponentAccessor implements ComponentAccessor {
                 return AdministrationUnit.class;
             case 12:
                 return Impact.class;
+            case 13:
+                return ImmunizationSource.class;
         }
         throw new IllegalArgumentException("No support for index " + index);
     }
@@ -90,12 +94,13 @@ public class Pdyn2ComponentAccessor implements ComponentAccessor {
                 Household.class,
                 MedicalHistory.class,
                 AdministrationUnit.class,
-                Impact.class
+                Impact.class,
+                ImmunizationSource.class
         };
     }
 
     @Override
     public int componentCount() {
-        return 13;
+        return 14;
     }
 }
