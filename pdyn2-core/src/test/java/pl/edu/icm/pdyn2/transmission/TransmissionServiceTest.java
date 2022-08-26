@@ -22,7 +22,7 @@ import pl.edu.icm.trurl.sampleSpace.EnumSampleSpace;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.data.Offset.offset;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -98,16 +98,26 @@ class TransmissionServiceTest {
     void exposureToProbability() {
         // given
         when(transmissionConfig.getAlpha()).thenReturn(2.047250f);
-
+        EnumSampleSpace<Load> exposure = new EnumSampleSpace<>(Load.class);
+        int day = 5;
+        Immunization immunization = ComponentCreator.immunization();
+        Entity agent = entityMocker.entity(immunization);
+        when(simulationTimer.getDaysPassed()).thenReturn(day);
+        when(immunizationService.getImmunizationCoefficient(immunization, ImmunizationStage.LATENTNY, Load.WILD, day))
+                .thenReturn(0.0f);
         // execute
-        double metNone = transmissionService.exposureToProbability(0);
-        double metOneInThousand = transmissionService.exposureToProbability(1f / 1000f);
-        double metMillion = transmissionService.exposureToProbability(1000000f);
+        var metNone = transmissionService.exposureToProbability(exposure, agent);
+        exposure.changeOutcome(Load.WILD, 1f / 1000f);
+        var metOneInThousand = transmissionService.exposureToProbability(exposure, agent);
+
+        exposure.changeOutcome(Load.WILD, 0);
+        exposure.changeOutcome(Load.BA2, 1000000f);
+        var metMillion = transmissionService.exposureToProbability(exposure, agent);
 
         // assert
-        assertThat(metNone).isZero();
-        assertThat(metOneInThousand).isCloseTo(0, offset(0.01));
-        assertThat(metMillion).isOne();
+        assertThat(metNone.sumOfProbabilities()).isZero();
+        assertThat(metOneInThousand.sumOfProbabilities()).isCloseTo(0.0F, offset(0.01F));
+        assertThat(metMillion.sumOfProbabilities()).isOne();
     }
 
     @Test

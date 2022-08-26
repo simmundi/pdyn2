@@ -54,11 +54,11 @@ public class TransmissionSystemBuilder {
                     float totalExposure = exposurePerLoad.sumOfProbabilities(); // TODO sumValues?
 
                     if (totalExposure > 0) {
-                        var probability = transmissionService.exposureToProbability(totalExposure);
-                        var chosenLoad = transmissionService.selectLoad(exposurePerLoad, random.nextDouble());
-                        var adjustedProbability = transmissionService.adjustProbabilityWithImmunity(probability, chosenLoad, agent);
-
-                        if (adjustedProbability > 0 && random.nextDouble() <= adjustedProbability) {
+                        var probabilities = transmissionService.exposureToProbability(exposurePerLoad, agent);
+                        var totalProbability = probabilities.sumOfProbabilities();
+                        double r = random.nextDouble();
+                        if (totalProbability > 0 && r <= totalProbability) {
+                            var chosenLoad = transmissionService.selectLoad(probabilities, r);
                             agentStateService.infect(agent, chosenLoad);
                             statsService.tickStageChange(Stage.LATENT);
                         }

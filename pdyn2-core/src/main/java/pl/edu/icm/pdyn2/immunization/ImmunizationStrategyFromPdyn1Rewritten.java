@@ -25,6 +25,7 @@ public class ImmunizationStrategyFromPdyn1Rewritten implements ImmunizationStrat
                         Load.ALPHA, day -> day < 30 ? 1.0 : max(0.900000, 1.0 - 0.0017 * (day - 30)),
                         Load.DELTA, day -> day < 30 ? 1.0 : max(0.900000, 1.0 - 0.0017 * (day - 30)),
                         Load.OMICRON, day -> day < 30 ? 1.0 : max(0.900000, 1.0 - 0.0017 * (day - 30)),
+                        Load.BA2, day -> day < 30 ? 1.0 : max(0.900000, 1.0 - 0.0017 * (day - 30)),
                         Load.PFIZER, day -> day < 30 ? min(day / 14.0, 1.0) : max(0.900000, 1.0 - 0.0017 * (day - 30)),
                         Load.BOOSTER, day -> day < 30 ? min(day / 14.0, 1.0) : max(0.900000, 1.0 - 0.0017 * (day - 30))
                 )),
@@ -33,6 +34,7 @@ public class ImmunizationStrategyFromPdyn1Rewritten implements ImmunizationStrat
                         Load.ALPHA, day -> day < 30 ? 1.0 : max(0.900000, 1.0 - 0.0017 * (day - 30)),
                         Load.DELTA, day -> day < 30 ? 1.0 : max(0.900000, 1.0 - 0.0017 * (day - 30)),
                         Load.OMICRON, day -> day < 30 ? 1.0 : max(0.900000, 1.0 - 0.0017 * (day - 30)),
+                        Load.BA2, day -> day < 30 ? 1.0 : max(0.900000, 1.0 - 0.0017 * (day - 30)),
                         Load.PFIZER, day -> day < 30 ? min(day / 14.0, 1.0) : max(0.900000, 1.0 - 0.0017 * (day - 30)),
                         Load.BOOSTER, day -> day < 30 ? min(day / 14.0, 1.0) : max(0.900000, 1.0 - 0.0017 * (day - 30))
                 )),
@@ -41,6 +43,7 @@ public class ImmunizationStrategyFromPdyn1Rewritten implements ImmunizationStrat
                         Load.ALPHA, day -> day < 30 ? 1.0 : max(0.900000, 1.0 - 0.0017 * (day - 30)),
                         Load.DELTA, day -> day < 30 ? 1.0 : max(0.900000, 1.0 - 0.0017 * (day - 30)),
                         Load.OMICRON, day -> day < 30 ? 1.0 : max(0.900000, 1.0 - 0.0017 * (day - 30)),
+                        Load.BA2, day -> day < 30 ? 1.0 : max(0.900000, 1.0 - 0.0017 * (day - 30)),
                         Load.PFIZER, day -> day < 30 ? min(day / 14.0, 1.0) : max(0.900000, 1.0 - 0.0017 * (day - 30)),
                         Load.BOOSTER, day -> day < 30 ? min(day / 14.0, 1.0) : max(0.900000, 1.0 - 0.0017 * (day - 30))
                 )),
@@ -49,6 +52,7 @@ public class ImmunizationStrategyFromPdyn1Rewritten implements ImmunizationStrat
                         Load.ALPHA, day -> day < 30 ? 1.0 : max(0.900000, 1.0 - 0.0017 * (day - 30)),
                         Load.DELTA, day -> day < 30 ? 1.0 : max(0.900000, 1.0 - 0.0017 * (day - 30)),
                         Load.OMICRON, day -> day < 30 ? 1.0 : max(0.900000, 1.0 - 0.0017 * (day - 30)),
+                        Load.BA2, day -> day < 30 ? 1.0 : max(0.900000, 1.0 - 0.0017 * (day - 30)),
                         Load.PFIZER, day -> day < 30 ? min(day / 14.0, 1.0) : max(0.900000, 1.0 - 0.0017 * (day - 30)),
                         Load.BOOSTER, day -> day < 30 ? min(day / 14.0, 1.0) : max(0.900000, 1.0 - 0.0017 * (day - 30))
                 ))
@@ -56,47 +60,52 @@ public class ImmunizationStrategyFromPdyn1Rewritten implements ImmunizationStrat
 
         crossImmunity.putAll(Map.of(
                 ImmunizationStage.LATENTNY, new EnumMap<>(Map.of(
-                        Load.WILD, generateCrossImmunity(1.0, 1.0, 0.975, 0.9),
-                        Load.ALPHA, generateCrossImmunity(1.0, 1.0, 0.975, 0.9),
-                        Load.DELTA, generateCrossImmunity(0.975, 0.975, 1.0, 0.9),
-                        Load.OMICRON, generateCrossImmunity(0.9, 0.9, 0.9, 1.0),
-                        Load.PFIZER, generateCrossImmunity(1.0, 1.0, 0.975, 0.9),
-                        Load.BOOSTER, generateCrossImmunity(1.0, 1.0, 0.975, 0.9)
+                        Load.WILD, generateCrossImmunity(1.0, 1.0, 0.975, 0.9, 0.9),
+                        Load.ALPHA, generateCrossImmunity(1.0, 1.0, 0.975, 0.9, 0.9),
+                        Load.DELTA, generateCrossImmunity(0.975, 0.975, 1.0, 0.9, 0.9),
+                        Load.OMICRON, generateCrossImmunity(0.9, 0.9, 0.9, 1.0, 0.9),
+                        Load.BA2, generateCrossImmunity(0.9, 0.9, 0.9, 1.0, 0.9),
+                        Load.PFIZER, generateCrossImmunity(1.0, 1.0, 0.975, 0.9, 0.9),
+                        Load.BOOSTER, generateCrossImmunity(1.0, 1.0, 0.975, 0.9, 0.9)
                 )),
                 ImmunizationStage.OBJAWOWY, new EnumMap<>(Map.of(
-                        Load.WILD, generateCrossImmunity(1.0, 1.0, 0.975, 0.9),
-                        Load.ALPHA, generateCrossImmunity(1.0, 1.0, 0.975, 0.9),
-                        Load.DELTA, generateCrossImmunity(0.975, 0.975, 1.0, 0.9),
-                        Load.OMICRON, generateCrossImmunity(0.9, 0.9, 0.9, 1.0),
-                        Load.PFIZER, generateCrossImmunity(1.0, 1.0, 0.975, 0.9),
-                        Load.BOOSTER, generateCrossImmunity(1.0, 1.0, 0.975, 0.9)
+                        Load.WILD, generateCrossImmunity(1.0, 1.0, 0.975, 0.9, 0.9),
+                        Load.ALPHA, generateCrossImmunity(1.0, 1.0, 0.975, 0.9, 0.9),
+                        Load.DELTA, generateCrossImmunity(0.975, 0.975, 1.0, 0.9, 0.9),
+                        Load.OMICRON, generateCrossImmunity(0.9, 0.9, 0.9, 1.0, 0.9),
+                        Load.BA2, generateCrossImmunity(0.9, 0.9, 0.9, 1.0, 0.9),
+                        Load.PFIZER, generateCrossImmunity(1.0, 1.0, 0.975, 0.9, 0.9),
+                        Load.BOOSTER, generateCrossImmunity(1.0, 1.0, 0.975, 0.9, 0.9)
                 )),
                 ImmunizationStage.HOSPITALIZOWANY_BEZ_OIOM, new EnumMap<>(Map.of(
-                        Load.WILD, generateCrossImmunity(1.0, 1.0, 0.975, 0.9),
-                        Load.ALPHA, generateCrossImmunity(1.0, 1.0, 0.975, 0.9),
-                        Load.DELTA, generateCrossImmunity(0.975, 0.975, 1.0, 0.9),
-                        Load.OMICRON, generateCrossImmunity(0.9, 0.9, 0.9, 1.0),
-                        Load.PFIZER, generateCrossImmunity(1.0, 1.0, 0.975, 0.9),
-                        Load.BOOSTER, generateCrossImmunity(1.0, 1.0, 0.975, 0.9)
+                        Load.WILD, generateCrossImmunity(1.0, 1.0, 0.975, 0.9, 0.9),
+                        Load.ALPHA, generateCrossImmunity(1.0, 1.0, 0.975, 0.9, 0.9),
+                        Load.DELTA, generateCrossImmunity(0.975, 0.975, 1.0, 0.9, 0.9),
+                        Load.OMICRON, generateCrossImmunity(0.9, 0.9, 0.9, 1.0, 0.9),
+                        Load.BA2, generateCrossImmunity(0.9, 0.9, 0.9, 1.0, 0.9),
+                        Load.PFIZER, generateCrossImmunity(1.0, 1.0, 0.975, 0.9, 0.9),
+                        Load.BOOSTER, generateCrossImmunity(1.0, 1.0, 0.975, 0.9, 0.9)
                 )),
                 ImmunizationStage.HOSPITALIZOWANY_PRZED_OIOM, new EnumMap<>(Map.of(
-                        Load.WILD, generateCrossImmunity(1.0, 1.0, 0.975, 0.9),
-                        Load.ALPHA, generateCrossImmunity(1.0, 1.0, 0.975, 0.9),
-                        Load.DELTA, generateCrossImmunity(0.975, 0.975, 1.0, 0.9),
-                        Load.OMICRON, generateCrossImmunity(0.9, 0.9, 0.9, 1.0),
-                        Load.PFIZER, generateCrossImmunity(1.0, 1.0, 0.975, 0.9),
-                        Load.BOOSTER, generateCrossImmunity(1.0, 1.0, 0.975, 0.9)
+                        Load.WILD, generateCrossImmunity(1.0, 1.0, 0.975, 0.9, 0.9),
+                        Load.ALPHA, generateCrossImmunity(1.0, 1.0, 0.975, 0.9, 0.9),
+                        Load.DELTA, generateCrossImmunity(0.975, 0.975, 1.0, 0.9, 0.9),
+                        Load.OMICRON, generateCrossImmunity(0.9, 0.9, 0.9, 1.0, 0.9),
+                        Load.BA2, generateCrossImmunity(0.9, 0.9, 0.9, 1.0, 0.9),
+                        Load.PFIZER, generateCrossImmunity(1.0, 1.0, 0.975, 0.9, 0.9),
+                        Load.BOOSTER, generateCrossImmunity(1.0, 1.0, 0.975, 0.9, 0.9)
                 ))
         ));
 
     }
 
-    private EnumMap<Load, Double> generateCrossImmunity(double wildValue, double alphaValue, double deltaValue, double omicronValue) {
+    private EnumMap<Load, Double> generateCrossImmunity(double wildValue, double alphaValue, double deltaValue, double omicronValue, double ba2Value) {
         var wildCrossImmunityInfection = new EnumMap<Load, Double>(Load.class);
         wildCrossImmunityInfection.put(Load.WILD, wildValue);
         wildCrossImmunityInfection.put(Load.ALPHA, alphaValue);
         wildCrossImmunityInfection.put(Load.DELTA, deltaValue);
         wildCrossImmunityInfection.put(Load.OMICRON, omicronValue);
+        wildCrossImmunityInfection.put(Load.BA2, ba2Value);
         return wildCrossImmunityInfection;
     }
 

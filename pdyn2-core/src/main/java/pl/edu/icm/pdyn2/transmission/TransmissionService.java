@@ -75,8 +75,17 @@ public class TransmissionService {
      *
      * @param totalExposure
      */
-    public double exposureToProbability(float totalExposure) {
-        return 1 - Math.exp(-transmissionConfig.getAlpha() * totalExposure);
+    public EnumSampleSpace<Load> exposureToProbability(EnumSampleSpace<Load> exposures, Entity agent) {
+        EnumSampleSpace<Load> probabilities = new EnumSampleSpace<Load>(Load.class);
+        var sumOfProbabilities = exposures.sumOfProbabilities();
+        if (sumOfProbabilities > 0) {
+            for (var virus : Load.viruses()) {
+                double tmp_probability = (1 - Math.exp(-transmissionConfig.getAlpha() * exposures.getProbability(virus))) * exposures.getProbability(virus) / sumOfProbabilities;
+                tmp_probability = this.adjustProbabilityWithImmunity(tmp_probability, virus, agent);
+                probabilities.changeOutcome(virus, (float) tmp_probability);
+            }
+        }
+        return probabilities;
     }
 
     /**
@@ -95,6 +104,7 @@ public class TransmissionService {
     /**
      * Given a load, total base probability of getting sick and an agent, returns the probability
      * adjusted for agent's immunization history, for the current date (from simulationTimer)
+     *
      * @param probability
      * @param chosenLoad
      * @param agent
@@ -103,9 +113,9 @@ public class TransmissionService {
     public double adjustProbabilityWithImmunity(double probability, Load chosenLoad, Entity agent) {
         Immunization immunization = agent.get(Immunization.class);
         double coefficient = immunization == null ? 1 : (1 - immunizationService.getImmunizationCoefficient(immunization,
-                    ImmunizationStage.LATENTNY,
-                    chosenLoad,
-                    simulationTimer.getDaysPassed()));
+                ImmunizationStage.LATENTNY,
+                chosenLoad,
+                simulationTimer.getDaysPassed()));
         return probability * coefficient;
     }
 
