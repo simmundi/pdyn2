@@ -9,7 +9,7 @@ import java.util.Objects;
 
 @WithMapper
 public class Immunization {
-    @MappedCollection(margin = 3)
+    @MappedCollection(margin = 5)
     private List<ImmunizationEvent> events = new ArrayList<>(5);
 
     public List<ImmunizationEvent> getEvents() {

@@ -32,7 +32,7 @@ import static pl.edu.icm.pdyn2.ComponentCreator.person;
 import static pl.edu.icm.pdyn2.ComponentCreator.travel;
 
 public class ImpactStressIT {
-    public static final int AGENT_COUNT = 1000;
+    public static final int AGENT_COUNT = 100000;
     public static final int TOTAL_TEST_TIME_IN_MILLIS = 10000;
     EmptyDataForIntegrationTests data = new EmptyDataForIntegrationTests();
     BehaviourType[] behaviours = { BehaviourType.ROUTINE, BehaviourType.PRIVATE_TRAVEL, BehaviourType.HOSPITALIZED };

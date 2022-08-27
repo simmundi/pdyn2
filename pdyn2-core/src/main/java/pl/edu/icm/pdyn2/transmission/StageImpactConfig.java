@@ -1,13 +1,13 @@
-package pl.edu.icm.pdyn2;
+package pl.edu.icm.pdyn2.transmission;
 
 import net.snowyhollows.bento.annotation.WithFactory;
 import pl.edu.icm.pdyn2.model.progression.Stage;
 
-public class StageShareConfig {
+public class StageImpactConfig {
     private final float[] influenceOfStage = new float[Stage.values().length];
 
     @WithFactory
-    StageShareConfig(float asymptomaticInfluenceShare, float symptomaticInfluenceShare) {
+    public StageImpactConfig(float asymptomaticInfluenceShare, float symptomaticInfluenceShare) {
         influenceOfStage[Stage.INFECTIOUS_ASYMPTOMATIC.ordinal()] = asymptomaticInfluenceShare;
         influenceOfStage[Stage.INFECTIOUS_SYMPTOMATIC.ordinal()] = symptomaticInfluenceShare;
     }

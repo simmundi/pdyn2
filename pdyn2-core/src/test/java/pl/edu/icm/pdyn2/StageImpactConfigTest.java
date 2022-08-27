@@ -4,17 +4,17 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.edu.icm.pdyn2.model.progression.Stage;
+import pl.edu.icm.pdyn2.transmission.StageImpactConfig;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.AssertionsForClassTypes.*;
 
 @ExtendWith(MockitoExtension.class)
-class StageShareConfigTest {
+class StageImpactConfigTest {
 
     @Test
     void getInfluenceOf() {
         //given
-        var stageShareConfig = new StageShareConfig(0.1f, 1.0f);
+        var stageShareConfig = new StageImpactConfig(0.1f, 1.0f);
         //execute
         for (var stage : Stage.values()) {
             float value = 0f;

@@ -15,13 +15,14 @@ public enum AgeRange {
     RANGE_110_120(110, 120),
     RANGE_120_130(120, 130);
 
-    private final int ageFrom;
-    private final int ageTo;
+    public final int ageFrom;
+    public final int ageTo;
 
     AgeRange(int ageFrom, int ageTo) {
         this.ageFrom = ageFrom;
         this.ageTo = ageTo;
     }
+
 
     public static AgeRange ofRange(int ageFrom, int ageTo) {
         for (AgeRange value : values()) {

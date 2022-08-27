@@ -5,43 +5,26 @@ import pl.edu.icm.trurl.ecs.annotation.NotMapped;
 import pl.edu.icm.trurl.ecs.annotation.WithMapper;
 import pl.edu.icm.trurl.ecs.mapper.feature.RequiresSetup;
 
+import static pl.edu.icm.pdyn2.model.context.Integerizer.toFloat;
+import static pl.edu.icm.pdyn2.model.context.Integerizer.toInt;
+
 @WithMapper
 public final class Contamination implements RequiresSetup {
-    private final static float PRECISION = 1000f;
     private Load load;
-    private float level;
-    @NotMapped private float originalLevel;
-
-    public Contamination() {
-    }
-
-    Contamination(Load load, float level) {
-        this.load = load;
-        this.level = level;
-    }
+    private int level;
+    @NotMapped private int originalLevel;
 
     public Load getLoad() {
         return load;
     }
 
-    void setLoad(Load load) {
-        this.load = load;
-    }
-
     public float getLevel() {
-        return level;
+        return toFloat(level);
     }
 
-    void setLevel(float level) {
-        this.level = level;
+    float changeLevel(float integerizedDelta) {
+        return toFloat(changeIntegerizedLevel(toInt(integerizedDelta)));
     }
-
-    float changeLevel(float delta) {
-        this.level += delta;
-        return this.level = Math.round(level * PRECISION) / PRECISION;
-    }
-
-    float getTotalLevelChange() { return this.level - this.originalLevel; }
 
     @Override
     public void setup() {
@@ -52,7 +35,23 @@ public final class Contamination implements RequiresSetup {
     public String toString() {
         return "Contamination{" +
                 "load=" + load +
-                ", level=" + level +
+                ", level=" + toFloat(level) +
                 '}';
     }
+
+    void setLevel(float level) {
+        this.level = toInt(level);
+    }
+
+    void setLoad(Load load) {
+        this.load = load;
+    }
+
+    int changeIntegerizedLevel(int integerizedDelta) {
+        this.level = Math.max(0, this.level + integerizedDelta);
+        return level;
+    }
+
+    int getTotalIntegerizedLevelChange() { return this.level - this.originalLevel; }
+
 }

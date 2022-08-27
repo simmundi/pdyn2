@@ -9,6 +9,7 @@ import pl.edu.icm.board.model.Person;
 import pl.edu.icm.pdyn2.ComponentCreator;
 import pl.edu.icm.pdyn2.EntityMocker;
 import pl.edu.icm.pdyn2.model.context.ContextType;
+import pl.edu.icm.pdyn2.transmission.ContextImpactService;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -17,12 +18,12 @@ import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.data.Offset.offset;
 
 @ExtendWith(MockitoExtension.class)
-class ContextFractionServiceTest {
+class ContextImpactServiceTest {
 
     EntityMocker entityMocker = new EntityMocker(null);
 
     @InjectMocks
-    ContextFractionService fractionService;
+    ContextImpactService fractionService;
 
     @Test
     @DisplayName("Should generally return one")

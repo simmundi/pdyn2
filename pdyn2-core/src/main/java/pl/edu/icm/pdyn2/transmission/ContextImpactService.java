@@ -1,4 +1,4 @@
-package pl.edu.icm.pdyn2.context;
+package pl.edu.icm.pdyn2.transmission;
 
 import net.snowyhollows.bento.annotation.WithFactory;
 import pl.edu.icm.board.model.Person;
@@ -10,7 +10,7 @@ import pl.edu.icm.trurl.sampleSpace.EnumSampleSpace;
 /**
  * Logic for fractional membership in contexts.
  */
-public class ContextFractionService {
+public class ContextImpactService {
 
     public static final int AGE_RANGE_COUNT = AgeRange.values().length;
     public static final int CONTEXT_TYPE_COUNT = ContextType.values().length;
@@ -18,7 +18,7 @@ public class ContextFractionService {
     private final float[] fractions = new float[AGE_RANGE_COUNT * CONTEXT_TYPE_COUNT];
 
     @WithFactory
-    public ContextFractionService() {
+    public ContextImpactService() {
         fillWithOnes();
         fillFractionsForStreets();
     }

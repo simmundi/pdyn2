@@ -2,15 +2,15 @@ package pl.edu.icm.pdyn2.impact;
 
 import net.snowyhollows.bento.annotation.WithFactory;
 import pl.edu.icm.board.model.Person;
-import pl.edu.icm.pdyn2.StageShareConfig;
 import pl.edu.icm.pdyn2.StatsService;
-import pl.edu.icm.pdyn2.context.ContextFractionService;
+import pl.edu.icm.pdyn2.transmission.ContextImpactService;
 import pl.edu.icm.pdyn2.context.ContextsService;
 import pl.edu.icm.pdyn2.model.behaviour.Behaviour;
 import pl.edu.icm.pdyn2.model.immunization.Load;
 import pl.edu.icm.pdyn2.model.impact.Impact;
 import pl.edu.icm.pdyn2.model.progression.HealthStatus;
 import pl.edu.icm.pdyn2.model.progression.Stage;
+import pl.edu.icm.pdyn2.transmission.StageImpactConfig;
 import pl.edu.icm.trurl.ecs.Entity;
 
 /**
@@ -19,18 +19,18 @@ import pl.edu.icm.trurl.ecs.Entity;
  */
 public class AgentImpactService {
     private final ContextsService contextsService;
-    private final ContextFractionService contextFractionService;
+    private final ContextImpactService contextImpactService;
     private final StatsService statsService;
-    private final StageShareConfig stageShareConfig;
+    private final StageImpactConfig stageImpactConfig;
     private final int REMOVE = -1;
     private final int ADD = 1;
 
     @WithFactory
-    public AgentImpactService(ContextsService contextsService, ContextFractionService contextFractionService, StatsService statsService, StageShareConfig stageShareConfig) {
+    public AgentImpactService(ContextsService contextsService, ContextImpactService contextImpactService, StatsService statsService, StageImpactConfig stageImpactConfig) {
         this.contextsService = contextsService;
-        this.contextFractionService = contextFractionService;
+        this.contextImpactService = contextImpactService;
         this.statsService = statsService;
-        this.stageShareConfig = stageShareConfig;
+        this.stageImpactConfig = stageImpactConfig;
     }
 
     public void updateImpact(Entity agentEntity) {
@@ -52,10 +52,10 @@ public class AgentImpactService {
         Load load = currentStage.isInfectious() ? impact.getLoad() : null;
 
         float activityDelta = sign;
-        float infectionDelta = stageShareConfig.getInfluenceOf(currentStage) * sign;
+        float infectionDelta = stageImpactConfig.getInfluenceOf(currentStage) * sign;
 
         contextsService.findActiveContextsForAgent(agentEntity, impact).forEach(c -> {
-            float influenceFraction = contextFractionService.calculateInfluenceFractionFor(person, c);
+            float influenceFraction = contextImpactService.calculateInfluenceFractionFor(person, c);
             c.updateAgentCount(activityDelta * influenceFraction);
             if (load != null) {
                 float scaledInfectionDelta = infectionDelta * influenceFraction;

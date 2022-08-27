@@ -1,18 +1,14 @@
 package pl.edu.icm.pdyn2;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import pl.edu.icm.pdyn2.context.ContextFractionService;
-import pl.edu.icm.pdyn2.context.ContextsService;
+import pl.edu.icm.pdyn2.transmission.ContextImpactService;
 import pl.edu.icm.pdyn2.model.behaviour.Behaviour;
 import pl.edu.icm.pdyn2.model.behaviour.BehaviourType;
-import pl.edu.icm.pdyn2.model.context.Contamination;
-import pl.edu.icm.pdyn2.model.context.Context;
 import pl.edu.icm.pdyn2.model.context.ContextType;
 import pl.edu.icm.pdyn2.model.immunization.Load;
 import pl.edu.icm.pdyn2.model.progression.HealthStatus;
@@ -21,11 +17,8 @@ import pl.edu.icm.pdyn2.model.travel.Travel;
 import pl.edu.icm.pdyn2.time.SimulationTimer;
 import pl.edu.icm.trurl.ecs.Entity;
 
-import java.util.stream.Stream;
-
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -36,7 +29,7 @@ class AgentStateServiceTest {
     SimulationTimer simulationTimer;
 
     @Mock
-    ContextFractionService contextFractionService;
+    ContextImpactService contextImpactService;
 
     @InjectMocks
     AgentStateService agentStateService;

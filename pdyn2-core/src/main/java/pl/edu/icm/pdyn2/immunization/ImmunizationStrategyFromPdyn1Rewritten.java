@@ -119,7 +119,8 @@ public class ImmunizationStrategyFromPdyn1Rewritten implements ImmunizationStrat
         for (ImmunizationEvent event : immunization.getEvents()) {
             var immunizationLoad = event.getLoad();
             var days = day - event.getDay();
-            coefficient = Float.max(coefficient, (float) (crossImmunity.get(immunizationStage).get(immunizationLoad).get(load) *
+            coefficient =
+                    Float.max(coefficient, (float) (crossImmunity.get(immunizationStage).get(immunizationLoad).get(load) *
                     sFunction.get(immunizationStage).get(immunizationLoad).applyAsDouble(days)));
         }
         return coefficient;

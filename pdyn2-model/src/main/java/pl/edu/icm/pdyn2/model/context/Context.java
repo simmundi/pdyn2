@@ -13,12 +13,15 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
+import static pl.edu.icm.pdyn2.model.context.Integerizer.toFloat;
+import static pl.edu.icm.pdyn2.model.context.Integerizer.toInt;
+
 @WithMapper
 public final class Context
         implements IsDirtyMarked, CanResolveConflicts<Context>, CanBeNormalized, RequiresSetup {
     private ContextType contextType;
-    private float agentCount;
-    private float originalAgentCount;
+    private int agentCount;
+    private int originalAgentCount;
     @NotMapped
     private boolean dirty = true;
     @NotMapped
@@ -67,16 +70,18 @@ public final class Context
     }
 
     public float getAgentCount() {
-        return agentCount;
+        return toFloat(agentCount);
     }
 
     void setAgentCount(float agentCount) {
-        this.agentCount = agentCount;
+        this.agentCount = toInt(agentCount);
     }
 
     public void updateAgentCount(float delta) {
-        if (delta != 0) {
-            this.agentCount += delta;
+        int integerDelta = toInt(delta);
+
+        if (integerDelta != 0) {
+            this.agentCount += integerDelta;
             dirty = true;
         }
     }
@@ -85,7 +90,7 @@ public final class Context
     public String toString() {
         return "Context{" +
                 "contextType=" + contextType +
-                ", agentCount=" + agentCount +
+                ", agentCount=" + toFloat(agentCount) +
                 ", contaminations=" + contaminations +
                 '}';
     }
@@ -98,12 +103,12 @@ public final class Context
 
     public Context resolve(Context other) {
         for (Contamination contamination : contaminations) {
-            other.changeContaminationLevel(contamination.getLoad(), contamination.getTotalLevelChange());
+            other.getContaminationByLoad(contamination.getLoad())
+                    .changeIntegerizedLevel(contamination.getTotalIntegerizedLevelChange());
         }
-        other.agentCount += getTotalAgentCountChange();
+        other.agentCount += getTotalIntegerizedAgentCountChange();
         return other;
     }
-
 
     public int getOwnerId() {
         return ownerId;
@@ -130,7 +135,7 @@ public final class Context
         contaminations.sort(Comparator.comparingInt(c -> c.getLoad().ordinal()));
     }
 
-    private float getTotalAgentCountChange() {
+    private float getTotalIntegerizedAgentCountChange() {
         return this.agentCount - this.originalAgentCount;
     }
 
