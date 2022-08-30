@@ -58,14 +58,16 @@ public class ImporterIT {
     @Test
     public void test() {
         var loader = new ImmunizationEventsLoaderFromAgentId(workDir);
+        var idMappingLoader = new AgentIdMappingLoader(workDir);
         importer = new ImmunizationEventsImporterFromAgentId(loader,
+                idMappingLoader,
                 board,
                 data.selectors,
                 agentStateService,
                 data.simulationTimer,
                 transitionsService);
         data.session.close();
-        importer.importEvents("/importerTest.csv", 1000);
+        importer.importEvents("/importerTest.csv", "/importerTest.orc", 1000);
         data.session.close();
 
         assertThat(data.allAgents.get(1).get(Immunization.class).getEvents().get(0).getDay()).isEqualTo(-997);
