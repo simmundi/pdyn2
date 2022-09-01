@@ -37,6 +37,8 @@ public class ImporterIT {
     public void before() throws FileNotFoundException {
         when(workDir.openForReading(new File("/importerTest.csv"))).thenReturn(ImporterIT.class
                 .getResourceAsStream("/importerTest.csv"));
+        when(workDir.absolutizeFile(new File("/importerTest.orc")))
+                .thenReturn(new File(String.valueOf(ImporterIT.class.getResource("/importerTest.orc"))));
         when(board.getEngine()).thenReturn(data.session.getEngine());
 
         when(transitionsService.durationOf(Load.WILD, Stage.INFECTIOUS_SYMPTOMATIC, 18)).thenReturn(6);

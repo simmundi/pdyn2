@@ -1,7 +1,5 @@
 package pl.edu.icm.pdyn2.importer;
 
-import com.univocity.parsers.csv.CsvParser;
-import com.univocity.parsers.csv.CsvParserSettings;
 import net.snowyhollows.bento.annotation.WithFactory;
 import net.snowyhollows.bento.config.WorkDir;
 import pl.edu.icm.board.pdyn1.ExportedId;
@@ -12,7 +10,6 @@ import pl.edu.icm.trurl.util.Status;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 public class AgentIdMappingLoader {
@@ -32,13 +29,13 @@ public class AgentIdMappingLoader {
         }
         mapper = new ExportedIdMapper();
 
-        AtomicInteger counter = new AtomicInteger(0);
         var store = new ArrayStore();
         mapper.configureAndAttach(store);
 
+        var file = workDir.absolutizeFile(new File(filename)).getPath();
         OrcStoreService orcStoreService = new OrcStoreService();
-        orcStoreService.read(store, filename);
-
+        orcStoreService.read(store, file);
+        mapper.attachStore(store);
         status.done();
     }
 

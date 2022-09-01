@@ -16,7 +16,6 @@ import pl.edu.icm.trurl.ecs.util.Selectors;
 import pl.edu.icm.trurl.util.Status;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class ImmunizationEventsImporterFromAgentId {
@@ -70,7 +69,7 @@ public class ImmunizationEventsImporterFromAgentId {
                     var members = household.getMembers();
                     members.forEach(memberEntity -> {
                         var pdyn2Id = memberEntity.getId();
-                        var pdyn1Id = idsMap.getOrDefault(pdyn2Id,-1);
+                        var pdyn1Id = idsMap.getOrDefault(pdyn2Id, -1);
 
                         if (pdyn1Id == -1) {
                             throw new IllegalStateException("Could not find id mapping for pdyn2Id=" + pdyn2Id);
