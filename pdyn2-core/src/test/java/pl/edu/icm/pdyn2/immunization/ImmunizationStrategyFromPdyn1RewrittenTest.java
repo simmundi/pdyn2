@@ -28,13 +28,13 @@ class ImmunizationStrategyFromPdyn1RewrittenTest {
     private final ImmunizationStrategyProvider provider = new ImmunizationStrategyProvider();
 
     @BeforeEach
-    void setUp() {
+    void setup() {
+        immunizationEvent1.setLoad(Load.ALPHA);
+        immunizationEvent1.setDay(1);
+        immunizationEvent2.setLoad(Load.BA45);
+        immunizationEvent2.setDay(59);
         when(immunization1.getEvents()).thenReturn(List.of(immunizationEvent1, immunizationEvent2));
         when(immunization2.getEvents()).thenReturn(List.of(immunizationEvent1));
-        immunizationEvent1.setLoad(Load.ALPHA);
-        immunizationEvent1.setDay(12);
-        immunizationEvent2.setLoad(Load.DELTA);
-        immunizationEvent2.setDay(59);
     }
 
     @Test
@@ -46,7 +46,7 @@ class ImmunizationStrategyFromPdyn1RewrittenTest {
         var coef2 = immunizationStrategy.getImmunizationCoefficient(immunization2, ImmunizationStage.LATENTNY, Load.OMICRON, 73);
         //assert
         assertThat(coef1).isEqualTo(0.9f);
-        assertThat(coef2).isEqualTo(0.85257f);
+        assertThat(coef2).isEqualTo(0.76f);
         assertThat(provider.getImmunizationStrategy()).isEqualTo(immunizationStrategy);
     }
 }

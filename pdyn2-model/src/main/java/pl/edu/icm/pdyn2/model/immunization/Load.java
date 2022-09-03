@@ -9,6 +9,7 @@ public enum Load {
     DELTA(VIRUS),
     OMICRON(VIRUS),
     BA2(VIRUS),
+    BA45(VIRUS),
 
     PFIZER(VACCINE),
     ASTRA(VACCINE),
