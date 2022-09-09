@@ -57,9 +57,13 @@ public class ContextImpactService {
             for (ContextType streetContext : ContextType.streetContexts()) {
                 int distance = ageBin - (streetContext.ordinal() - ContextType.STREET_00.ordinal());
                 int distanceSquared = distance * distance;
-                sampleSpace.changeOutcome(streetContext, (float) Math.exp( - distanceSquared / 2.0));
+                if (ageBin == 0 && streetContext == ContextType.STREET_00) {
+                    sampleSpace.changeOutcome(streetContext, (float) 1);
+                } else {
+                    sampleSpace.changeOutcome(streetContext, (float) 0);
+                }
             }
-            sampleSpace.normalize();
+//            sampleSpace.normalize();
 
             for (ContextType streetContext : ContextType.streetContexts()) {
                 int idx = idxFor(ageRange, streetContext);
