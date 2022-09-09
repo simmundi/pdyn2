@@ -47,9 +47,9 @@ public class ContextsService {
     private Stream<Context> findActiveContextsForAgent(Entity agentEntity, BehaviourType type) {
         switch (type) {
             case DORMANT:
-            case DEAD:
             case HOSPITALIZED:  // not interacting with any context
                 return Stream.empty();
+            case DEAD:
             case ROUTINE: {     // routine: home + any education / workplace / street contexts + their linked contexts
                 List<Entity> contexts = new ArrayList(100);
                 Inhabitant inhabitant = agentEntity.get(Inhabitant.class);
@@ -83,10 +83,6 @@ public class ContextsService {
         Session ctx = entity.getSession();
         KilometerGridCell cell = KilometerGridCell.fromLocation(location);
         areaIndex.appendStreetIdsFromKilometerGridCell(cell, (idx, id) -> results.add(ctx.getEntity(id)));
-        areaIndex.appendStreetIdsFromKilometerGridCell(cell.neighbourE(), (idx, id) -> results.add(ctx.getEntity(id)));
-        areaIndex.appendStreetIdsFromKilometerGridCell(cell.neighbourW(), (idx, id) -> results.add(ctx.getEntity(id)));
-        areaIndex.appendStreetIdsFromKilometerGridCell(cell.neighbourN(), (idx, id) -> results.add(ctx.getEntity(id)));
-        areaIndex.appendStreetIdsFromKilometerGridCell(cell.neighbourS(), (idx, id) -> results.add(ctx.getEntity(id)));
     }
 
 }
