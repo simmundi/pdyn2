@@ -50,8 +50,8 @@ class DiseaseStageTransitionsServiceTest {
         new DiseaseStageTransitionsService("xxx", filesystem, reader);
 
         // assert
-        verify(reader).readFromFile(endsWith("/a_WILD.txt"), eq(Load.WILD));
-        verify(reader).readFromFile(endsWith("/b_OMICRON.txt"), eq(Load.OMICRON));
+        verify(reader).readFromFile(endsWith("a_WILD.txt"), eq(Load.WILD));
+        verify(reader).readFromFile(endsWith("b_OMICRON.txt"), eq(Load.OMICRON));
     }
 
 
