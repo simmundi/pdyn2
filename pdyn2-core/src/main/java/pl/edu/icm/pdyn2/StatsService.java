@@ -27,7 +27,6 @@ public class StatsService {
     private final DebugTextFileService debugFileService;
     private DebugTextFile debugTextFile;
 
-
     @WithFactory
     public StatsService(DebugTextFileService debugFileService) {
         this.debugFileService = debugFileService;
@@ -149,5 +148,6 @@ public class StatsService {
     public void tickChangedImpact() {
         additionalStatistics.get("changedImpact").incrementAndGet();
     }
+
 
 }
