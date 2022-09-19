@@ -13,6 +13,7 @@ import pl.edu.icm.pdyn2.model.immunization.Immunization;
 import pl.edu.icm.pdyn2.model.immunization.Load;
 import pl.edu.icm.pdyn2.model.progression.Stage;
 import pl.edu.icm.pdyn2.progression.DiseaseStageTransitionsService;
+import pl.edu.icm.trurl.io.orc.OrcStoreService;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -37,8 +38,6 @@ public class ImporterIT {
     public void before() throws FileNotFoundException {
         when(workDir.openForReading(new File("/importerTest.csv"))).thenReturn(ImporterIT.class
                 .getResourceAsStream("/importerTest.csv"));
-        when(workDir.absolutizeFile(new File("/importerTest.orc")))
-                .thenReturn(new File(String.valueOf(ImporterIT.class.getResource("/importerTest.orc"))));
         when(board.getEngine()).thenReturn(data.session.getEngine());
 
         when(transitionsService.durationOf(Load.WILD, Stage.INFECTIOUS_SYMPTOMATIC, 18)).thenReturn(6);
@@ -60,7 +59,7 @@ public class ImporterIT {
     @Test
     public void test() {
         var loader = new ImmunizationEventsLoaderFromAgentId(workDir);
-        var idMappingLoader = new AgentIdMappingLoader(workDir);
+        var idMappingLoader = new AgentIdMappingLoader();
         importer = new ImmunizationEventsImporterFromAgentId(loader,
                 idMappingLoader,
                 board,
@@ -69,7 +68,8 @@ public class ImporterIT {
                 data.simulationTimer,
                 transitionsService);
         data.session.close();
-        importer.importEvents("/importerTest.csv", "/importerTest.orc", 1000);
+        var orcFilename = String.valueOf(ImporterIT.class.getResource("/importerTest.orc"));
+        importer.importEvents("/importerTest.csv", orcFilename, 1000);
         data.session.close();
 
         assertThat(data.allAgents.get(1).get(Immunization.class).getEvents().get(0).getDay()).isEqualTo(-997);

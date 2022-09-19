@@ -1,25 +1,22 @@
 package pl.edu.icm.pdyn2.importer;
 
 import net.snowyhollows.bento.annotation.WithFactory;
-import net.snowyhollows.bento.config.WorkDir;
 import pl.edu.icm.board.pdyn1.ExportedId;
 import pl.edu.icm.board.pdyn1.ExportedIdMapper;
 import pl.edu.icm.trurl.io.orc.OrcStoreService;
 import pl.edu.icm.trurl.store.array.ArrayStore;
 import pl.edu.icm.trurl.util.Status;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.function.Consumer;
 
 public class AgentIdMappingLoader {
 
     private ExportedIdMapper mapper;
-    private final WorkDir workDir;
 
     @WithFactory
-    public AgentIdMappingLoader(WorkDir workDir) {
-        this.workDir = workDir;
+    public AgentIdMappingLoader() {
+
     }
 
     private void load(String filename) throws IOException {
@@ -31,10 +28,8 @@ public class AgentIdMappingLoader {
 
         var store = new ArrayStore();
         mapper.configureAndAttach(store);
-
-        var file = workDir.absolutizeFile(new File(filename)).getPath();
-        OrcStoreService orcStoreService = new OrcStoreService();
-        orcStoreService.read(store, file);
+        var orcStoreService = new OrcStoreService();
+        orcStoreService.read(store, filename);
         mapper.attachStore(store);
         status.done();
     }
