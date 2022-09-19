@@ -44,14 +44,14 @@ public class ImmunizationEventsImporterFromAgentId {
         this.transitionsService = transitionsService;
     }
 
-    public void importEvents(String filename, String idsFilename, int durationOfPreviousSimulation) {
+    public void importEvents(String eventsFilename, String idsFilename, int durationOfPreviousSimulation) {
 
         Map<Integer, List<ImmunizationEvent>> immunizationMap = new HashMap<>();
         Map<Integer, Integer> idsMap = new HashMap<>();
         var currentDay = simulationTimer.getDaysPassed();
 
         mappingLoader.forEach(idsFilename, idsMapping -> idsMap.put(idsMapping.getPdyn2Id(), idsMapping.getPdyn1Id()));
-        loader.forEach(filename, importedEvent -> {
+        loader.forEach(eventsFilename, importedEvent -> {
             var event = new ImmunizationEvent();
             var load = load(importedEvent.getOdmiana_wirusa(), importedEvent.getOdmiana_szczepionki());
             event.setLoad(load);
