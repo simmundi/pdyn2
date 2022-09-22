@@ -51,6 +51,7 @@ public class DiseaseProgressionSystemBuilder {
                     Stage currentStage = health.getStage();
 
                     if (!currentStage.hasOutcomes()) {
+                        statsService.tickStage(currentStage);
                         return;
                     }
 
