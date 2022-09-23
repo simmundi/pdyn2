@@ -13,6 +13,7 @@ import pl.edu.icm.pdyn2.model.immunization.Immunization;
 import pl.edu.icm.pdyn2.model.immunization.Load;
 import pl.edu.icm.pdyn2.model.progression.Stage;
 import pl.edu.icm.pdyn2.progression.DiseaseStageTransitionsService;
+import pl.edu.icm.trurl.io.orc.OrcStoreService;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -58,14 +59,17 @@ public class ImporterIT {
     @Test
     public void test() {
         var loader = new ImmunizationEventsLoaderFromAgentId(workDir);
+        var idMappingLoader = new AgentIdMappingLoader();
         importer = new ImmunizationEventsImporterFromAgentId(loader,
+                idMappingLoader,
                 board,
                 data.selectors,
                 agentStateService,
                 data.simulationTimer,
                 transitionsService);
         data.session.close();
-        importer.importEvents("/importerTest.csv", 1000);
+        var orcFilename = String.valueOf(ImporterIT.class.getResource("/importerTest.orc"));
+        importer.importEvents("/importerTest.csv", orcFilename, 1000);
         data.session.close();
 
         assertThat(data.allAgents.get(1).get(Immunization.class).getEvents().get(0).getDay()).isEqualTo(-997);

@@ -16,11 +16,11 @@ import pl.edu.icm.trurl.ecs.util.Selectors;
 import pl.edu.icm.trurl.util.Status;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class ImmunizationEventsImporterFromAgentId {
     private final ImmunizationEventsLoaderFromAgentId loader;
+    private final AgentIdMappingLoader mappingLoader;
     private final Board board;
     private final Selectors selectors;
     private final AgentStateService agentStateService;
@@ -29,12 +29,14 @@ public class ImmunizationEventsImporterFromAgentId {
 
     @WithFactory
     public ImmunizationEventsImporterFromAgentId(ImmunizationEventsLoaderFromAgentId immunizationEventsLoaderFromAgentId,
+                                                 AgentIdMappingLoader mappingLoader,
                                                  Board board,
                                                  Selectors selectors,
                                                  AgentStateService agentStateService,
                                                  SimulationTimer simulationTimer,
                                                  DiseaseStageTransitionsService transitionsService) {
         this.loader = immunizationEventsLoaderFromAgentId;
+        this.mappingLoader = mappingLoader;
         this.board = board;
         this.selectors = selectors;
         this.agentStateService = agentStateService;
@@ -42,11 +44,14 @@ public class ImmunizationEventsImporterFromAgentId {
         this.transitionsService = transitionsService;
     }
 
-    public void importEvents(String filename, int durationOfPreviousSimulation) {
+    public void importEvents(String eventsFilename, String idsFilename, int durationOfPreviousSimulation) {
 
         Map<Integer, List<ImmunizationEvent>> immunizationMap = new HashMap<>();
+        Map<Integer, Integer> idsMap = new HashMap<>();
         var currentDay = simulationTimer.getDaysPassed();
-        loader.forEach(filename, importedEvent -> {
+
+        mappingLoader.forEach(idsFilename, idsMapping -> idsMap.put(idsMapping.getPdyn2Id(), idsMapping.getPdyn1Id()));
+        loader.forEach(eventsFilename, importedEvent -> {
             var event = new ImmunizationEvent();
             var load = load(importedEvent.getOdmiana_wirusa(), importedEvent.getOdmiana_szczepionki());
             event.setLoad(load);
@@ -58,17 +63,20 @@ public class ImmunizationEventsImporterFromAgentId {
         });
         var status = Status.of("applying immunization history to agents", loader.getCapacity() / 10 + 1);
 
-        AtomicInteger agentId = new AtomicInteger();
-
         board.getEngine().execute(EntityIterator
                 .select(selectors.allWithComponents(Household.class))
                 .forEach(Household.class, (householdEntity, household) -> {
                     var members = household.getMembers();
                     members.forEach(memberEntity -> {
-                        var id = agentId.getAndIncrement();
-                        if (immunizationMap.containsKey(id)) {
+                        var pdyn2Id = memberEntity.getId();
+                        var pdyn1Id = idsMap.getOrDefault(pdyn2Id, -1);
+
+                        if (pdyn1Id == -1) {
+                            throw new IllegalStateException("Could not find id mapping for pdyn2Id=" + pdyn2Id);
+                        }
+                        if (immunizationMap.containsKey(pdyn1Id)) {
                             var age = memberEntity.get(Person.class).getAge();
-                            for (ImmunizationEvent event : immunizationMap.get(id)) {
+                            for (ImmunizationEvent event : immunizationMap.get(pdyn1Id)) {
                                 event.setDay(
                                         endDayFromDiseaseHistory(event.getLoad(), event.getDiseaseHistory(), age, event.getDay()));
                                 agentStateService.addImmunizationEvent(memberEntity, event);
