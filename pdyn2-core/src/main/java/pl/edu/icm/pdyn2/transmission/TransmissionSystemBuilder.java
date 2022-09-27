@@ -6,6 +6,7 @@ import pl.edu.icm.board.util.RandomProvider;
 import pl.edu.icm.pdyn2.AgentStateService;
 import pl.edu.icm.pdyn2.StatsService;
 import pl.edu.icm.pdyn2.index.AreaClusteredSelectors;
+import pl.edu.icm.pdyn2.model.context.ContextInfectivityClass;
 import pl.edu.icm.pdyn2.model.context.Inhabitant;
 import pl.edu.icm.pdyn2.model.immunization.Load;
 import pl.edu.icm.pdyn2.model.progression.Stage;
@@ -48,18 +49,23 @@ public class TransmissionSystemBuilder {
                         return;
                     }
 
-                    EnumSampleSpace<Load> exposurePerLoad = transmissionService.gatherExposurePerLoadForAgent(
-                            new EnumSampleSpace<>(Load.class),
+                    EnumSampleSpace<Load> exposurePerLoad =
+                            new EnumSampleSpace<>(Load.class);
+                    EnumSampleSpace<ContextInfectivityClass> exposurePerContext = new EnumSampleSpace<>(ContextInfectivityClass.class);
+                    transmissionService.gatherExposurePerLoadAndContextForAgent(
+                            exposurePerLoad,
+                            exposurePerContext,
                             agent);
                     float totalExposure = exposurePerLoad.sumOfProbabilities(); // TODO sumValues?
 
                     if (totalExposure > 0) {
-                        var probabilities = transmissionService.exposureToProbability(exposurePerLoad, agent);
-                        var totalProbability = probabilities.sumOfProbabilities();
-                        double r = random.nextDouble();
-                        if (totalProbability > 0 && r <= totalProbability) {
-                            var chosenLoad = transmissionService.selectLoad(probabilities, r);
+                        var probability = transmissionService.exposureToProbability(totalExposure);
+                        var chosenLoad = transmissionService.selectLoad(exposurePerLoad, random.nextDouble());
+                        var adjustedProbability = transmissionService.adjustProbabilityWithImmunity(probability, chosenLoad, agent);
+
+                        if (adjustedProbability > 0 && random.nextDouble() <= adjustedProbability) {
                             agentStateService.infect(agent, chosenLoad);
+                            agentStateService.addSourcesDistribution(agent, exposurePerContext);
                             statsService.tickStageChange(Stage.LATENT);
                         }
                     }

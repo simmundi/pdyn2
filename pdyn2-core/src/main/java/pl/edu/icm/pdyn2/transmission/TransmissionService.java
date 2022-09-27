@@ -6,6 +6,7 @@ import pl.edu.icm.pdyn2.immunization.ImmunizationService;
 import pl.edu.icm.pdyn2.immunization.ImmunizationStage;
 import pl.edu.icm.pdyn2.model.context.Contamination;
 import pl.edu.icm.pdyn2.model.context.Context;
+import pl.edu.icm.pdyn2.model.context.ContextInfectivityClass;
 import pl.edu.icm.pdyn2.model.immunization.Immunization;
 import pl.edu.icm.pdyn2.model.immunization.Load;
 import pl.edu.icm.pdyn2.model.progression.HealthStatus;
@@ -63,29 +64,25 @@ public class TransmissionService {
      * @param entity      the agent entity
      * @return
      */
-    public EnumSampleSpace<Load> gatherExposurePerLoadForAgent(EnumSampleSpace<Load> infectivity, Entity entity) {
+    public void gatherExposurePerLoadAndContextForAgent(EnumSampleSpace<Load> infectivity,
+                                                                         EnumSampleSpace<ContextInfectivityClass> infectionSourceSampleSpace,
+                                                                         Entity entity) {
         var contexts = contextsService.findActiveContextsForAgent(entity);
-        contexts.forEach(context -> addContextInfectivity(context, infectivity));
+        contexts.forEach(context -> {
+            addContextInfectivity(context, infectivity);
+            updateSources(context, infectionSourceSampleSpace);
+        });
         infectivity.multiply(relativeAlpha);
-        return infectivity;
     }
+
 
     /**
      * Calculates the basic formula for probability of getting sick based on the exposure
      *
      * @param totalExposure
      */
-    public EnumSampleSpace<Load> exposureToProbability(EnumSampleSpace<Load> exposures, Entity agent) {
-        EnumSampleSpace<Load> probabilities = new EnumSampleSpace<Load>(Load.class);
-        var sumOfProbabilities = exposures.sumOfProbabilities();
-        if (sumOfProbabilities > 0) {
-            for (var virus : Load.viruses()) {
-                double tmp_probability = (1 - Math.exp(-transmissionConfig.getAlpha() * exposures.getProbability(virus))) * exposures.getProbability(virus) / sumOfProbabilities;
-                tmp_probability = this.adjustProbabilityWithImmunity(tmp_probability, virus, agent);
-                probabilities.changeOutcome(virus, (float) tmp_probability);
-            }
-        }
-        return probabilities;
+    public double exposureToProbability(float totalExposure) {
+        return 1 - Math.exp(-transmissionConfig.getAlpha() * totalExposure);
     }
 
     /**
@@ -129,4 +126,15 @@ public class TransmissionService {
         }
     }
 
+    private void updateSources(Context context, EnumSampleSpace<ContextInfectivityClass> infectionSources) {
+        var weight = transmissionConfig.getTotalWeightForContextType(context.getContextType());
+        var agentCount = context.getAgentCount();
+        for (Contamination contamination : context.getContaminations()) {
+            var loadInContext = contamination.getLoad();
+            var levelInContext = contamination.getLevel() * weight / agentCount;
+            infectionSources
+                    .increaseOutcome(context.getContextType().getInfectivityClass(),
+                            levelInContext * relativeAlpha.getProbability(loadInContext));
+        }
+    }
 }

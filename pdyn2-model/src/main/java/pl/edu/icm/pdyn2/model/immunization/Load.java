@@ -24,7 +24,7 @@ public enum Load {
 
     public static Load[] viruses() {
         return new Load[]{
-                WILD, ALPHA, DELTA, OMICRON, BA2
+                WILD, ALPHA, DELTA, OMICRON, BA2, BA45
         };
     }
 }

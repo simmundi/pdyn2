@@ -4,15 +4,14 @@ import com.google.common.base.Preconditions;
 import net.snowyhollows.bento.annotation.WithFactory;
 import pl.edu.icm.pdyn2.model.behaviour.Behaviour;
 import pl.edu.icm.pdyn2.model.behaviour.BehaviourType;
-import pl.edu.icm.pdyn2.model.immunization.Immunization;
-import pl.edu.icm.pdyn2.model.immunization.ImmunizationEvent;
-import pl.edu.icm.pdyn2.model.immunization.Load;
-import pl.edu.icm.pdyn2.model.immunization.LoadClassification;
+import pl.edu.icm.pdyn2.model.context.ContextInfectivityClass;
+import pl.edu.icm.pdyn2.model.immunization.*;
 import pl.edu.icm.pdyn2.model.progression.HealthStatus;
 import pl.edu.icm.pdyn2.model.progression.Stage;
 import pl.edu.icm.pdyn2.model.travel.Travel;
 import pl.edu.icm.pdyn2.time.SimulationTimer;
 import pl.edu.icm.trurl.ecs.Entity;
+import pl.edu.icm.trurl.sampleSpace.EnumSampleSpace;
 
 import static pl.edu.icm.pdyn2.model.progression.Stage.LATENT;
 import static pl.edu.icm.pdyn2.model.progression.Stage.HEALTHY;
@@ -203,6 +202,15 @@ public class AgentStateService {
         health.setDiseaseLoad(targetLoad);
     }
 
+    public void addSourcesDistribution(Entity agent, EnumSampleSpace<ContextInfectivityClass> exposurePerContext) {
+        var immunizationSources = agent.getOrCreate(ImmunizationSources.class);
+        var immunizationSource = new ImmunizationSource();
+        for (var contextType : ContextInfectivityClass.values()) {
+            immunizationSource.setForContextType(contextType, exposurePerContext.getProbability(contextType));
+        }
+        immunizationSources.getImmunizationSources().add(immunizationSource);
+    }
+
     private ImmunizationEvent createEventFromHealth(HealthStatus healthStatus) {
         ImmunizationEvent immunizationEvent = new ImmunizationEvent();
         immunizationEvent.setLoad(healthStatus.getDiseaseLoad());
@@ -236,5 +244,4 @@ public class AgentStateService {
     private void resumeRoutine(Entity agentEntity, Behaviour behaviour) {
         behaviour.transitionTo(BehaviourType.ROUTINE, simulationTimer.getDaysPassed());
     }
-
 }

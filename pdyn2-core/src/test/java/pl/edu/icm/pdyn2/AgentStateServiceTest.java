@@ -6,6 +6,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import pl.edu.icm.pdyn2.model.context.ContextInfectivityClass;
+import pl.edu.icm.pdyn2.model.immunization.ImmunizationSources;
 import pl.edu.icm.pdyn2.transmission.ContextImpactService;
 import pl.edu.icm.pdyn2.model.behaviour.Behaviour;
 import pl.edu.icm.pdyn2.model.behaviour.BehaviourType;
@@ -16,6 +18,7 @@ import pl.edu.icm.pdyn2.model.progression.Stage;
 import pl.edu.icm.pdyn2.model.travel.Travel;
 import pl.edu.icm.pdyn2.time.SimulationTimer;
 import pl.edu.icm.trurl.ecs.Entity;
+import pl.edu.icm.trurl.sampleSpace.EnumSampleSpace;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -139,6 +142,25 @@ class AgentStateServiceTest {
         assertThatIllegalArgumentException()
                 .isThrownBy(() -> agentStateService.changeLoad(data.agent3, Load.MODERNA))
                 .withMessage("Variant can be changed only to another virus load");
+    }
+
+    @Test
+    @DisplayName("should create ImmunizationSources component")
+    void addSourcesDistribution() {
+        // given
+        ExampleData data = new ExampleData();
+        EnumSampleSpace<ContextInfectivityClass> sourcesDistribution = new EnumSampleSpace<>(ContextInfectivityClass.class);
+        sourcesDistribution.changeOutcome(ContextInfectivityClass.SCHOOL, 10f);
+        sourcesDistribution.changeOutcome(ContextInfectivityClass.STREET, 12f);
+
+        // execute
+        agentStateService.addSourcesDistribution(data.agent3, sourcesDistribution);
+
+        // assert
+        var sources = data.agent3.get(ImmunizationSources.class);
+
+        assertThat(sources.getImmunizationSources().get(0).getSchoolInfluence()).isEqualTo(10f);
+        assertThat(sources.getImmunizationSources().get(0).getStreetInfluence()).isEqualTo(12f);
     }
 
     static class ExampleData {

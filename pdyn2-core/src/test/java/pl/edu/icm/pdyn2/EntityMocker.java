@@ -7,6 +7,7 @@ import pl.edu.icm.pdyn2.model.behaviour.Behaviour;
 import pl.edu.icm.pdyn2.model.context.Context;
 import pl.edu.icm.pdyn2.model.context.Inhabitant;
 import pl.edu.icm.pdyn2.model.immunization.Immunization;
+import pl.edu.icm.pdyn2.model.immunization.ImmunizationSources;
 import pl.edu.icm.pdyn2.model.impact.Impact;
 import pl.edu.icm.pdyn2.model.progression.HealthStatus;
 import pl.edu.icm.pdyn2.model.travel.Travel;
@@ -40,7 +41,8 @@ public class EntityMocker {
                 MedicalHistory.class,
                 Impact.class,
                 Behaviour.class,
-                Travel.class);
+                Travel.class,
+                ImmunizationSources.class);
     }
 
     public EntityMocker(Session session, Class<?>... componentClasses) {
