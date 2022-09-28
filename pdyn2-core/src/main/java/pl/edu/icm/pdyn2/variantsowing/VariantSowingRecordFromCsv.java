@@ -1,24 +1,33 @@
-package pl.edu.icm.pdyn2.sowing;
+package pl.edu.icm.pdyn2.variantsowing;
 
 import pl.edu.icm.pdyn2.model.immunization.Load;
+import pl.edu.icm.trurl.ecs.annotation.WithMapper;
 
-import java.util.List;
-
-public class VariantSowingRecord {
-    private List<String> teryts;
+@WithMapper
+public class VariantSowingRecordFromCsv {
+    private int day;
+    private String teryts;
     private int minAge;
     private int maxAge;
     private Load load;
     private int sowingCount;
 
-    public VariantSowingRecord() {
+    public VariantSowingRecordFromCsv() {
     }
 
-    public List<String> getTeryts() {
+    public int getDay() {
+        return day;
+    }
+
+    public void setDay(int day) {
+        this.day = day;
+    }
+
+    public String getTeryts() {
         return teryts;
     }
 
-    public void setTeryts(List<String> teryts) {
+    public void setTeryts(String teryts) {
         this.teryts = teryts;
     }
 

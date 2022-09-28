@@ -1,7 +1,9 @@
-package pl.edu.icm.pdyn2.sowing;
+package pl.edu.icm.pdyn2.variantsowing;
 
 import net.snowyhollows.bento.annotation.WithFactory;
-import pl.edu.icm.em.common.EmConfig;
+import pl.edu.icm.board.model.Person;
+import pl.edu.icm.pdyn2.model.progression.HealthStatus;
+import pl.edu.icm.pdyn2.model.progression.Stage;
 import pl.edu.icm.pdyn2.time.SimulationTimer;
 import pl.edu.icm.trurl.ecs.EntitySystem;
 import pl.edu.icm.trurl.util.Status;
@@ -12,19 +14,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class VariantSowingFromCsv {
+public class VariantSowingFromCsvSystemBuilder {
     private final VariantSowingFromCsvLoader loader;
-    private final VariantSowingService sowingService;
+    private final VariantSowingService variantSowingService;
     private final SimulationTimer simulationTimer;
-    private Map<Integer, Set<VariantSowingRecord>> sowingRecords = new HashMap<>();
+    private final Map<Integer, Set<VariantSowingRecord>> sowingRecords = new HashMap<>();
 
 
     @WithFactory
-    public VariantSowingFromCsv(VariantSowingFromCsvLoader variantSowingFromCsvLoader,
-                                VariantSowingService variantSowingService,
-                                SimulationTimer simulationTimer) {
+    public VariantSowingFromCsvSystemBuilder(VariantSowingFromCsvLoader variantSowingFromCsvLoader,
+                                             VariantSowingService variantSowingService,
+                                             SimulationTimer simulationTimer) {
         this.loader = variantSowingFromCsvLoader;
-        this.sowingService = variantSowingService;
+        this.variantSowingService = variantSowingService;
         this.simulationTimer = simulationTimer;
     }
 
@@ -52,7 +54,9 @@ public class VariantSowingFromCsv {
         loadingStatus.done();
     }
 
-    public EntitySystem sowFromFile() {
+    public EntitySystem buildVariantSowingSystem() {
+        if (sowingRecords.isEmpty())
+            load();
         return sessionFactory -> {
             var currentDay = simulationTimer.getDaysPassed();
             if (sowingRecords.isEmpty()) {
@@ -61,9 +65,26 @@ public class VariantSowingFromCsv {
             if (!sowingRecords.containsKey(currentDay)) {
                 return;
             }
+            var status = Status.of("Variant sowing");
+            var session = sessionFactory.create();
             for (VariantSowingRecord record : sowingRecords.get(currentDay)) {
-                //todo: sow
+                variantSowingService.sowVariant(
+                        session,
+                        record.getLoad(),
+                        record.getSowingCount(),
+                        record.getTeryts(),
+                        entity -> {
+                            var healthStatus = entity.get(HealthStatus.class);
+                            var person = entity.get(Person.class);
+                            return healthStatus.getStage() == Stage.LATENT &&
+                                    healthStatus.getDiseaseLoad() != record.getLoad() &&
+                                    person.getAge() >= record.getMinAge() &&
+                                    person.getAge() <= record.getMaxAge();
+                        },
+                        status);
             }
+            session.close();
+            status.done();
         };
     }
 }

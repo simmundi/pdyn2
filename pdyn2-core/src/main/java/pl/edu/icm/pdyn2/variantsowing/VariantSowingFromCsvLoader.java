@@ -1,4 +1,4 @@
-package pl.edu.icm.pdyn2.sowing;
+package pl.edu.icm.pdyn2.variantsowing;
 
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
