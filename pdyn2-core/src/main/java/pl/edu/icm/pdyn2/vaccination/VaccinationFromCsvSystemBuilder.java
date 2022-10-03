@@ -1,6 +1,12 @@
 package pl.edu.icm.pdyn2.vaccination;
 
 import net.snowyhollows.bento.annotation.WithFactory;
+import pl.edu.icm.board.model.Person;
+import pl.edu.icm.pdyn2.model.behaviour.Behaviour;
+import pl.edu.icm.pdyn2.model.behaviour.BehaviourType;
+import pl.edu.icm.pdyn2.model.immunization.ImmunizationEvent;
+import pl.edu.icm.pdyn2.model.progression.HealthStatus;
+import pl.edu.icm.pdyn2.model.progression.Stage;
 import pl.edu.icm.pdyn2.time.SimulationTimer;
 import pl.edu.icm.trurl.ecs.EntitySystem;
 import pl.edu.icm.trurl.util.Status;
@@ -15,13 +21,15 @@ public class VaccinationFromCsvSystemBuilder {
     private final VaccinationFromCsvLoader loader;
     private final SimulationTimer simulationTimer;
     private final Map<Integer, Set<VaccinationRecord>> vaccinationRecords = new HashMap<>();
+    private final VaccinationService vaccinationService;
 
 
     @WithFactory
     public VaccinationFromCsvSystemBuilder(VaccinationFromCsvLoader vaccinationFromCsvLoader,
-                                           SimulationTimer simulationTimer) {
+                                           SimulationTimer simulationTimer, VaccinationService vaccinationService) {
         this.loader = vaccinationFromCsvLoader;
         this.simulationTimer = simulationTimer;
+        this.vaccinationService = vaccinationService;
     }
 
     public void load() {
@@ -49,6 +57,8 @@ public class VaccinationFromCsvSystemBuilder {
     }
 
     public EntitySystem buildVaccinationSystem() {
+        if (vaccinationRecords.isEmpty())
+            load();
         return sessionFactory -> {
             var currentDay = simulationTimer.getDaysPassed();
             if (vaccinationRecords.isEmpty()) {
@@ -57,9 +67,30 @@ public class VaccinationFromCsvSystemBuilder {
             if (!vaccinationRecords.containsKey(currentDay)) {
                 return;
             }
+            Status status = Status.of("Vaccinating");
+            var session = sessionFactory.create();
             for (VaccinationRecord record : vaccinationRecords.get(currentDay)) {
-                //todo: implement vaccine system
+                var vaccinationEvent = new ImmunizationEvent();
+                vaccinationEvent.setDay(currentDay);
+                vaccinationEvent.setLoad(record.getLoad());
+                vaccinationService.vaccinate(
+                        session,
+                        vaccinationEvent,
+                        record.getVaccineCount(),
+                        record.getTeryts(),
+                        agentEntity -> {
+                            var healthStatus = agentEntity.get(HealthStatus.class);
+                            var behaviour = agentEntity.get(Behaviour.class);
+                            var person = agentEntity.get(Person.class);
+                            return healthStatus.getStage() == Stage.HEALTHY &&
+                                    behaviour.getType() == BehaviourType.ROUTINE &&
+                                    person.getAge() >= record.getMinAge() &&
+                                    person.getAge() <= record.getMaxAge();
+                        },
+                        status);
             }
+            session.close();
+            status.done();
         };
     }
 }

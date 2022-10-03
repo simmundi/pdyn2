@@ -1,4 +1,4 @@
-package pl.edu.icm.pdyn2.variantsowing;
+package pl.edu.icm.pdyn2.vaccination;
 
 import net.snowyhollows.bento.annotation.WithFactory;
 import org.apache.commons.math3.random.RandomAdaptor;
@@ -7,6 +7,7 @@ import pl.edu.icm.board.model.Household;
 import pl.edu.icm.board.util.RandomProvider;
 import pl.edu.icm.pdyn2.AgentStateService;
 import pl.edu.icm.pdyn2.StatsService;
+import pl.edu.icm.pdyn2.model.immunization.ImmunizationEvent;
 import pl.edu.icm.pdyn2.model.immunization.Load;
 import pl.edu.icm.trurl.ecs.Entity;
 import pl.edu.icm.trurl.ecs.Session;
@@ -22,24 +23,21 @@ import java.util.stream.IntStream;
 
 import static java.lang.Math.min;
 
-public class VariantSowingService {
+public class VaccinationService {
     private final AgentStateService agentStateService;
     private final Random random;
     private final HouseholdsInCommuneAccessor householdsInCommuneAccessor;
     private final StatsService statsService;
 
     @WithFactory
-    public VariantSowingService(AgentStateService agentStateService,
-                                RandomProvider randomProvider,
-                                HouseholdsInCommuneAccessor householdsInCommuneAccessor,
-                                StatsService statsService) {
+    public VaccinationService(AgentStateService agentStateService, RandomProvider randomProvider, HouseholdsInCommuneAccessor householdsInCommuneAccessor, StatsService statsService) {
         this.agentStateService = agentStateService;
-        this.random = RandomAdaptor.createAdaptor(randomProvider.getRandomGenerator(VariantSowingService.class));
+        this.random = RandomAdaptor.createAdaptor(randomProvider.getRandomGenerator(VaccinationService.class));
         this.householdsInCommuneAccessor = householdsInCommuneAccessor;
         this.statsService = statsService;
     }
 
-    public void sowVariant(Session session, Load load, int count, Collection<String> teryts, Predicate<Entity> entityPredicate, Status status) {
+    public void vaccinate(Session session, ImmunizationEvent vaccinationEvent, int count, Collection<String> teryts, Predicate<Entity> entityPredicate, Status status) {
         var eligibleAgents = householdsInCommuneAccessor.getHouseholdIdsForTeryts(teryts)
                 .mapToObj(session::getEntity)
                 .flatMap(e -> e.get(Household.class).getMembers().stream())
@@ -53,8 +51,8 @@ public class VariantSowingService {
             Collections.shuffle(eligibleAgents, random);
         }
         IntStream.range(0, min(eligibleAgents.size(), count))
-                .peek(unused -> statsService.tickChangedVariant())
-                .forEach(i -> agentStateService.changeLoad(eligibleAgents.get(i), load));
+                .peek(unused -> statsService.tickVaccinated())
+                .forEach(i -> agentStateService.vaccinate(eligibleAgents.get(i), vaccinationEvent));
     }
 
 }

@@ -187,6 +187,11 @@ public class AgentStateService {
         return true;
     }
 
+    public void vaccinate(Entity agentEntity, ImmunizationEvent vaccinationEvent) {
+        Preconditions.checkArgument(vaccinationEvent.getLoad().classification == LoadClassification.VACCINE, "Agent can only be vaccinated with a vaccine!");
+        addImmunizationEvent(agentEntity, vaccinationEvent);
+    }
+
     public void addImmunizationEvent(Entity agentEntity, ImmunizationEvent immunizationEvent) {
         Immunization immunization = agentEntity.getOrCreate(Immunization.class);
         immunization

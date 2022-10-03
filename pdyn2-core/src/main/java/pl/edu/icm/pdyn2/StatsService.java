@@ -40,6 +40,8 @@ public class StatsService {
         additionalStatistics.put("quarantined", new AtomicInteger());
         additionalStatistics.put("unquarantined", new AtomicInteger());
         additionalStatistics.put("changedImpact", new AtomicInteger());
+        additionalStatistics.put("changedVariant", new AtomicInteger());
+        additionalStatistics.put("vaccinated", new AtomicInteger());
     }
 
     /**
@@ -56,6 +58,8 @@ public class StatsService {
         out.println(" - quarantined: " + additionalStatistics.get("quarantined").get());
         out.println(" - unquarantined: " + additionalStatistics.get("unquarantined").get());
         out.println(" - changed impact: " + additionalStatistics.get("changedImpact").get());
+        out.println(" - changed variant: " + additionalStatistics.get("changedVariant").get());
+        out.println(" - vaccinated: " + additionalStatistics.get("vaccinated").get());
     }
 
     public void createStatsOutputFile(String simulationStatsOutputFilename) {
@@ -99,6 +103,8 @@ public class StatsService {
         additionalStatistics.get("unquarantined").set(0);
         additionalStatistics.get("quarantined").set(0);
         additionalStatistics.get("changedImpact").set(0);
+        additionalStatistics.get("changedVariant").set(0);
+        additionalStatistics.get("vaccinated").set(0);
     }
 
     /**
@@ -149,5 +155,11 @@ public class StatsService {
     public void tickChangedImpact() {
         additionalStatistics.get("changedImpact").incrementAndGet();
     }
+    public void tickChangedVariant() {
+        additionalStatistics.get("changedVariant").incrementAndGet();
+    }
 
+    public void tickVaccinated() {
+        additionalStatistics.get("vaccinated").incrementAndGet();
+    }
 }
