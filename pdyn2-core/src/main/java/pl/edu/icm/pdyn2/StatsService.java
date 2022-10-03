@@ -162,4 +162,8 @@ public class StatsService {
     public void tickVaccinated() {
         additionalStatistics.get("vaccinated").incrementAndGet();
     }
+    public int getStats(Stage stage) {
+        return this.statsAll.get(stage).intValue();
+    }
+
 }
