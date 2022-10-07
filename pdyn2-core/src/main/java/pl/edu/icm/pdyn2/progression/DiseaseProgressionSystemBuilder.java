@@ -55,12 +55,10 @@ public class DiseaseProgressionSystemBuilder {
                         return;
                     }
 
-                    int elapsed = health.getElapsedDays(simulationTimer.getDaysPassed());
-
                     int stageDuration = diseaseStageTransitionsService
                             .durationOf(health.getDiseaseLoad(), currentStage, person.getAge());
 
-                    if (elapsed >= stageDuration) {
+                    if (1.0 / (double) stageDuration >= random.nextDouble()) {
                         Stage nextStage = diseaseStageTransitionsService.outcomeOf(
                                 currentStage,
                                 entity,
