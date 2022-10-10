@@ -2,6 +2,7 @@ package pl.edu.icm.pdyn2.importer;
 
 import net.snowyhollows.bento.config.WorkDir;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -13,7 +14,6 @@ import pl.edu.icm.pdyn2.model.immunization.Immunization;
 import pl.edu.icm.pdyn2.model.immunization.Load;
 import pl.edu.icm.pdyn2.model.progression.Stage;
 import pl.edu.icm.pdyn2.progression.DiseaseStageTransitionsService;
-import pl.edu.icm.trurl.io.orc.OrcStoreService;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -57,6 +57,7 @@ public class ImporterIT {
     }
 
     @Test
+    @Disabled
     public void test() {
         var loader = new ImmunizationEventsLoaderFromAgentId(workDir);
         var idMappingLoader = new AgentIdMappingLoader();
