@@ -1,28 +1,27 @@
 package pl.edu.icm.pdyn2.progression;
 
 import net.snowyhollows.bento.annotation.WithFactory;
-import net.snowyhollows.bento.config.WorkDir;
-import pl.edu.icm.pdyn2.StatsService;
 import pl.edu.icm.pdyn2.model.immunization.Load;
 import pl.edu.icm.pdyn2.model.progression.Stage;
 import pl.edu.icm.trurl.ecs.Entity;
 
-import java.io.File;
 import java.util.EnumMap;
 
 public class DiseaseStageTransitionsService {
     private final EnumMap<Load, LoadDiseaseStageTransitions> loadSpecificTransitions = new EnumMap<>(Load.class);
 
     @WithFactory
-    public DiseaseStageTransitionsService(String infectionTransitionsDirectory,
-                                          WorkDir filesystem, LoadDiseaseStageTransitionsReader loadDiseaseStageTransitionsReader) {
-        File[] files = filesystem.listFiles(new File(infectionTransitionsDirectory), file -> file.getName().endsWith(".txt"));
-
-        for (File file : files) {
-            String loadName = file.getName().replaceFirst("^.*?([^_]*)\\.txt$", "$1");
-            Load load = Load.valueOf(loadName);
-            loadSpecificTransitions.put(load, loadDiseaseStageTransitionsReader.readFromFile(file.getAbsolutePath(), load));
-        }
+    public DiseaseStageTransitionsService(String wildStageTransitionsFilename,
+                                          String alphaStageTransitionsFilename,
+                                          String deltaStageTransitionsFilename,
+                                          String omicronStageTransitionsFilename,
+                                          String ba2StageTransitionsFilename,
+                                          LoadDiseaseStageTransitionsReader reader) {
+        loadSpecificTransitions.put(Load.WILD, reader.readFromFile(wildStageTransitionsFilename, Load.WILD));
+        loadSpecificTransitions.put(Load.ALPHA, reader.readFromFile(alphaStageTransitionsFilename, Load.ALPHA));
+        loadSpecificTransitions.put(Load.DELTA, reader.readFromFile(deltaStageTransitionsFilename, Load.DELTA));
+        loadSpecificTransitions.put(Load.OMICRON, reader.readFromFile(omicronStageTransitionsFilename, Load.OMICRON));
+        loadSpecificTransitions.put(Load.BA2, reader.readFromFile(ba2StageTransitionsFilename, Load.BA2));
     }
 
     public int durationOf(Load load, Stage stage, int age) {
