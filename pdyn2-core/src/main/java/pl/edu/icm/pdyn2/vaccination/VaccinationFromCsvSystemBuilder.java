@@ -4,6 +4,7 @@ import net.snowyhollows.bento.annotation.WithFactory;
 import pl.edu.icm.board.model.Person;
 import pl.edu.icm.pdyn2.model.behaviour.Behaviour;
 import pl.edu.icm.pdyn2.model.behaviour.BehaviourType;
+import pl.edu.icm.pdyn2.model.immunization.Immunization;
 import pl.edu.icm.pdyn2.model.immunization.ImmunizationEvent;
 import pl.edu.icm.pdyn2.model.progression.HealthStatus;
 import pl.edu.icm.pdyn2.model.progression.Stage;
@@ -12,10 +13,7 @@ import pl.edu.icm.trurl.ecs.EntitySystem;
 import pl.edu.icm.trurl.util.Status;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class VaccinationFromCsvSystemBuilder {
     private final VaccinationFromCsvLoader loader;
@@ -47,7 +45,9 @@ public class VaccinationFromCsvSystemBuilder {
             record.setVaccineCount(recordFromCsv.getVaccineCount());
             record.setTeryts(List.of(recordFromCsv.getTeryts().split(", ")));
             if (records == null) {
-                return Set.of(record);
+                var hs = new HashSet<VaccinationRecord>();
+                hs.add(record);
+                return hs;
             } else {
                 records.add(record);
                 return records;
@@ -78,16 +78,22 @@ public class VaccinationFromCsvSystemBuilder {
                         vaccinationEvent,
                         record.getVaccineCount(),
                         record.getTeryts(),
-                        agentEntity -> {
-                            var healthStatus = agentEntity.get(HealthStatus.class);
-                            var behaviour = agentEntity.get(Behaviour.class);
-                            var person = agentEntity.get(Person.class);
-                            return healthStatus.getStage() == Stage.HEALTHY &&
-                                    behaviour.getType() == BehaviourType.ROUTINE &&
-                                    person.getAge() >= record.getMinAge() &&
-                                    person.getAge() <= record.getMaxAge();
-                        },
-                        status);
+                        status,
+                        HealthStatus.class,
+                        hs -> hs.getStage() == Stage.HEALTHY,
+                        false,
+                        Behaviour.class,
+                        b -> b.getType() == BehaviourType.ROUTINE,
+                        false,
+                        Person.class,
+                        person -> person.getAge() >= record.getMinAge() && person.getAge() <= record.getMaxAge(),
+                        false,
+                        Immunization.class,
+                        immunization -> immunization.getEvents().stream()
+                                .noneMatch(immunizationEvent ->
+                                        immunizationEvent.getLoad() == record.getLoad()),
+                        true
+                );
             }
             session.close();
             status.done();

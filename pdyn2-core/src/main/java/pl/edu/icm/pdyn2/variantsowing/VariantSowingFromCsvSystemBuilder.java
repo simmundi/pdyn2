@@ -9,10 +9,7 @@ import pl.edu.icm.trurl.ecs.EntitySystem;
 import pl.edu.icm.trurl.util.Status;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class VariantSowingFromCsvSystemBuilder {
     private final VariantSowingFromCsvLoader loader;
@@ -45,7 +42,9 @@ public class VariantSowingFromCsvSystemBuilder {
             record.setSowingCount(recordFromCsv.getSowingCount());
             record.setTeryts(List.of(recordFromCsv.getTeryts().split(", ")));
             if (records == null) {
-                return Set.of(record);
+                var hs = new HashSet<VariantSowingRecord>();
+                hs.add(record);
+                return hs;
             } else {
                 records.add(record);
                 return records;
@@ -68,20 +67,9 @@ public class VariantSowingFromCsvSystemBuilder {
             var status = Status.of("Variant sowing");
             var session = sessionFactory.create();
             for (VariantSowingRecord record : sowingRecords.get(currentDay)) {
-                variantSowingService.sowVariant(
-                        session,
-                        record.getLoad(),
-                        record.getSowingCount(),
-                        record.getTeryts(),
-                        entity -> {
-                            var healthStatus = entity.get(HealthStatus.class);
-                            var person = entity.get(Person.class);
-                            return healthStatus.getStage() == Stage.LATENT &&
-                                    healthStatus.getDiseaseLoad() != record.getLoad() &&
-                                    person.getAge() >= record.getMinAge() &&
-                                    person.getAge() <= record.getMaxAge();
-                        },
-                        status);
+                variantSowingService.sowVariant(session, record.getLoad(), record.getSowingCount(), record.getTeryts(), status,
+                        HealthStatus.class, hs -> hs.getStage() == Stage.LATENT && hs.getDiseaseLoad() != record.getLoad(), false,
+                        Person.class, person -> person.getAge() >= record.getMinAge() && person.getAge() <= record.getMaxAge(), false);
             }
             session.close();
             status.done();
