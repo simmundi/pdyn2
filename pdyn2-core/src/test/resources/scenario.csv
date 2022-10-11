@@ -1,0 +1,8 @@
+date,TERYT,household_wm,kindergarten_wm,school_wm,workplace_wm,university_wm,big_university_wm,streets_wm,lower_age_schools_open,upper_age_schools_open,fraction_of_symp_not_isolated,probability_of_travel,probability_of_ending_travel,comment
+2020-03-06,,1,1,1,1,1,1,1,0,20,1,1,0,start
+2020-03-12,,1.01,0.2,0.2,0.8,0,0,0.7,0,20,1,1,0,"zamkniecie placówek oświatowych i instytucji kultury, zaczyna się praca zdalna"
+2020-03-14,,1.02,0.01,0.01,0.5,0,0,0.55,0,20,0.2,1,0,"wprowadzenie stanu zagrożenia epidemicznego, ograniczenie handlu i zgromadzeń religijnych, kara za nieprzestrzeganie kwarantanny"
+2020-03-27,28,1.03,0.3,0.15,0.2,0.01,0.01,0.2,0,9,0.03,1,0,zamkn war-maz
+2020-04-08,,1.03,0.3,0.35,0.16,0.05,0.05,0.17,0,9,0.03,1,0,korekta 12.02
+2020-04-09,28,1.03,0.3,0.15,0.15,0.01,0.01,0.15,0,9,0.03,0.5,0,korekta
+2020-04-15,"22,08,14",1.03,0.3,0.15,0.15,0.01,0.01,0.15,0,9,0.03,0.5,0,zamkn pom lub maz

@@ -40,8 +40,12 @@ public class EpidemicConfig {
     }
 
     public EpidemicConfig university(float v) {
-        transmissionConfig.setBigUniversityWeight(v);
         transmissionConfig.setUniversityWeight(v);
+        return this;
+    }
+
+    public EpidemicConfig bigUniversity(float v) {
+        transmissionConfig.setBigUniversityWeight(v);
         return this;
     }
 

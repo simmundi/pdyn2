@@ -154,5 +154,4 @@ class TransmissionSystemIT {
 
         board.save("transmissionTestOutput.csv");
     }
-
 }
