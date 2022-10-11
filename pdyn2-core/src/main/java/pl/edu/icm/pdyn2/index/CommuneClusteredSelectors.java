@@ -54,7 +54,7 @@ public class CommuneClusteredSelectors {
     private void createSelectors() {
         HouseholdMapper householdMapper = (HouseholdMapper) engineConfiguration.getEngine().getMapperSet().classToMapper(Household.class);
         Mapper<Location> locationMapper = engineConfiguration.getEngine().getMapperSet().classToMapper(Location.class);
-        EntityListAttribute members = engineConfiguration.getEngine().getComponentStore().get("members");
+        EntityListAttribute members = engineConfiguration.getEngine().getStore().get("members");
 
         Multimap<String, Integer> multimap = HashMultimap.create(2500, 6000);
 

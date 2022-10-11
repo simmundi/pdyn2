@@ -115,7 +115,8 @@ public class AgentStateService {
                 // thru
             case HEALTHY:
                 Behaviour behaviour = agentEntity.getOrCreate(Behaviour.class);
-                if (behaviour.getType() == BehaviourType.SELF_ISOLATION) {
+                if (behaviour.getType() == BehaviourType.SELF_ISOLATION
+                        || behaviour.getType() == BehaviourType.HOSPITALIZED) {
                     behaviour.transitionTo(BehaviourType.ROUTINE, simulationTimer.getDaysPassed());
                 }
                 addImmunizationEvent(agentEntity, createEventFromHealth(healthStatus));

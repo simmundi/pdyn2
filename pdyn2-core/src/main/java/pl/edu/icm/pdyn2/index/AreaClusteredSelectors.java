@@ -52,7 +52,7 @@ public class AreaClusteredSelectors {
     private void createSelectors() {
         HouseholdMapper householdMapper = (HouseholdMapper) engineConfiguration.getEngine().getMapperSet().classToMapper(Household.class);
         Mapper<Location> locationMapper = engineConfiguration.getEngine().getMapperSet().classToMapper(Location.class);
-        EntityListAttribute members = engineConfiguration.getEngine().getComponentStore().get("members");
+        EntityListAttribute members = engineConfiguration.getEngine().getStore().get("members");
 
         Multimap<KilometerGridCell, Integer> multimap = HashMultimap.create(13_000_000, 100);
 

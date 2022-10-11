@@ -145,7 +145,7 @@ class TransmissionSystemIT {
     @Disabled
     void test() throws IOException {
         board.getEngine().execute(transmissionSystem);
-        var table = ((TablesawStore)board.getEngine().getComponentStore()).asTable("entities");
+        var table = ((TablesawStore)board.getEngine().getStore()).asTable("entities");
 
         assertThat(table.where(table.stringColumn("health.stage").isEqualTo("OBJAWOWY"))
                 .rowCount()).isEqualTo(1);
