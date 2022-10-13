@@ -31,7 +31,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class SowingFromDistributionIT {
-    private final ExampleDataForIntegrationTests data = new ExampleDataForIntegrationTests();
+    private final ExampleDataForIntegrationTests data = new ExampleDataForIntegrationTests(false);
     private final RandomProvider randomProvider = new MockRandomProvider();
     @Mock
     private WorkDir workDir;

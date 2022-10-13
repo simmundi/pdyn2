@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.*;
 public class AgentImpactServiceIT {
     private final static Offset<Float> VERY_CLOSE = Offset.offset(0.000001f);
 
-    ExampleDataForIntegrationTests data = new ExampleDataForIntegrationTests();
+    ExampleDataForIntegrationTests data = new ExampleDataForIntegrationTests(false);
     AgentImpactService agentImpactService = data.agentImpactService;
     AgentStateService agentStateService = data.agentStateService;
 

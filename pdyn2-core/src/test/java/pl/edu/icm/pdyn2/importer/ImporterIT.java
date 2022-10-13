@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class ImporterIT {
-    private final ExampleDataForIntegrationTests data = new ExampleDataForIntegrationTests();
+    private final ExampleDataForIntegrationTests data = new ExampleDataForIntegrationTests(false);
     private final AgentStateService agentStateService = data.agentStateService;
     @Mock
     private DiseaseStageTransitionsService transitionsService;

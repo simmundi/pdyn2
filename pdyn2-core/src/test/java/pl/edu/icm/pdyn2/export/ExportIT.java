@@ -29,7 +29,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class ExportIT {
-    private final ExampleDataForIntegrationTests data = new ExampleDataForIntegrationTests();
+    private final ExampleDataForIntegrationTests data = new ExampleDataForIntegrationTests(false);
     private final RandomProvider randomProvider = new MockRandomProvider();
     private final AgentStateService agentStateService = data.agentStateService;
     @Mock

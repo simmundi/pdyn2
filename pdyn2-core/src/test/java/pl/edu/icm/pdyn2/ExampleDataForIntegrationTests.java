@@ -36,8 +36,6 @@ import pl.edu.icm.trurl.ecs.Entity;
 import pl.edu.icm.trurl.ecs.Session;
 import pl.edu.icm.trurl.ecs.util.Selectors;
 import pl.edu.icm.trurl.ecs.util.SelectorsFactory;
-import pl.edu.icm.trurl.ecs.util.StaticSelectors;
-import pl.edu.icm.trurl.ecs.util.StaticSelectorsFactory;
 import pl.edu.icm.trurl.store.array.ArrayStoreFactory;
 
 import java.util.ArrayList;
@@ -82,7 +80,7 @@ public class ExampleDataForIntegrationTests {
     public List<Entity> allAgents;
     public final WorkDir workDir = Mockito.mock(WorkDir.class);
 
-    public ExampleDataForIntegrationTests() {
+    public ExampleDataForIntegrationTests(boolean sharedSession) {
         config = Bento.createRoot();
         config.register("gridRows", rows);
         config.register("gridColumns", cols);
@@ -99,6 +97,7 @@ public class ExampleDataForIntegrationTests {
         selectors = config.get(SelectorsFactory.IT);
 
         EngineConfiguration engineConfig = config.get(EngineConfigurationFactory.IT);
+        engineConfig.setSharedSession(sharedSession);
         engineConfig.setStoreFactory(new ArrayStoreFactory());
         engineConfig.addComponentClasses(
                 Person.class,

@@ -29,7 +29,7 @@ public class CommuneClusteredSelectors {
     private ManuallyChunkedArraySelector householdSelector;
 
     @WithFactory
-    CommuneClusteredSelectors(EngineConfiguration engineConfiguration, Selectors selectors, CommuneManager communeManager) {
+    public CommuneClusteredSelectors(EngineConfiguration engineConfiguration, Selectors selectors, CommuneManager communeManager) {
         this.engineConfiguration = engineConfiguration;
         this.communeManager = communeManager;
         engineConfiguration.addComponentClasses(Person.class, Household.class, Location.class);
