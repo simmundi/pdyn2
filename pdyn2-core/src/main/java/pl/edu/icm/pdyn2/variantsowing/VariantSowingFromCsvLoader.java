@@ -38,7 +38,8 @@ public class VariantSowingFromCsvLoader {
 
             CsvParser csvParser = new CsvParser(csvParserSettings);
             AtomicInteger counter = new AtomicInteger(0);
-            csvParser.iterateRecords(workDir.openForReading(new File(variantSowingFilename)), StandardCharsets.UTF_8)
+            var stream = workDir.openForReading(new File(variantSowingFilename));
+            csvParser.iterateRecords(stream, StandardCharsets.UTF_8)
                     .forEach(row -> {
                         VariantSowingRecordFromCsv variantFromCsv = new VariantSowingRecordFromCsv();
                         variantFromCsv.setSowingCount(row.getInt("licz_zm_odm"));
