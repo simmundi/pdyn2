@@ -10,6 +10,16 @@ public class HealthStatus {
     private int dayOfLastChange;
     private int diseaseHistory = 0;
 
+    private int duration = 0;
+
+    public int getDuration() {
+        return duration;
+    }
+
+    public void setDuration(int duration) {
+        this.duration = duration;
+    }
+
     public HealthStatus(Load diseaseLoad) {
         this.diseaseLoad = diseaseLoad;
     }

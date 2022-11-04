@@ -1,6 +1,8 @@
 package pl.edu.icm.pdyn2.progression;
 
 import net.snowyhollows.bento.annotation.WithFactory;
+import org.apache.commons.math3.distribution.PoissonDistribution;
+import org.apache.commons.math3.random.RandomGenerator;
 import pl.edu.icm.board.model.Person;
 import pl.edu.icm.board.util.RandomForChunkProvider;
 import pl.edu.icm.board.util.RandomProvider;
@@ -58,7 +60,17 @@ public class DiseaseProgressionSystemBuilder {
                     int stageDuration = diseaseStageTransitionsService
                             .durationOf(health.getDiseaseLoad(), currentStage, person.getAge());
 
-                    if (1.0 / (double) stageDuration >= random.nextDouble()) {
+                    int elapsed = health.getElapsedDays(simulationTimer.getDaysPassed());
+                    double p = 1.0;
+                    if (currentStage.isInfectious() && elapsed <= 1) {
+                        int days = new PoissonDistribution(random,
+                                stageDuration,
+                                PoissonDistribution.DEFAULT_EPSILON,
+                                PoissonDistribution.DEFAULT_MAX_ITERATIONS).sample();
+                        health.setDuration(days);
+                    }
+
+                    if (elapsed >= health.getDuration()) {
                         Stage nextStage = diseaseStageTransitionsService.outcomeOf(
                                 currentStage,
                                 entity,
