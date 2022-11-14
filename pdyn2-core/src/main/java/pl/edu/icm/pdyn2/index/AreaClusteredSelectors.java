@@ -22,8 +22,8 @@ public class AreaClusteredSelectors {
     private final int targetChunkSize = 25_000;
     private final int gridColumns;
     private final int gridRows;
-    private final int chunkWidth = 6;
-    private final int chunkHeight = 6;
+    private final int chunkWidth = 1;
+    private final int chunkHeight = 1;
     private ManuallyChunkedArraySelector personSelector;
     private ManuallyChunkedArraySelector householdSelector;
 
@@ -83,14 +83,14 @@ public class AreaClusteredSelectors {
                                 householdSelector.add(id);
                                 members.loadIds(id, (index, value) -> personSelector.add(value));
                                 status.tick();
+                                if (householdSelector.getRunningSize() >= targetChunkSize) {
+                                    householdSelector.endChunk();
+                                }
+                                if (personSelector.getRunningSize() >= targetChunkSize) {
+                                    personSelector.endChunk();
+                                }
                             }
                         }
-                    }
-                    if (householdSelector.getRunningSize() >= targetChunkSize) {
-                        householdSelector.endChunk();
-                    }
-                    if (personSelector.getRunningSize() >= targetChunkSize) {
-                        personSelector.endChunk();
                     }
                 }
             }

@@ -36,10 +36,10 @@ public class StreetUrizen {
             statusCollecting.tick();
             KilometerGridCell center = KilometerGridCell.fromLocation(location);
             kilometerGridCellsWithLocation.add(center);
-            kilometerGridCellsWithLocation.add(center.neighbourE());
-            kilometerGridCellsWithLocation.add(center.neighbourW());
-            kilometerGridCellsWithLocation.add(center.neighbourN());
-            kilometerGridCellsWithLocation.add(center.neighbourS());
+//            kilometerGridCellsWithLocation.add(center.neighbourE());
+//            kilometerGridCellsWithLocation.add(center.neighbourW());
+//            kilometerGridCellsWithLocation.add(center.neighbourN());
+//            kilometerGridCellsWithLocation.add(center.neighbourS());
         }));
         statusCollecting.done("found: " + kilometerGridCellsWithLocation.size() + " street locations");
         var statusBuilding = Status.of("Building streets", 10000);
