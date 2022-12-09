@@ -62,15 +62,15 @@ public class DiseaseProgressionSystemBuilder {
 
                     int elapsed = health.getElapsedDays(simulationTimer.getDaysPassed());
                     double p = 1.0;
-                    if (currentStage.isInfectious() && elapsed <= 1) {
-                        int days = new PoissonDistribution(random,
-                                stageDuration,
-                                PoissonDistribution.DEFAULT_EPSILON,
-                                PoissonDistribution.DEFAULT_MAX_ITERATIONS).sample();
-                        health.setDuration(days);
-                    }
+//                    if (currentStage.isInfectious() && elapsed <= 1) {
+//                        int days = new PoissonDistribution(random,
+//                                stageDuration,
+//                                PoissonDistribution.DEFAULT_EPSILON,
+//                                PoissonDistribution.DEFAULT_MAX_ITERATIONS).sample();
+//                        health.setDuration(days);
+//                    }
 
-                    if (elapsed >= health.getDuration()) {
+                    if (1.0 / stageDuration >= random.nextDouble()) {
                         Stage nextStage = diseaseStageTransitionsService.outcomeOf(
                                 currentStage,
                                 entity,
