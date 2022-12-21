@@ -1,7 +1,7 @@
 dependencies {
-    annotationProcessor 'pl.edu.icm.em:trurl-generator:1.1-SNAPSHOT'
+    annotationProcessor "pl.edu.icm.em:trurl-generator:${trurlVersion}"
 
-    api 'pl.edu.icm.em:trurl-core:1.1-SNAPSHOT'
+    api "pl.edu.icm.em:trurl-core:${trurlVersion}"
 }
 
 publishing {

@@ -1,18 +1,18 @@
 dependencies {
     annotationProcessor "net.snowyhollows.bento:bento-generator:${bentoVersion}"
-    annotationProcessor 'pl.edu.icm.em:trurl-generator:1.1-SNAPSHOT'
+    annotationProcessor "pl.edu.icm.em:trurl-generator:${trurlVersion}"
 
     implementation "com.graphhopper:graphhopper-core:${grasshopperVersion}"
     implementation "net.snowyhollows.bento:bento-config:${bentoVersion}"
-    implementation 'pl.edu.icm.em:em-common:1.1-SNAPSHOT'
+    implementation "pl.edu.icm.em:em-common:${emCommonVersion}"
 
     api project(":pdyn2-model")
 
-    api 'pl.edu.icm.em:soc-struct-core:1.1-SNAPSHOT'
-    api 'pl.edu.icm.em:soc-struct-model:1.1-SNAPSHOT'
-    api 'pl.edu.icm.em:trurl-orc:1.1-SNAPSHOT'
-    api 'pl.edu.icm.em:trurl-store-tablesaw:1.1-SNAPSHOT'
-    api 'pl.edu.icm.em:trurl-core:1.1-SNAPSHOT'
+    api "pl.edu.icm.em:soc-struct-core:${socStructVersion}"
+    api "pl.edu.icm.em:soc-struct-model:${socStructVersion}"
+    api "pl.edu.icm.em:trurl-orc:${trurlVersion}"
+    api "pl.edu.icm.em:trurl-store-tablesaw:${trurlVersion}"
+    api "pl.edu.icm.em:trurl-core:${trurlVersion}"
     api "net.snowyhollows.bento:bento-core:${bentoVersion}"
 
     runtimeOnly "org.slf4j:slf4j-simple:${slf4jVersion}"
