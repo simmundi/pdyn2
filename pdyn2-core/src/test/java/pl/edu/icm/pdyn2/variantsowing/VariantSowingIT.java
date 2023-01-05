@@ -32,7 +32,6 @@ import pl.edu.icm.pdyn2.ExampleDataForIntegrationTests;
 import pl.edu.icm.pdyn2.MockRandomProvider;
 import pl.edu.icm.pdyn2.StatsService;
 import pl.edu.icm.pdyn2.index.CommuneClusteredSelectors;
-import pl.edu.icm.pdyn2.model.immunization.Load;
 import pl.edu.icm.pdyn2.model.progression.HealthStatus;
 import pl.edu.icm.pdyn2.time.SimulationTimer;
 import pl.edu.icm.trurl.ecs.Entity;
@@ -93,13 +92,13 @@ public class VariantSowingIT {
                 simulationTimer);
         variantSowingSystemBuilder.load();
 
-        agentStateService.infect(data.agent1, Load.ALPHA);
-        agentStateService.infect(data.agent2, Load.WILD);
-        agentStateService.infect(data.agent3, Load.WILD);
-        agentStateService.infect(data.agent4, Load.ALPHA);
-        agentStateService.infect(data.agent5, Load.ALPHA);
-        agentStateService.infect(data.agent6, Load.ALPHA);
-        agentStateService.infect(data.agentA, Load.WILD);
+        agentStateService.infect(data.agent1, data.alpha);
+        agentStateService.infect(data.agent2, data.wild);
+        agentStateService.infect(data.agent3, data.wild);
+        agentStateService.infect(data.agent4, data.alpha);
+        agentStateService.infect(data.agent5, data.alpha);
+        agentStateService.infect(data.agent6, data.alpha);
+        agentStateService.infect(data.agentA, data.wild);
         data.session.close();
 
         var variantSowing = variantSowingSystemBuilder.buildVariantSowingSystem();
@@ -107,12 +106,12 @@ public class VariantSowingIT {
             data.engine.execute(sequence(variantSowing, simulationTimer));
         }
 
-        assertThat(data.agent1.get(HealthStatus.class).getDiseaseLoad()).isEqualTo(Load.ALPHA);
-        assertThat(data.agent2.get(HealthStatus.class).getDiseaseLoad()).isEqualTo(Load.ALPHA);
-        assertThat(data.agent3.get(HealthStatus.class).getDiseaseLoad()).isEqualTo(Load.ALPHA);
-        assertThat(data.agent4.get(HealthStatus.class).getDiseaseLoad()).isEqualTo(Load.DELTA);
-        assertThat(data.agent5.get(HealthStatus.class).getDiseaseLoad()).isEqualTo(Load.DELTA);
-        assertThat(data.agent6.get(HealthStatus.class).getDiseaseLoad()).isEqualTo(Load.DELTA);
-        assertThat(data.agentA.get(HealthStatus.class).getDiseaseLoad()).isEqualTo(Load.ALPHA);
+        assertThat(data.agent1.get(HealthStatus.class).getDiseaseLoad()).isEqualTo(data.alpha);
+        assertThat(data.agent2.get(HealthStatus.class).getDiseaseLoad()).isEqualTo(data.alpha);
+        assertThat(data.agent3.get(HealthStatus.class).getDiseaseLoad()).isEqualTo(data.alpha);
+        assertThat(data.agent4.get(HealthStatus.class).getDiseaseLoad()).isEqualTo(data.delta);
+        assertThat(data.agent5.get(HealthStatus.class).getDiseaseLoad()).isEqualTo(data.delta);
+        assertThat(data.agent6.get(HealthStatus.class).getDiseaseLoad()).isEqualTo(data.delta);
+        assertThat(data.agentA.get(HealthStatus.class).getDiseaseLoad()).isEqualTo(data.alpha);
     }
 }

@@ -34,15 +34,16 @@ import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.groups.Tuple.tuple;
-import static pl.edu.icm.pdyn2.model.immunization.Load.ALPHA;
-import static pl.edu.icm.pdyn2.model.immunization.Load.ASTRA;
-import static pl.edu.icm.pdyn2.model.immunization.Load.BOOSTER;
-import static pl.edu.icm.pdyn2.model.immunization.Load.DELTA;
-import static pl.edu.icm.pdyn2.model.immunization.Load.MODERNA;
-import static pl.edu.icm.pdyn2.model.immunization.Load.PFIZER;
 
 public class ImmunizationIT {
     private Mapper<Immunization> mapper;
+    private final static Load ALPHA = new Load("ALPHA", LoadClassification.VIRUS,-1,1,"");
+    private final static Load DELTA = new Load("DELTA", LoadClassification.VIRUS,-1,2,"");
+    private final static Load PFIZER = new Load("PFIZER", LoadClassification.VACCINE,0,-1,"");
+    private final static Load ASTRA = new Load("ASTRA", LoadClassification.VACCINE,1,-1,"");
+    private final static Load MODERNA = new Load("MODERNA", LoadClassification.VACCINE,2,-1,"");
+    private final static Load BOOSTER = new Load("BOOSTER", LoadClassification.VACCINE,3,-1,"");
+
 
     Store store = new ArrayStore(10);
 

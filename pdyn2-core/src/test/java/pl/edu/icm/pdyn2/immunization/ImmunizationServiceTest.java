@@ -23,8 +23,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import pl.edu.icm.pdyn2.ExampleDataForIntegrationTests;
 import pl.edu.icm.pdyn2.model.immunization.Immunization;
-import pl.edu.icm.pdyn2.model.immunization.Load;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -37,6 +37,8 @@ class ImmunizationServiceTest {
     ImmunizationStrategyProvider mockprovider;
     @Mock
     ImmunizationStrategy immunizationStrategy;
+
+    ExampleDataForIntegrationTests data = new ExampleDataForIntegrationTests(false);
 
     @BeforeEach
     void before() {
@@ -51,7 +53,7 @@ class ImmunizationServiceTest {
         //execute
         var coef = immunizationService.getImmunizationCoefficient(new Immunization(),
                 ImmunizationStage.LATENTNY,
-                Load.WILD,
+                data.wild,
                 0);
         //assert
         assertThat(coef).isEqualTo(0.5f);

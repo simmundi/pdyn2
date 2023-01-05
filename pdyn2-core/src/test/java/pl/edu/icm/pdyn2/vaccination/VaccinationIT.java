@@ -34,7 +34,6 @@ import pl.edu.icm.pdyn2.StatsService;
 import pl.edu.icm.pdyn2.index.CommuneClusteredSelectors;
 import pl.edu.icm.pdyn2.model.immunization.Immunization;
 import pl.edu.icm.pdyn2.model.immunization.ImmunizationEvent;
-import pl.edu.icm.pdyn2.model.immunization.Load;
 import pl.edu.icm.pdyn2.time.SimulationTimer;
 import pl.edu.icm.trurl.ecs.Entity;
 import pl.edu.icm.trurl.ecs.selector.Chunk;
@@ -96,12 +95,12 @@ public class VaccinationIT {
 
         var event1 = new ImmunizationEvent();
         event1.setDay(0);
-        event1.setLoad(Load.PFIZER);
+        event1.setLoad(data.pfizer);
 
         agentStateService.vaccinate(data.agent1, event1);
         agentStateService.vaccinate(data.agent7, event1);
         agentStateService.vaccinate(data.agent8, event1);
-        agentStateService.infect(data.agent9, Load.OMICRON);
+        agentStateService.infect(data.agent9, data.omicron);
 
         data.session.close();
         var vaccinationSystem = vaccinationSystemBuilder.buildVaccinationSystem();
@@ -111,12 +110,12 @@ public class VaccinationIT {
             ));
         }
 
-        assertThat(data.agent1.get(Immunization.class).getEvents().get(0).getLoad()).isEqualTo(Load.PFIZER);
-        assertThat(data.agent2.get(Immunization.class).getEvents().get(0).getLoad()).isEqualTo(Load.PFIZER);
-        assertThat(data.agent3.get(Immunization.class).getEvents().get(0).getLoad()).isEqualTo(Load.PFIZER);
-        assertThat(data.agent4.get(Immunization.class).getEvents().get(0).getLoad()).isEqualTo(Load.BOOSTER);
-        assertThat(data.agent5.get(Immunization.class).getEvents().get(0).getLoad()).isEqualTo(Load.BOOSTER);
-        assertThat(data.agent6.get(Immunization.class).getEvents().get(0).getLoad()).isEqualTo(Load.BOOSTER);
-        assertThat(data.agentA.get(Immunization.class).getEvents().get(0).getLoad()).isEqualTo(Load.PFIZER);
+        assertThat(data.agent1.get(Immunization.class).getEvents().get(0).getLoad()).isEqualTo(data.pfizer);
+        assertThat(data.agent2.get(Immunization.class).getEvents().get(0).getLoad()).isEqualTo(data.pfizer);
+        assertThat(data.agent3.get(Immunization.class).getEvents().get(0).getLoad()).isEqualTo(data.pfizer);
+        assertThat(data.agent4.get(Immunization.class).getEvents().get(0).getLoad()).isEqualTo(data.booster);
+        assertThat(data.agent5.get(Immunization.class).getEvents().get(0).getLoad()).isEqualTo(data.booster);
+        assertThat(data.agent6.get(Immunization.class).getEvents().get(0).getLoad()).isEqualTo(data.booster);
+        assertThat(data.agentA.get(Immunization.class).getEvents().get(0).getLoad()).isEqualTo(data.pfizer);
     }
 }

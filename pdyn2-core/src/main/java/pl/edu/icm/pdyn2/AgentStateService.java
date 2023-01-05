@@ -207,7 +207,7 @@ public class AgentStateService {
     }
 
     public void vaccinate(Entity agentEntity, ImmunizationEvent vaccinationEvent) {
-        Preconditions.checkArgument(vaccinationEvent.getLoad().classification == LoadClassification.VACCINE, "Agent can only be vaccinated with a vaccine!");
+        Preconditions.checkArgument(vaccinationEvent.getLoad().getClassification() == LoadClassification.VACCINE, "Agent can only be vaccinated with a vaccine!");
         addImmunizationEvent(agentEntity, vaccinationEvent);
     }
 
@@ -220,7 +220,7 @@ public class AgentStateService {
 
     public void changeLoad(Entity agentEntity, Load targetLoad) {
         var health = getHealthStatus(agentEntity);
-        Preconditions.checkArgument(targetLoad.classification.equals(LoadClassification.VIRUS), "Variant can be changed only to another virus load");
+        Preconditions.checkArgument(targetLoad.getClassification().equals(LoadClassification.VIRUS), "Variant can be changed only to another virus load");
         Preconditions.checkArgument(health.getStage().equals(LATENT), "Only latent agents can have their load changed");
 
         health.setDiseaseLoad(targetLoad);

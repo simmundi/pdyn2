@@ -22,13 +22,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import pl.edu.icm.pdyn2.model.immunization.Load;
+import pl.edu.icm.pdyn2.model.immunization.LoadClassification;
 import pl.edu.icm.trurl.ecs.mapper.Mapper;
 import pl.edu.icm.trurl.ecs.mapper.Mappers;
 import pl.edu.icm.trurl.store.Store;
 import pl.edu.icm.trurl.store.array.ArrayStore;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -39,14 +39,15 @@ import static pl.edu.icm.pdyn2.model.context.ContextType.HOUSEHOLD;
 import static pl.edu.icm.pdyn2.model.context.ContextType.SCHOOL;
 import static pl.edu.icm.pdyn2.model.context.ContextType.STREET_10;
 import static pl.edu.icm.pdyn2.model.context.ContextType.WORKPLACE;
-import static pl.edu.icm.pdyn2.model.immunization.Load.ALPHA;
-import static pl.edu.icm.pdyn2.model.immunization.Load.BA2;
-import static pl.edu.icm.pdyn2.model.immunization.Load.DELTA;
-import static pl.edu.icm.pdyn2.model.immunization.Load.OMICRON;
-import static pl.edu.icm.pdyn2.model.immunization.Load.WILD;
 
 public class ContextIT {
     private Mapper<Context> mapper;
+    private static final Load WILD = new Load("WILD", LoadClassification.VIRUS,-1,0,"");
+    private static final Load ALPHA = new Load("ALPHA", LoadClassification.VIRUS,-1,1,"");
+    private static final Load DELTA = new Load("DELTA", LoadClassification.VIRUS,-1,2,"");
+    private static final Load OMICRON = new Load("OMICRON", LoadClassification.VIRUS,-1,3,"");
+    private static final Load BA2 = new Load("BA2", LoadClassification.VIRUS,-1,4,"");
+
 
     Store store = new ArrayStore(10000);
 

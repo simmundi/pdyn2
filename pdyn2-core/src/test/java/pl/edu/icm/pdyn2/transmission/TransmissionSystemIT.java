@@ -39,9 +39,11 @@ import pl.edu.icm.board.model.Workplace;
 import pl.edu.icm.board.util.RandomForChunkProvider;
 import pl.edu.icm.board.util.RandomProvider;
 import pl.edu.icm.pdyn2.AgentStateService;
+import pl.edu.icm.pdyn2.MockLoadService;
 import pl.edu.icm.pdyn2.StatsService;
 import pl.edu.icm.pdyn2.context.ContextsService;
 import pl.edu.icm.pdyn2.immunization.ImmunizationService;
+import pl.edu.icm.pdyn2.immunization.LoadService;
 import pl.edu.icm.pdyn2.index.AreaClusteredSelectors;
 import pl.edu.icm.pdyn2.index.AreaIndex;
 import pl.edu.icm.pdyn2.model.context.Context;
@@ -115,6 +117,8 @@ class TransmissionSystemIT {
 
     private EntitySystem transmissionSystem;
 
+    private LoadService loadService = new MockLoadService();
+
     @BeforeEach
     void before() throws IOException {
         EngineConfiguration engineConfiguration = new EngineConfiguration();
@@ -141,7 +145,12 @@ class TransmissionSystemIT {
         when(randomProvider.getRandomGenerator(TransmissionSystemBuilder.class)).thenReturn(randomGenerator);
         when(randomProvider.getRandomForChunkProvider(TransmissionSystemBuilder.class)).thenReturn(randomForChunkProvider);
         contextsService = new ContextsService(areaIndex);
-        transmissionService = new TransmissionService(contextsService, relativeAlphaConfig, transmissionConfig, simulationTimer, immunizationService);
+        transmissionService = new TransmissionService(contextsService,
+                relativeAlphaConfig,
+                transmissionConfig,
+                simulationTimer,
+                immunizationService,
+                loadService);
         transmissionSystemBuilder = new TransmissionSystemBuilder(
                 transmissionService,
                 agentStateService,

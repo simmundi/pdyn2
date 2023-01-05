@@ -35,6 +35,8 @@ import pl.edu.icm.pdyn2.model.behaviour.Behaviour;
 import pl.edu.icm.pdyn2.model.context.Context;
 import pl.edu.icm.pdyn2.model.context.Inhabitant;
 import pl.edu.icm.pdyn2.model.immunization.Immunization;
+import pl.edu.icm.pdyn2.model.immunization.Load;
+import pl.edu.icm.pdyn2.model.immunization.LoadClassification;
 import pl.edu.icm.pdyn2.model.impact.Impact;
 import pl.edu.icm.pdyn2.model.progression.HealthStatus;
 import pl.edu.icm.pdyn2.model.travel.Travel;
@@ -58,6 +60,18 @@ public class EmptyDataForIntegrationTests {
     public final int cols = 100;
     public final int rows = 100;
     public final WorkDir workDir = Mockito.mock(WorkDir.class);
+    public final Load wild = new Load("WILD", LoadClassification.VIRUS,-1,0,"");
+    public final Load alpha = new Load("ALPHA", LoadClassification.VIRUS,-1,1,"");
+    public final Load delta = new Load("DELTA", LoadClassification.VIRUS,-1,2,"");
+    public final Load omicron = new Load("OMICRON", LoadClassification.VIRUS,-1,3,"");
+    public final Load ba2 = new Load("BA2", LoadClassification.VIRUS,-1,4,"");
+    public final Load ba45 = new Load("BA45", LoadClassification.VIRUS,-1,5,"");
+    public final Load pfizer = new Load("PFIZER", LoadClassification.VACCINE,0,-1,"");
+    public final Load astra = new Load("ASTRA", LoadClassification.VACCINE,1,-1,"");
+    public final Load moderna = new Load("MODERNA", LoadClassification.VACCINE,2,-1,"");
+    public final Load booster = new Load("BOOSTER", LoadClassification.VACCINE,3,-1,"");
+
+
 
     public EmptyDataForIntegrationTests() {
         config = Bento.createRoot();

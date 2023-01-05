@@ -1,5 +1,5 @@
 group 'pl.edu.icm.em'
-version '1.1'
+version '1.2-SNAPSHOT'
 
 subprojects {
 
@@ -89,7 +89,7 @@ subprojects {
         bentoVersion = '1.4'
         emCommonVersion = "1.1"
         socStructVersion = "1.1"
-        trurlVersion = "1.1"
+        trurlVersion = "1.2-SNAPSHOT"
         geotoolsVersion = '26-RC'
         grasshopperVersion = '4.0'
         univocityVersion = '2.8.4'

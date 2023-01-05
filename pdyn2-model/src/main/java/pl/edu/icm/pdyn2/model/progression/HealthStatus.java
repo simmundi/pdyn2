@@ -33,7 +33,6 @@ public class HealthStatus {
     }
 
     public HealthStatus() {
-        this.diseaseLoad = Load.WILD;
     }
 
     public Stage getStage() {

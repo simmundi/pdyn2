@@ -22,8 +22,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import pl.edu.icm.pdyn2.ExampleDataForIntegrationTests;
 import pl.edu.icm.pdyn2.model.immunization.Immunization;
-import pl.edu.icm.pdyn2.model.immunization.Load;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -34,6 +34,8 @@ class SimpleImmunizationStrategyTest {
     @Mock
     Immunization immunization;
 
+    ExampleDataForIntegrationTests data = new ExampleDataForIntegrationTests(false);
+
     @Test
     void getImmunizationCoefficient() {
         //given
@@ -41,7 +43,7 @@ class SimpleImmunizationStrategyTest {
         //execute
         var coef = simpleImmunizationStrategy.getImmunizationCoefficient(immunization,
                 ImmunizationStage.LATENTNY,
-                Load.WILD,
+                data.wild,
                 0);
         //assert
         assertThat(coef).isEqualTo(0.3f);

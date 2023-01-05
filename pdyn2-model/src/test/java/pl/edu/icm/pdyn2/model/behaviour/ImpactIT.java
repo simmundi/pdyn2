@@ -24,6 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.edu.icm.pdyn2.model.immunization.Load;
+import pl.edu.icm.pdyn2.model.immunization.LoadClassification;
 import pl.edu.icm.pdyn2.model.impact.Impact;
 import pl.edu.icm.pdyn2.model.progression.HealthStatus;
 import pl.edu.icm.pdyn2.model.progression.Stage;
@@ -38,6 +39,8 @@ import static org.assertj.core.api.Assertions.*;
 class ImpactIT {
 
     private Mapper<Impact> mapper;
+    private static final Load BA2 = new Load("BA2", LoadClassification.VIRUS,-1,4,"");
+
     Store store = new ArrayStore(10);
 
     @BeforeEach
@@ -51,7 +54,7 @@ class ImpactIT {
     public void save() {
         // given
         var health = new HealthStatus();
-        health.setDiseaseLoad(Load.BA2);
+        health.setDiseaseLoad(BA2);
         health.setStage(Stage.INFECTIOUS_ASYMPTOMATIC);
         var behavior = new Behaviour();
         behavior.transitionTo(BehaviourType.DORMANT, 2);
@@ -73,7 +76,7 @@ class ImpactIT {
     public void isDifferentFrom() {
         // given
         var health = new HealthStatus();
-        health.setDiseaseLoad(Load.BA2);
+        health.setDiseaseLoad(BA2);
         health.setStage(Stage.INFECTIOUS_ASYMPTOMATIC);
         var behavior = new Behaviour();
         behavior.transitionTo(BehaviourType.ROUTINE, 2);
@@ -93,7 +96,7 @@ class ImpactIT {
     public void isDifferentFrom__same() {
         // given
         var health = new HealthStatus();
-        health.setDiseaseLoad(Load.BA2);
+        health.setDiseaseLoad(BA2);
         health.setStage(Stage.INFECTIOUS_ASYMPTOMATIC);
         var behavior = new Behaviour();
         var impact = new Impact();

@@ -18,31 +18,80 @@
 
 package pl.edu.icm.pdyn2.model.immunization;
 
-import static pl.edu.icm.pdyn2.model.immunization.LoadClassification.VACCINE;
-import static pl.edu.icm.pdyn2.model.immunization.LoadClassification.VIRUS;
+import pl.edu.icm.trurl.ecs.annotation.WithMapper;
 
-public enum Load {
-    WILD(VIRUS),
-    ALPHA(VIRUS),
-    DELTA(VIRUS),
-    OMICRON(VIRUS),
-    BA2(VIRUS),
-    BA45(VIRUS),
+import java.util.Objects;
 
-    PFIZER(VACCINE),
-    ASTRA(VACCINE),
-    MODERNA(VACCINE),
-    BOOSTER(VACCINE);
+@WithMapper
+public class Load {
 
-    public final LoadClassification classification;
+    private String loadName;
+    private LoadClassification classification;
+    private int vaccineEncoding;
+    private int virusEncoding;
+    private String stageTransitionsFilename;
 
-    Load(LoadClassification classification) {
+    public Load() {
+
+    }
+
+    public Load(String loadName,
+                LoadClassification classification,
+                int vaccineEncoding,
+                int virusEncoding,
+                String stageTransitionsFilename) {
+        this.loadName = loadName;
+        this.classification = classification;
+        this.vaccineEncoding = vaccineEncoding;
+        this.virusEncoding = virusEncoding;
+        this.stageTransitionsFilename = stageTransitionsFilename;
+    }
+
+    public String getLoadName() {
+        return loadName;
+    }
+
+    public void setLoadName(String loadName) {
+        this.loadName = loadName;
+    }
+
+    public LoadClassification getClassification() {
+        return classification;
+    }
+
+    public void setClassification(LoadClassification classification) {
         this.classification = classification;
     }
 
-    public static Load[] viruses() {
-        return new Load[]{
-                WILD, ALPHA, DELTA, OMICRON, BA2, BA45
-        };
+    public int getVaccineEncoding() {
+        return vaccineEncoding;
+    }
+
+    public void setVaccineEncoding(int vaccineEncoding) {
+        this.vaccineEncoding = vaccineEncoding;
+    }
+
+    public int getVirusEncoding() {
+        return virusEncoding;
+    }
+
+    public void setVirusEncoding(int virusEncoding) {
+        this.virusEncoding = virusEncoding;
+    }
+
+    public String getStageTransitionsFilename() {
+        return stageTransitionsFilename;
+    }
+
+    public void setStageTransitionsFilename(String stageTransitionsFilename) {
+        this.stageTransitionsFilename = stageTransitionsFilename;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Load that = (Load) o;
+        return Objects.equals(loadName, that.loadName);
     }
 }

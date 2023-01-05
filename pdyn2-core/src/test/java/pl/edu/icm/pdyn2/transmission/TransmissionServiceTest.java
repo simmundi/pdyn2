@@ -23,12 +23,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import pl.edu.icm.board.model.Person;
 import pl.edu.icm.pdyn2.ComponentCreator;
 import pl.edu.icm.pdyn2.EntityMocker;
+import pl.edu.icm.pdyn2.ExampleDataForIntegrationTests;
+import pl.edu.icm.pdyn2.MockLoadService;
 import pl.edu.icm.pdyn2.context.ContextsService;
 import pl.edu.icm.pdyn2.immunization.ImmunizationService;
 import pl.edu.icm.pdyn2.immunization.ImmunizationStage;
+import pl.edu.icm.pdyn2.immunization.LoadService;
 import pl.edu.icm.pdyn2.model.context.ContextInfectivityClass;
 import pl.edu.icm.pdyn2.model.context.ContextType;
 import pl.edu.icm.pdyn2.model.immunization.Immunization;
@@ -38,6 +40,7 @@ import pl.edu.icm.pdyn2.time.SimulationTimer;
 import pl.edu.icm.trurl.ecs.Entity;
 import pl.edu.icm.trurl.ecs.Session;
 import pl.edu.icm.trurl.sampleSpace.EnumSampleSpace;
+import pl.edu.icm.trurl.sampleSpace.SampleSpace;
 
 import java.util.Map;
 import java.util.stream.Stream;
@@ -62,6 +65,8 @@ class TransmissionServiceTest {
     Session session;
     EntityMocker entityMocker;
     TransmissionService transmissionService;
+    ExampleDataForIntegrationTests data = new ExampleDataForIntegrationTests(false);
+    LoadService loadService = new MockLoadService();
 
     @BeforeEach
     void before() {
@@ -71,14 +76,15 @@ class TransmissionServiceTest {
                 relativeAlphaConfig,
                 transmissionConfig,
                 simulationTimer,
-                immunizationService);
+                immunizationService,
+                loadService);
     }
 
     @Test
     void consideredForInfection() {
         // given
         Entity healthyAgent = entityMocker.entity(ComponentCreator.health(null, Stage.HEALTHY));
-        Entity sickAgent = entityMocker.entity(ComponentCreator.health(Load.BA2, Stage.INFECTIOUS_SYMPTOMATIC));
+        Entity sickAgent = entityMocker.entity(ComponentCreator.health(data.ba2, Stage.INFECTIOUS_SYMPTOMATIC));
 
         // execute
         var consideredHealthy = transmissionService.consideredForInfection(healthyAgent);
@@ -98,14 +104,14 @@ class TransmissionServiceTest {
         when(contextsService.findActiveContextsForAgent(agent))
                 .thenReturn(Stream.of( // relativeAlpha is 10f, weightForType is always 1f:
                         // so in HOUSEHOLD (10 agents), 1f of exposure is equal to impact 1f
-                        ComponentCreator.context(ContextType.HOUSEHOLD, 10, Map.of(Load.WILD, 1f, Load.BA2, 1f, Load.ALPHA, 3f)),
+                        ComponentCreator.context(ContextType.HOUSEHOLD, 10, Map.of(data.wild, 1f, data.ba2, 1f, data.alpha, 3f)),
                         // so in SCHOOL (100 agents), 10f of exposure is equal to impact 1f
-                        ComponentCreator.context(ContextType.SCHOOL, 100, Map.of(Load.DELTA, 10f, Load.BA2, 10f, Load.OMICRON, 80f)),
-                        ComponentCreator.context(ContextType.STREET_10, 100, Map.of(Load.BA45, 100f)),
-                        ComponentCreator.context(ContextType.STREET_20, 100, Map.of(Load.BA45, 50f))));
+                        ComponentCreator.context(ContextType.SCHOOL, 100, Map.of(data.delta, 10f, data.ba2, 10f, data.omicron, 80f)),
+                        ComponentCreator.context(ContextType.STREET_10, 100, Map.of(data.ba45, 100f)),
+                        ComponentCreator.context(ContextType.STREET_20, 100, Map.of(data.ba45, 50f))));
 
         // execute
-        EnumSampleSpace<Load> exposure = new EnumSampleSpace<>(Load.class);
+        SampleSpace<Load> exposure = new SampleSpace<>();
         EnumSampleSpace<ContextInfectivityClass> sources = new EnumSampleSpace<>(ContextInfectivityClass.class);
         transmissionService.gatherExposurePerLoadAndContextForAgent(
                 exposure,
@@ -113,12 +119,12 @@ class TransmissionServiceTest {
                 agent);
 
         // assert
-        assertThat(exposure.getProbability(Load.WILD)).isEqualTo(1f);
-        assertThat(exposure.getProbability(Load.BA2)).isEqualTo(2f);
-        assertThat(exposure.getProbability(Load.ALPHA)).isEqualTo(3f);
-        assertThat(exposure.getProbability(Load.DELTA)).isEqualTo(1f);
-        assertThat(exposure.getProbability(Load.OMICRON)).isEqualTo(8f);
-        assertThat(exposure.getProbability(Load.BA45)).isEqualTo(15f);
+        assertThat(exposure.getProbability(data.wild)).isEqualTo(1f);
+        assertThat(exposure.getProbability(data.ba2)).isEqualTo(2f);
+        assertThat(exposure.getProbability(data.alpha)).isEqualTo(3f);
+        assertThat(exposure.getProbability(data.delta)).isEqualTo(1f);
+        assertThat(exposure.getProbability(data.omicron)).isEqualTo(8f);
+        assertThat(exposure.getProbability(data.ba45)).isEqualTo(15f);
         assertThat(exposure.sumOfProbabilities()).isEqualTo(30f);
 
         assertThat(sources.getProbability(ContextInfectivityClass.HOUSEHOLD)).isEqualTo(5f);
@@ -145,9 +151,9 @@ class TransmissionServiceTest {
     @Test
     void selectLoad() {
         // given
-        EnumSampleSpace<Load> exposure = new EnumSampleSpace<>(Load.class);
-        exposure.changeOutcome(Load.BA2, 0.1f);
-        exposure.changeOutcome(Load.OMICRON, 0.1f);
+        SampleSpace<Load> exposure = new SampleSpace<>();
+        exposure.changeOutcome(data.ba2, 0.1f);
+        exposure.changeOutcome(data.omicron, 0.1f);
 
         // execute
         var loadA = transmissionService.selectLoad(exposure, 0.49);
@@ -155,9 +161,9 @@ class TransmissionServiceTest {
         var loadC = transmissionService.selectLoad(exposure, 0.999999999999);
 
         // assert
-        assertThat(loadA).isEqualTo(Load.OMICRON);
-        assertThat(loadB).isEqualTo(Load.BA2);
-        assertThat(loadC).isEqualTo(Load.BA2);
+        assertThat(loadA).isEqualTo(data.omicron);
+        assertThat(loadB).isEqualTo(data.ba2);
+        assertThat(loadC).isEqualTo(data.ba2);
     }
 
     @Test
@@ -167,11 +173,11 @@ class TransmissionServiceTest {
         Immunization immunization = ComponentCreator.immunization();
         Entity agent = entityMocker.entity(immunization);
         when(simulationTimer.getDaysPassed()).thenReturn(day);
-        when(immunizationService.getImmunizationCoefficient(immunization, ImmunizationStage.LATENTNY, Load.WILD, day))
+        when(immunizationService.getImmunizationCoefficient(immunization, ImmunizationStage.LATENTNY, data.wild, day))
                 .thenReturn(0.5f);
 
         // execute
-        var result = transmissionService.adjustProbabilityWithImmunity(0.1, Load.WILD, agent);
+        var result = transmissionService.adjustProbabilityWithImmunity(0.1, data.wild, agent);
 
         // assert
         assertThat(result).isEqualTo(0.05);

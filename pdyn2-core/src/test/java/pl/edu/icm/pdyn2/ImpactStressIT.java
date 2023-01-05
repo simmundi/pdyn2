@@ -54,7 +54,7 @@ public class ImpactStressIT {
     public static final int TOTAL_TEST_TIME_IN_MILLIS = 10000;
     EmptyDataForIntegrationTests data = new EmptyDataForIntegrationTests();
     BehaviourType[] behaviours = { BehaviourType.ROUTINE, BehaviourType.PRIVATE_TRAVEL, BehaviourType.HOSPITALIZED };
-    Load[] loads = { Load.WILD, Load.ALPHA, Load.OMICRON };
+    Load[] loads = { data.wild, data.alpha, data.omicron};
     Stage[] stages = { Stage.HEALTHY, Stage.INFECTIOUS_SYMPTOMATIC, Stage.INFECTIOUS_ASYMPTOMATIC };
 
     Random random = new Random(0);

@@ -25,7 +25,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import pl.edu.icm.pdyn2.model.immunization.Load;
+import pl.edu.icm.pdyn2.ExampleDataForIntegrationTests;
 import pl.edu.icm.pdyn2.model.progression.Stage;
 
 import static org.assertj.core.api.Assertions.*;
@@ -41,6 +41,8 @@ class LoadDiseaseStageTransitionsReaderTest {
     @InjectMocks
     LoadDiseaseStageTransitionsReader reader;
 
+    ExampleDataForIntegrationTests data = new ExampleDataForIntegrationTests(false);
+
     @Test
     @DisplayName("Should create a correct LoadDiseaseStageTransitions instance")
     void readFromFile() {
@@ -49,7 +51,7 @@ class LoadDiseaseStageTransitionsReaderTest {
                 LoadDiseaseStageTransitionsTest.class.getResourceAsStream("/stanCzasTest.txt"));
 
         // execute
-        LoadDiseaseStageTransitions transition = reader.readFromFile("stan_czas.txt", Load.WILD);
+        LoadDiseaseStageTransitions transition = reader.readFromFile("stan_czas.txt", data.wild);
 
         // assert
         assertThat(transition.durationOf(Stage.LATENT, 7)).isPositive();

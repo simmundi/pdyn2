@@ -23,6 +23,7 @@ import pl.edu.icm.board.Board;
 import pl.edu.icm.board.model.Household;
 import pl.edu.icm.board.model.Person;
 import pl.edu.icm.pdyn2.AgentStateService;
+import pl.edu.icm.pdyn2.immunization.LoadService;
 import pl.edu.icm.pdyn2.model.immunization.ImmunizationEvent;
 import pl.edu.icm.pdyn2.model.immunization.Load;
 import pl.edu.icm.pdyn2.model.immunization.LoadClassification;
@@ -44,6 +45,7 @@ public class ImmunizationEventsImporterFromAgentId {
     private final AgentStateService agentStateService;
     private final SimulationTimer simulationTimer;
     private final DiseaseStageTransitionsService transitionsService;
+    private final LoadService loadService;
 
     @WithFactory
     public ImmunizationEventsImporterFromAgentId(ImmunizationEventsLoaderFromAgentId immunizationEventsLoaderFromAgentId,
@@ -52,7 +54,8 @@ public class ImmunizationEventsImporterFromAgentId {
                                                  Selectors selectors,
                                                  AgentStateService agentStateService,
                                                  SimulationTimer simulationTimer,
-                                                 DiseaseStageTransitionsService transitionsService) {
+                                                 DiseaseStageTransitionsService transitionsService,
+                                                 LoadService loadService) {
         this.loader = immunizationEventsLoaderFromAgentId;
         this.mappingLoader = mappingLoader;
         this.board = board;
@@ -60,6 +63,7 @@ public class ImmunizationEventsImporterFromAgentId {
         this.agentStateService = agentStateService;
         this.simulationTimer = simulationTimer;
         this.transitionsService = transitionsService;
+        this.loadService = loadService;
     }
 
     public void importEvents(String eventsFilename, String idsFilename, int durationOfPreviousSimulation) {
@@ -71,9 +75,11 @@ public class ImmunizationEventsImporterFromAgentId {
         mappingLoader.forEach(idsFilename, idsMapping -> idsMap.put(idsMapping.getPdyn2Id(), idsMapping.getPdyn1Id()));
         loader.forEach(eventsFilename, importedEvent -> {
             var event = new ImmunizationEvent();
-            var load = load(importedEvent.getOdmiana_wirusa(), importedEvent.getOdmiana_szczepionki());
+            var virusEncoding = Integer.parseInt(importedEvent.getOdmiana_wirusa());
+            var vaccineEncoding = Integer.parseInt(importedEvent.getOdmiana_szczepionki());
+            var load = loadService.getLoad(virusEncoding, vaccineEncoding);
             event.setLoad(load);
-            if (load.classification == LoadClassification.VIRUS) {
+            if (load.getClassification() == LoadClassification.VIRUS) {
                 event.setDiseaseHistory(importedEvent.getHistoria_stanow());
             }
             event.setDay(currentDay - durationOfPreviousSimulation + importedEvent.getDzien_zakazenia());
@@ -104,31 +110,6 @@ public class ImmunizationEventsImporterFromAgentId {
                     });
                 }));
         status.done();
-    }
-
-    private Load load(String diseaseLoad, String vaccineLoad) {
-        if (vaccineLoad.equals("-1")) {
-            switch (diseaseLoad) {
-                case "0":
-                    return Load.WILD;
-                case "1":
-                    return Load.ALPHA;
-                case "2":
-                    return Load.DELTA;
-                case "3":
-                    return Load.OMICRON;
-            }
-        } else if (diseaseLoad.equals("-1")) {
-            switch (vaccineLoad) {
-                case "0":
-                    return Load.PFIZER;
-                case "1":
-                    return Load.BOOSTER;
-            }
-        }
-
-        throw new IllegalArgumentException("Could not find value for: disease=" + diseaseLoad +
-                " vaccine=" + vaccineLoad);
     }
 
     private int endDayFromDiseaseHistory(Load load, int history, int age, int startDay) {

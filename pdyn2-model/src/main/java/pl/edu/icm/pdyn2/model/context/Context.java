@@ -150,7 +150,6 @@ public final class Context
                 i.remove();
             }
         }
-        contaminations.sort(Comparator.comparingInt(c -> c.getLoad().ordinal()));
     }
 
     private float getTotalIntegerizedAgentCountChange() {

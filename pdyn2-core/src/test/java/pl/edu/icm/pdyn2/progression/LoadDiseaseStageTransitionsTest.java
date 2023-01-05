@@ -26,9 +26,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.edu.icm.board.model.Person;
+import pl.edu.icm.pdyn2.EmptyDataForIntegrationTests;
 import pl.edu.icm.pdyn2.immunization.ImmunizationService;
 import pl.edu.icm.pdyn2.immunization.ImmunizationStage;
-import pl.edu.icm.pdyn2.model.immunization.Load;
 import pl.edu.icm.pdyn2.model.progression.Stage;
 import pl.edu.icm.pdyn2.time.SimulationTimer;
 import pl.edu.icm.trurl.ecs.Entity;
@@ -59,6 +59,8 @@ class LoadDiseaseStageTransitionsTest {
     @Mock
     Entity entity2;
 
+    EmptyDataForIntegrationTests data = new EmptyDataForIntegrationTests();
+
     @BeforeEach
     void before() {
         when(workDir.openForReading(any())).thenReturn(
@@ -67,7 +69,7 @@ class LoadDiseaseStageTransitionsTest {
                 immunizationService,
                 simulationTimer,
                 workDir,
-                Load.OMICRON);
+                data.omicron);
         when(immunizationService.getImmunizationCoefficient(any(),
                 eq(ImmunizationStage.OBJAWOWY), any(), anyInt())).thenReturn(1.0f);
         when(immunizationService.getImmunizationCoefficient(any(),

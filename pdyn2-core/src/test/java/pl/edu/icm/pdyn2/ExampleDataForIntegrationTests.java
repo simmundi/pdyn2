@@ -41,6 +41,7 @@ import pl.edu.icm.pdyn2.model.context.ContextType;
 import pl.edu.icm.pdyn2.model.context.Inhabitant;
 import pl.edu.icm.pdyn2.model.immunization.Immunization;
 import pl.edu.icm.pdyn2.model.immunization.Load;
+import pl.edu.icm.pdyn2.model.immunization.LoadClassification;
 import pl.edu.icm.pdyn2.model.impact.Impact;
 import pl.edu.icm.pdyn2.model.progression.HealthStatus;
 import pl.edu.icm.pdyn2.model.progression.Stage;
@@ -63,6 +64,17 @@ import java.util.concurrent.atomic.AtomicReference;
 import static pl.edu.icm.pdyn2.ComponentCreator.*;
 
 public class ExampleDataForIntegrationTests {
+    public final Load wild = new Load("WILD", LoadClassification.VIRUS,-1,0,"");
+    public final Load alpha = new Load("ALPHA", LoadClassification.VIRUS,-1,1,"");
+    public final Load delta = new Load("DELTA", LoadClassification.VIRUS,-1,2,"");
+    public final Load omicron = new Load("OMICRON", LoadClassification.VIRUS,-1,3,"");
+    public final Load ba2 = new Load("BA2", LoadClassification.VIRUS,-1,4,"");
+    public final Load ba45 = new Load("BA45", LoadClassification.VIRUS,-1,5,"");
+    public final Load pfizer = new Load("PFIZER", LoadClassification.VACCINE,0,-1,"");
+    public final Load astra = new Load("ASTRA", LoadClassification.VACCINE,1,-1,"");
+    public final Load moderna = new Load("MODERNA", LoadClassification.VACCINE,2,-1,"");
+    public final Load booster = new Load("BOOSTER", LoadClassification.VACCINE,3,-1,"");
+
     public final Session session;
     public Selectors selectors;
     public Entity agent1;
@@ -153,25 +165,25 @@ public class ExampleDataForIntegrationTests {
         school2 = session.createEntity(context(ContextType.SCHOOL));
         workplace = session.createEntity(context(ContextType.WORKPLACE));
         agent1 = session.createEntity(person(18, Person.Sex.M),
-                inhabitant(householdContext1, school1), health(Load.WILD, Stage.HEALTHY), behaviour(BehaviourType.ROUTINE));
+                inhabitant(householdContext1, school1), health(wild, Stage.HEALTHY), behaviour(BehaviourType.ROUTINE));
         agent2 = session.createEntity(person(18, Person.Sex.M),
-                inhabitant(householdContext1, school1), health(Load.WILD, Stage.HEALTHY), behaviour(BehaviourType.ROUTINE));
+                inhabitant(householdContext1, school1), health(wild, Stage.HEALTHY), behaviour(BehaviourType.ROUTINE));
         agent3 = session.createEntity(person(18, Person.Sex.M),
-                inhabitant(householdContext1, school1), health(Load.WILD, Stage.HEALTHY), behaviour(BehaviourType.ROUTINE));
+                inhabitant(householdContext1, school1), health(wild, Stage.HEALTHY), behaviour(BehaviourType.ROUTINE));
         agent4 = session.createEntity(person(18, Person.Sex.M),
-                inhabitant(householdContext2, school1), health(Load.WILD, Stage.HEALTHY), behaviour(BehaviourType.ROUTINE));
+                inhabitant(householdContext2, school1), health(wild, Stage.HEALTHY), behaviour(BehaviourType.ROUTINE));
         agent5 = session.createEntity(person(18, Person.Sex.M),
-                inhabitant(householdContext2, school1), health(Load.WILD, Stage.HEALTHY), behaviour(BehaviourType.ROUTINE));
+                inhabitant(householdContext2, school1), health(wild, Stage.HEALTHY), behaviour(BehaviourType.ROUTINE));
         agent6 = session.createEntity(person(18, Person.Sex.M),
-                inhabitant(householdContext2, school2), health(Load.WILD, Stage.HEALTHY), behaviour(BehaviourType.ROUTINE));
+                inhabitant(householdContext2, school2), health(wild, Stage.HEALTHY), behaviour(BehaviourType.ROUTINE));
         agent7 = session.createEntity(person(18, Person.Sex.M),
-                inhabitant(householdContext3, school2), health(Load.WILD, Stage.HEALTHY), behaviour(BehaviourType.ROUTINE));
+                inhabitant(householdContext3, school2), health(wild, Stage.HEALTHY), behaviour(BehaviourType.ROUTINE));
         agent8 = session.createEntity(person(18, Person.Sex.M),
-                inhabitant(householdContext3, school2), health(Load.WILD, Stage.HEALTHY), behaviour(BehaviourType.ROUTINE));
+                inhabitant(householdContext3, school2), health(wild, Stage.HEALTHY), behaviour(BehaviourType.ROUTINE));
         agent9 = session.createEntity(person(18, Person.Sex.M),
-                inhabitant(householdContext3, school2), health(Load.WILD, Stage.HEALTHY), behaviour(BehaviourType.ROUTINE));
+                inhabitant(householdContext3, school2), health(wild, Stage.HEALTHY), behaviour(BehaviourType.ROUTINE));
         agentA = session.createEntity(person(18, Person.Sex.M),
-                inhabitant(householdContext3, workplace, school2), health(Load.WILD, Stage.HEALTHY), behaviour(BehaviourType.ROUTINE));
+                inhabitant(householdContext3, workplace, school2), health(wild, Stage.HEALTHY), behaviour(BehaviourType.ROUTINE));
         allAgents = List.of(agent1, agent2, agent3, agent4, agent5, agent6, agent7, agent8, agent9, agentA);
         householdContext1.add(household(List.of(agent1, agent2, agent3)));
         householdContext2.add(household(List.of(agent4, agent5, agent6)));

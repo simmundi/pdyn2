@@ -67,13 +67,13 @@ public class AgentImpactServiceIT {
     @DisplayName("Should properly account for infection of two agents")
     void twoAgentsShedding() {
         // given
-        agentStateService.infect(data.agent2, Load.WILD);
+        agentStateService.infect(data.agent2, data.wild);
         agentStateService.progressToDiseaseStage(data.agent2, Stage.INFECTIOUS_SYMPTOMATIC);
 
-        agentStateService.infect(data.agent3, Load.WILD);
+        agentStateService.infect(data.agent3, data.wild);
         agentStateService.progressToDiseaseStage(data.agent3, Stage.INFECTIOUS_SYMPTOMATIC);
 
-        agentStateService.infect(data.agent4, Load.OMICRON);
+        agentStateService.infect(data.agent4, data.omicron);
         agentStateService.progressToDiseaseStage(data.agent4, Stage.INFECTIOUS_SYMPTOMATIC);
 
         // execute
@@ -87,14 +87,14 @@ public class AgentImpactServiceIT {
         assertThat(agentCount(data.streetsB)).isCloseTo(10, VERY_CLOSE);
         assertThat(agentCount(data.streetsC)).isCloseTo(4, VERY_CLOSE);
 
-        assertThat(contaminationLevel(data.householdContext1, Load.WILD)).isEqualTo(2f);
-        assertThat(contaminationLevel(data.householdContext2, Load.WILD)).isZero();
-        assertThat(contaminationLevel(data.workplace, Load.WILD)).isZero();
-        assertThat(contaminationLevel(data.streetsA, Load.WILD)).isCloseTo(2f, VERY_CLOSE);
-        assertThat(contaminationLevel(data.streetsB, Load.WILD)).isCloseTo(2f, VERY_CLOSE);
-        assertThat(contaminationLevel(data.streetsC, Load.WILD)).isZero();
-        assertThat(contaminationLevel(data.school1, Load.WILD)).isEqualTo(2f);
-        assertThat(contaminationLevel(data.school1, Load.DELTA)).isZero();
+        assertThat(contaminationLevel(data.householdContext1, data.wild)).isEqualTo(2f);
+        assertThat(contaminationLevel(data.householdContext2, data.wild)).isZero();
+        assertThat(contaminationLevel(data.workplace, data.wild)).isZero();
+        assertThat(contaminationLevel(data.streetsA, data.wild)).isCloseTo(2f, VERY_CLOSE);
+        assertThat(contaminationLevel(data.streetsB, data.wild)).isCloseTo(2f, VERY_CLOSE);
+        assertThat(contaminationLevel(data.streetsC, data.wild)).isZero();
+        assertThat(contaminationLevel(data.school1, data.wild)).isEqualTo(2f);
+        assertThat(contaminationLevel(data.school1, data.delta)).isZero();
     }
 
     private float agentCount(Entity contextEntity) {

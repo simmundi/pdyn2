@@ -32,6 +32,7 @@ import pl.edu.icm.trurl.ecs.EntitySystem;
 import pl.edu.icm.trurl.ecs.util.EntityIterator;
 import pl.edu.icm.trurl.ecs.util.Selectors;
 import pl.edu.icm.trurl.sampleSpace.EnumSampleSpace;
+import pl.edu.icm.trurl.sampleSpace.SampleSpace;
 
 public class TransmissionSystemBuilder {
     private final TransmissionService transmissionService;
@@ -67,8 +68,8 @@ public class TransmissionSystemBuilder {
                         return;
                     }
 
-                    EnumSampleSpace<Load> exposurePerLoad =
-                            new EnumSampleSpace<>(Load.class);
+                    SampleSpace<Load> exposurePerLoad =
+                            new SampleSpace<>();
                     EnumSampleSpace<ContextInfectivityClass> exposurePerContext = new EnumSampleSpace<>(ContextInfectivityClass.class);
                     transmissionService.gatherExposurePerLoadAndContextForAgent(
                             exposurePerLoad,

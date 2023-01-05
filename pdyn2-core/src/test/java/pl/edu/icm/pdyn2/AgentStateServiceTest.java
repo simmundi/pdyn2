@@ -24,8 +24,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import pl.edu.icm.pdyn2.model.context.Context;
 import pl.edu.icm.pdyn2.model.context.ContextInfectivityClass;
 import pl.edu.icm.pdyn2.model.immunization.ImmunizationSources;
+import pl.edu.icm.pdyn2.model.immunization.LoadClassification;
 import pl.edu.icm.pdyn2.transmission.ContextImpactService;
 import pl.edu.icm.pdyn2.model.behaviour.Behaviour;
 import pl.edu.icm.pdyn2.model.behaviour.BehaviourType;
@@ -36,6 +38,7 @@ import pl.edu.icm.pdyn2.model.progression.Stage;
 import pl.edu.icm.pdyn2.model.travel.Travel;
 import pl.edu.icm.pdyn2.time.SimulationTimer;
 import pl.edu.icm.trurl.ecs.Entity;
+import pl.edu.icm.trurl.ecs.mapper.Mapper;
 import pl.edu.icm.trurl.sampleSpace.EnumSampleSpace;
 
 import static org.assertj.core.api.Assertions.*;
@@ -45,6 +48,11 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class AgentStateServiceTest {
+
+    private static final Load WILD = new Load("WILD", LoadClassification.VIRUS,-1,0,"");
+    private static final Load ALPHA = new Load("ALPHA", LoadClassification.VIRUS,-1,1,"");
+    private static final Load DELTA = new Load("DELTA", LoadClassification.VIRUS,-1,2,"");
+    private static final Load MODERNA = new Load("MODERNA", LoadClassification.VACCINE,2,-1,"");
 
     @Mock
     SimulationTimer simulationTimer;
@@ -63,11 +71,11 @@ class AgentStateServiceTest {
         when(simulationTimer.getDaysPassed()).thenReturn(123);
 
         // execute
-        agentStateService.infect(data.agent2, Load.ALPHA);
+        agentStateService.infect(data.agent2, ALPHA);
         var result = data.agent2.get(HealthStatus.class);
 
         // assert
-        assertThat(result.getDiseaseLoad()).isEqualTo(Load.ALPHA);
+        assertThat(result.getDiseaseLoad()).isEqualTo(ALPHA);
         assertThat(result.getDayOfLastChange()).isEqualTo(123);
     }
 
@@ -149,16 +157,16 @@ class AgentStateServiceTest {
         ExampleData data = new ExampleData();
 
         // execute
-        agentStateService.changeLoad(data.agent3, Load.WILD);
+        agentStateService.changeLoad(data.agent3, WILD);
 
         // assert
         var health = data.agent3.get(HealthStatus.class);
-        assertThat(health.getDiseaseLoad()).isEqualTo(Load.WILD);
+        assertThat(health.getDiseaseLoad()).isEqualTo(WILD);
         assertThatIllegalArgumentException()
-                .isThrownBy(() -> agentStateService.changeLoad(data.agent1, Load.ALPHA))
+                .isThrownBy(() -> agentStateService.changeLoad(data.agent1, ALPHA))
                 .withMessage("Only latent agents can have their load changed");
         assertThatIllegalArgumentException()
-                .isThrownBy(() -> agentStateService.changeLoad(data.agent3, Load.MODERNA))
+                .isThrownBy(() -> agentStateService.changeLoad(data.agent3, MODERNA))
                 .withMessage("Variant can be changed only to another virus load");
     }
 
@@ -187,11 +195,11 @@ class AgentStateServiceTest {
         Entity someRemoteHousehold = build.entityWithId(1, ComponentCreator.context(ContextType.HOUSEHOLD));
 
         Entity agent1 = build.entityWithId(5,
-                ComponentCreator.health(Load.DELTA, Stage.INFECTIOUS_SYMPTOMATIC));
+                ComponentCreator.health(DELTA, Stage.INFECTIOUS_SYMPTOMATIC));
         Entity agent2 = build.entityWithId(6,
-                ComponentCreator.health(Load.WILD, Stage.HEALTHY));
+                ComponentCreator.health(WILD, Stage.HEALTHY));
         Entity agent3 = build.entityWithId(7,
-                ComponentCreator.health(Load.ALPHA, Stage.LATENT));
+                ComponentCreator.health(ALPHA, Stage.LATENT));
 
     }
 

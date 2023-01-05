@@ -107,8 +107,8 @@ public class EpidemicExporter {
                                     bufferedWriter.write(e.getId() + ",");
                                     bufferedWriter.write(startDay + ",");
                                     bufferedWriter.write(infectionContext(ContextInfectivityClass.HOUSEHOLD) + ",");
-                                    bufferedWriter.write(diseaseLoad(load) + ",");
-                                    bufferedWriter.write(vaccineLoad(load) + ",");
+                                    bufferedWriter.write(load.getVirusEncoding() + ",");
+                                    bufferedWriter.write(load.getVaccineEncoding() + ",");
                                     bufferedWriter.write(history + ",");
                                     bufferedWriter.write(testedValue(load, possibleTestDay, records) + ",");
                                     bufferedWriter.write(cell.getLegacyPdynCol() + ",");
@@ -131,7 +131,7 @@ public class EpidemicExporter {
         if (records == null) {
             return "0";
         }
-        if (load.classification == LoadClassification.VACCINE) {
+        if (load.getClassification() == LoadClassification.VACCINE) {
             return "-1";
         } else {
             for (Record record : records) {
@@ -159,44 +159,6 @@ public class EpidemicExporter {
                 return "7";
             default:
                 throw new IllegalArgumentException("Could not find context infectivity type for: " + contextType);
-        }
-    }
-
-    private String diseaseLoad(Load load) {
-        switch (load) {
-            case WILD:
-                return "0";
-            case ALPHA:
-                return "1";
-            case DELTA:
-                return "2";
-            case OMICRON:
-                return "3";
-            case ASTRA:
-            case PFIZER:
-            case MODERNA:
-            case BOOSTER:
-                return "-1";
-            default:
-                throw new IllegalArgumentException("Could not find value for: " + load);
-        }
-    }
-
-    private String vaccineLoad(Load load) {
-        switch (load) {
-            case WILD:
-            case ALPHA:
-            case DELTA:
-            case OMICRON:
-                return "-1";
-            case ASTRA:
-            case PFIZER:
-            case MODERNA:
-                return "0";
-            case BOOSTER:
-                return "1";
-            default:
-                throw new IllegalArgumentException("Could not find value for: " + load);
         }
     }
 

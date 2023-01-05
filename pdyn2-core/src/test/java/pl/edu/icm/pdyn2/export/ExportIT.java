@@ -34,7 +34,6 @@ import pl.edu.icm.pdyn2.MockRandomProvider;
 import pl.edu.icm.pdyn2.StatsService;
 import pl.edu.icm.pdyn2.administration.TestingConfig;
 import pl.edu.icm.pdyn2.administration.TestingService;
-import pl.edu.icm.pdyn2.model.immunization.Load;
 import pl.edu.icm.pdyn2.model.progression.Stage;
 import pl.edu.icm.pdyn2.progression.DiseaseStageTransitionsService;
 
@@ -70,20 +69,20 @@ public class ExportIT {
         results = new ByteArrayOutputStream();
         when(workDir.openForWriting(file.capture())).thenReturn(results);
 
-        when(transitionsService.durationOf(Load.WILD, Stage.INFECTIOUS_SYMPTOMATIC, 18)).thenReturn(6);
-        when(transitionsService.durationOf(Load.WILD, Stage.LATENT, 18)).thenReturn(7);
+        when(transitionsService.durationOf(data.wild, Stage.INFECTIOUS_SYMPTOMATIC, 18)).thenReturn(6);
+        when(transitionsService.durationOf(data.wild, Stage.LATENT, 18)).thenReturn(7);
 
-        when(transitionsService.durationOf(Load.OMICRON, Stage.HOSPITALIZED_ICU, 18)).thenReturn(2);
-        when(transitionsService.durationOf(Load.OMICRON, Stage.HOSPITALIZED_PRE_ICU, 18)).thenReturn(4);
-        when(transitionsService.durationOf(Load.OMICRON, Stage.INFECTIOUS_SYMPTOMATIC, 18)).thenReturn(6);
-        when(transitionsService.durationOf(Load.OMICRON, Stage.LATENT, 18)).thenReturn(7);
+        when(transitionsService.durationOf(data.omicron, Stage.HOSPITALIZED_ICU, 18)).thenReturn(2);
+        when(transitionsService.durationOf(data.omicron, Stage.HOSPITALIZED_PRE_ICU, 18)).thenReturn(4);
+        when(transitionsService.durationOf(data.omicron, Stage.INFECTIOUS_SYMPTOMATIC, 18)).thenReturn(6);
+        when(transitionsService.durationOf(data.omicron, Stage.LATENT, 18)).thenReturn(7);
 
-        when(transitionsService.durationOf(Load.DELTA, Stage.INFECTIOUS_ASYMPTOMATIC, 18)).thenReturn(5);
-        when(transitionsService.durationOf(Load.DELTA, Stage.LATENT, 18)).thenReturn(7);
+        when(transitionsService.durationOf(data.delta, Stage.INFECTIOUS_ASYMPTOMATIC, 18)).thenReturn(5);
+        when(transitionsService.durationOf(data.delta, Stage.LATENT, 18)).thenReturn(7);
 
-        when(transitionsService.durationOf(Load.OMICRON, Stage.HOSPITALIZED_NO_ICU, 18)).thenReturn(3);
-        when(transitionsService.durationOf(Load.OMICRON, Stage.INFECTIOUS_SYMPTOMATIC, 18)).thenReturn(6);
-        when(transitionsService.durationOf(Load.OMICRON, Stage.LATENT, 18)).thenReturn(7);
+        when(transitionsService.durationOf(data.omicron, Stage.HOSPITALIZED_NO_ICU, 18)).thenReturn(3);
+        when(transitionsService.durationOf(data.omicron, Stage.INFECTIOUS_SYMPTOMATIC, 18)).thenReturn(6);
+        when(transitionsService.durationOf(data.omicron, Stage.LATENT, 18)).thenReturn(7);
     }
 
     @Test
@@ -101,9 +100,9 @@ public class ExportIT {
                 statsService,
                 agentStateService, new TestingConfig(1.0f));
 
-        agentStateService.infect(data.agent1, Load.WILD, 10);
+        agentStateService.infect(data.agent1, data.wild, 10);
         agentStateService.progressToDiseaseStage(data.agent1, Stage.INFECTIOUS_SYMPTOMATIC, 7);
-        agentStateService.infect(data.agentA, Load.DELTA, 3);
+        agentStateService.infect(data.agentA, data.delta, 3);
         advance(3);
         agentStateService.progressToDiseaseStage(data.agent1, Stage.HEALTHY);
         advance(1);
@@ -111,9 +110,9 @@ public class ExportIT {
         advance(5);
         agentStateService.progressToDiseaseStage(data.agentA, Stage.HEALTHY);
         advance(1);
-        agentStateService.infect(data.agent2, Load.ALPHA);
-        agentStateService.infect(data.agent3, Load.DELTA);
-        agentStateService.infect(data.agent7, Load.OMICRON);
+        agentStateService.infect(data.agent2, data.alpha);
+        agentStateService.infect(data.agent3, data.delta);
+        agentStateService.infect(data.agent7, data.omicron);
         advance(7);
         testingService.maybeTestAgent(data.agent7);
         agentStateService.progressToDiseaseStage(data.agent7, Stage.INFECTIOUS_SYMPTOMATIC);
@@ -123,7 +122,7 @@ public class ExportIT {
         agentStateService.progressToDiseaseStage(data.agent7, Stage.HOSPITALIZED_ICU);
         advance(2);
         agentStateService.progressToDiseaseStage(data.agent7, Stage.DECEASED);
-        agentStateService.infect(data.agentA, Load.OMICRON);
+        agentStateService.infect(data.agentA, data.omicron);
         advance(7);
         agentStateService.progressToDiseaseStage(data.agentA, Stage.INFECTIOUS_SYMPTOMATIC);
         advance(6);
