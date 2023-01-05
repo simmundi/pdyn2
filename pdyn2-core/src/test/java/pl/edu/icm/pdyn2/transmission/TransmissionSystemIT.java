@@ -107,9 +107,6 @@ class TransmissionSystemIT {
     @Mock
     private ImmunizationService immunizationService;
 
-    @Mock
-    private RelativeAlphaConfig relativeAlphaConfig;
-
     private TransmissionService transmissionService;
 
     @Mock
@@ -146,7 +143,6 @@ class TransmissionSystemIT {
         when(randomProvider.getRandomForChunkProvider(TransmissionSystemBuilder.class)).thenReturn(randomForChunkProvider);
         contextsService = new ContextsService(areaIndex);
         transmissionService = new TransmissionService(contextsService,
-                relativeAlphaConfig,
                 transmissionConfig,
                 simulationTimer,
                 immunizationService,
@@ -165,7 +161,6 @@ class TransmissionSystemIT {
         when(transmissionConfig.getAlpha()).thenReturn(1.0f);
         when(transmissionConfig.getTotalWeightForContextType(any())).thenReturn(1.0f);
         when(randomGenerator.nextDouble()).thenReturn(0.2);
-        when(relativeAlphaConfig.getRelativeAlpha(any())).thenReturn(0.5f);
     }
 
     @Test

@@ -39,7 +39,7 @@ import static org.assertj.core.api.Assertions.*;
 class ImpactIT {
 
     private Mapper<Impact> mapper;
-    private static final Load BA2 = new Load("BA2", LoadClassification.VIRUS,-1,4,"");
+    private final Load ba2 = new Load("BA2", LoadClassification.VIRUS,-1,4,"", 10f);
 
     Store store = new ArrayStore(10);
 
@@ -54,7 +54,7 @@ class ImpactIT {
     public void save() {
         // given
         var health = new HealthStatus();
-        health.setDiseaseLoad(BA2);
+        health.setDiseaseLoad(ba2);
         health.setStage(Stage.INFECTIOUS_ASYMPTOMATIC);
         var behavior = new Behaviour();
         behavior.transitionTo(BehaviourType.DORMANT, 2);
@@ -76,7 +76,7 @@ class ImpactIT {
     public void isDifferentFrom() {
         // given
         var health = new HealthStatus();
-        health.setDiseaseLoad(BA2);
+        health.setDiseaseLoad(ba2);
         health.setStage(Stage.INFECTIOUS_ASYMPTOMATIC);
         var behavior = new Behaviour();
         behavior.transitionTo(BehaviourType.ROUTINE, 2);
@@ -96,7 +96,7 @@ class ImpactIT {
     public void isDifferentFrom__same() {
         // given
         var health = new HealthStatus();
-        health.setDiseaseLoad(BA2);
+        health.setDiseaseLoad(ba2);
         health.setStage(Stage.INFECTIOUS_ASYMPTOMATIC);
         var behavior = new Behaviour();
         var impact = new Impact();

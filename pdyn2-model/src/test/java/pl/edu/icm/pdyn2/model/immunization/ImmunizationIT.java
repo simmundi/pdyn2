@@ -37,12 +37,12 @@ import static org.assertj.core.groups.Tuple.tuple;
 
 public class ImmunizationIT {
     private Mapper<Immunization> mapper;
-    private final static Load ALPHA = new Load("ALPHA", LoadClassification.VIRUS,-1,1,"");
-    private final static Load DELTA = new Load("DELTA", LoadClassification.VIRUS,-1,2,"");
-    private final static Load PFIZER = new Load("PFIZER", LoadClassification.VACCINE,0,-1,"");
-    private final static Load ASTRA = new Load("ASTRA", LoadClassification.VACCINE,1,-1,"");
-    private final static Load MODERNA = new Load("MODERNA", LoadClassification.VACCINE,2,-1,"");
-    private final static Load BOOSTER = new Load("BOOSTER", LoadClassification.VACCINE,3,-1,"");
+    private final Load alpha = new Load("ALPHA", LoadClassification.VIRUS,-1,1,"",10f);
+    private final Load delta = new Load("DELTA", LoadClassification.VIRUS,-1,2,"",10f);
+    private final Load pfizer = new Load("ASTRA", LoadClassification.VACCINE,0,-1,"");
+    private final Load astra = new Load("ASTRA", LoadClassification.VACCINE,1,-1,"");
+    private final Load moderna = new Load("MODERNA", LoadClassification.VACCINE,2,-1,"");
+    private final Load booster = new Load("BOOSTER", LoadClassification.VACCINE,3,-1,"");
 
 
     Store store = new ArrayStore(10);
@@ -79,18 +79,18 @@ public class ImmunizationIT {
         assertThat(items.stream().flatMap(i -> i.getEvents().stream()))
                 .extracting(ImmunizationEvent::getDay, ImmunizationEvent::getLoad)
                 .containsExactly(
-                        tuple(0, ALPHA),
-                        tuple(4, ASTRA),
-                        tuple(0, ALPHA),
+                        tuple(0, alpha),
+                        tuple(4, astra),
+                        tuple(0, alpha),
                         tuple(0, null),
-                        tuple(100, BOOSTER),
-                        tuple(Integer.MAX_VALUE, ALPHA),
-                        tuple(34, ALPHA),
-                        tuple(21, PFIZER),
-                        tuple(67, ALPHA),
-                        tuple(34, MODERNA),
+                        tuple(100, booster),
+                        tuple(Integer.MAX_VALUE, alpha),
+                        tuple(34, alpha),
+                        tuple(21, pfizer),
+                        tuple(67, alpha),
+                        tuple(34, moderna),
                         tuple(-15, null),
-                        tuple(478, DELTA)
+                        tuple(478, delta)
                 );
     }
 
@@ -106,7 +106,7 @@ public class ImmunizationIT {
         var item = mapper.create();
         mapper.load(null, item, index);
         item.getEvents().remove(0);
-        item.getEvents().add(event(99, BOOSTER));
+        item.getEvents().add(event(99, booster));
         var modified = mapper.isModified(item, index);
         mapper.save(item, index);
 
@@ -117,29 +117,29 @@ public class ImmunizationIT {
         assertThat(result.getEvents().stream())
                 .extracting(ImmunizationEvent::getDay, ImmunizationEvent::getLoad)
                 .containsExactly(
-                        tuple(34, MODERNA),
-                        tuple(99, BOOSTER));
+                        tuple(34, moderna),
+                        tuple(99, booster));
         assertThat(modified).isTrue();
     }
 
     private List<Immunization> exampleData() {
         return List.of(
                 immunization(
-                        event(0, ALPHA),
-                        event(4, ASTRA),
-                        event(0, ALPHA),
+                        event(0, alpha),
+                        event(4, astra),
+                        event(0, alpha),
                         event(0, null),
-                        event(100, BOOSTER),
-                        event(Integer.MAX_VALUE, ALPHA)),
+                        event(100, booster),
+                        event(Integer.MAX_VALUE, alpha)),
                 immunization(
-                        event(34, ALPHA),
-                        event(21, PFIZER)),
+                        event(34, alpha),
+                        event(21, pfizer)),
                 immunization(
-                        event(67, ALPHA),
-                        event(34, MODERNA)),
+                        event(67, alpha),
+                        event(34, moderna)),
                 immunization(
                         event(-15, null),
-                        event(478, DELTA)));
+                        event(478, delta)));
     }
 
     private Immunization immunization(ImmunizationEvent... events) {

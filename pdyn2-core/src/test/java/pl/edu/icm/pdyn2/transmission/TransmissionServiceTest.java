@@ -60,8 +60,6 @@ class TransmissionServiceTest {
     SimulationTimer simulationTimer;
     @Mock
     ImmunizationService immunizationService;
-    @Mock
-    RelativeAlphaConfig relativeAlphaConfig;
     Session session;
     EntityMocker entityMocker;
     TransmissionService transmissionService;
@@ -71,9 +69,7 @@ class TransmissionServiceTest {
     @BeforeEach
     void before() {
         entityMocker = new EntityMocker(session);
-        when(relativeAlphaConfig.getRelativeAlpha(any())).thenReturn(10f);
         transmissionService = new TransmissionService(contextsService,
-                relativeAlphaConfig,
                 transmissionConfig,
                 simulationTimer,
                 immunizationService,

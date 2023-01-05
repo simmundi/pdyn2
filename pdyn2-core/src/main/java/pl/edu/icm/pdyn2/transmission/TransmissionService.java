@@ -46,12 +46,10 @@ public class TransmissionService {
     private final ContextsService contextsService;
     private final SimulationTimer simulationTimer;
     private final ImmunizationService immunizationService;
-    private final LoadService loadService;
     private final SampleSpace<Load> relativeAlpha = new SampleSpace<>();
 
     @WithFactory
     public TransmissionService(ContextsService contextsService,
-                               RelativeAlphaConfig relativeAlphaConfig,
                                TransmissionConfig transmissionConfig,
                                SimulationTimer simulationTimer,
                                ImmunizationService immunizationService,
@@ -60,9 +58,8 @@ public class TransmissionService {
         this.transmissionConfig = transmissionConfig;
         this.simulationTimer = simulationTimer;
         this.immunizationService = immunizationService;
-        this.loadService = loadService;
         for (Load currentLoad : loadService.getViruses()) {
-            relativeAlpha.changeOutcome(currentLoad, relativeAlphaConfig.getRelativeAlpha(currentLoad));
+            relativeAlpha.changeOutcome(currentLoad, currentLoad.getRelativeAlpha());
         }
     }
 

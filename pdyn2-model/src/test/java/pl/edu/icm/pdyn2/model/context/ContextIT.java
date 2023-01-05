@@ -42,11 +42,11 @@ import static pl.edu.icm.pdyn2.model.context.ContextType.WORKPLACE;
 
 public class ContextIT {
     private Mapper<Context> mapper;
-    private static final Load WILD = new Load("WILD", LoadClassification.VIRUS,-1,0,"");
-    private static final Load ALPHA = new Load("ALPHA", LoadClassification.VIRUS,-1,1,"");
-    private static final Load DELTA = new Load("DELTA", LoadClassification.VIRUS,-1,2,"");
-    private static final Load OMICRON = new Load("OMICRON", LoadClassification.VIRUS,-1,3,"");
-    private static final Load BA2 = new Load("BA2", LoadClassification.VIRUS,-1,4,"");
+    private final Load wild = new Load("WILD", LoadClassification.VIRUS,-1,0,"", 1.0f);
+    private final Load alpha = new Load("ALPHA", LoadClassification.VIRUS,-1,1,"", 10f);
+    private final Load delta = new Load("DELTA", LoadClassification.VIRUS,-1,2,"", 10f);
+    private final Load omicron = new Load("OMICRON", LoadClassification.VIRUS,-1,3,"", 10f);
+    private final Load ba2 = new Load("BA2", LoadClassification.VIRUS,-1,4,"", 10f);
 
 
     Store store = new ArrayStore(10000);
@@ -83,13 +83,13 @@ public class ContextIT {
         assertThat(items.stream().flatMap(i -> i.getContaminations().stream()))
                 .extracting(Contamination::getLevel, Contamination::getLoad)
                 .containsExactly(
-                        tuple(136f, WILD),
-                        tuple(45f, ALPHA),
-                        tuple(89f, DELTA),
-                        tuple(5f, OMICRON),
-                        tuple(20000.23f, OMICRON),
-                        tuple(10f, DELTA),
-                        tuple(10f, OMICRON));
+                        tuple(136f, wild),
+                        tuple(45f, alpha),
+                        tuple(89f, delta),
+                        tuple(5f, omicron),
+                        tuple(20000.23f, omicron),
+                        tuple(10f, delta),
+                        tuple(10f, omicron));
     }
 
     @Test
@@ -102,15 +102,15 @@ public class ContextIT {
 
         // execute
         Context context = mapper.createAndLoad(3);
-        context.changeContaminationLevel(DELTA, 3.4f); // was 10f
-        context.changeContaminationLevel(WILD, 15f);
+        context.changeContaminationLevel(delta, 3.4f); // was 10f
+        context.changeContaminationLevel(wild, 15f);
         mapper.save(context, 3);
 
         // assert
         var result = mapper.createAndLoad(3);
-        assertThat(result.getContaminationByLoad(WILD).getLevel()).isEqualTo(15f);
-        assertThat(result.getContaminationByLoad(DELTA).getLevel()).isEqualTo(13.4f);
-        assertThat(result.getContaminationByLoad(OMICRON).getLevel()).isEqualTo(10f);
+        assertThat(result.getContaminationByLoad(wild).getLevel()).isEqualTo(15f);
+        assertThat(result.getContaminationByLoad(delta).getLevel()).isEqualTo(13.4f);
+        assertThat(result.getContaminationByLoad(omicron).getLevel()).isEqualTo(10f);
         assertThat(result.getContaminations()).hasSize(3);
     }
 
@@ -121,66 +121,66 @@ public class ContextIT {
         Context contextA = exampleData().get(0);
         Context contextB = exampleData().get(0);
 
-        contextA.changeContaminationLevel(WILD, 10f);
-        contextA.changeContaminationLevel(ALPHA, 20f);
-        contextA.changeContaminationLevel(DELTA, 30f);
-        contextA.changeContaminationLevel(OMICRON, 40f);
+        contextA.changeContaminationLevel(wild, 10f);
+        contextA.changeContaminationLevel(alpha, 20f);
+        contextA.changeContaminationLevel(delta, 30f);
+        contextA.changeContaminationLevel(omicron, 40f);
         contextA.updateAgentCount(50);
 
-        contextB.changeContaminationLevel(WILD, 100f);
-        contextB.changeContaminationLevel(ALPHA, 200f);
-        contextB.changeContaminationLevel(BA2, 300f);
+        contextB.changeContaminationLevel(wild, 100f);
+        contextB.changeContaminationLevel(alpha, 200f);
+        contextB.changeContaminationLevel(ba2, 300f);
         contextB.updateAgentCount(-100);
 
         // execute
         Context resolved = contextA.resolve(contextB);
         assertThat(resolved.getAgentCount()).isEqualTo(100f + 50f - 100f);
-        assertThat(resolved.getContaminationByLoad(WILD).getLevel()).isEqualTo(136f + 10f + 100f);
-        assertThat(resolved.getContaminationByLoad(ALPHA).getLevel()).isEqualTo(45f + 20f + 200f);
-        assertThat(resolved.getContaminationByLoad(DELTA).getLevel()).isEqualTo(89f + 30f + 0f);
-        assertThat(resolved.getContaminationByLoad(OMICRON).getLevel()).isEqualTo(5f + 40f + 0f);
-        assertThat(resolved.getContaminationByLoad(BA2).getLevel()).isEqualTo(0f + 0f + 300f);
+        assertThat(resolved.getContaminationByLoad(wild).getLevel()).isEqualTo(136f + 10f + 100f);
+        assertThat(resolved.getContaminationByLoad(alpha).getLevel()).isEqualTo(45f + 20f + 200f);
+        assertThat(resolved.getContaminationByLoad(delta).getLevel()).isEqualTo(89f + 30f + 0f);
+        assertThat(resolved.getContaminationByLoad(omicron).getLevel()).isEqualTo(5f + 40f + 0f);
+        assertThat(resolved.getContaminationByLoad(ba2).getLevel()).isEqualTo(0f + 0f + 300f);
     }
 
     @Test
     @DisplayName("should accumulate level and normalize everything")
     void multipleChanges() {
         // given
-        Context context = context(HOUSEHOLD, 10, contamination(10, WILD));
+        Context context = context(HOUSEHOLD, 10, contamination(10, wild));
 
         // execute
-        context.changeContaminationLevel(WILD, 23);
-        context.changeContaminationLevel(WILD, 230);
-        context.changeContaminationLevel(WILD, 2300);
-        context.changeContaminationLevel(OMICRON, 100);
-        context.changeContaminationLevel(BA2, 200);
-        context.changeContaminationLevel(OMICRON, -100);
+        context.changeContaminationLevel(wild, 23);
+        context.changeContaminationLevel(wild, 230);
+        context.changeContaminationLevel(wild, 2300);
+        context.changeContaminationLevel(omicron, 100);
+        context.changeContaminationLevel(ba2, 200);
+        context.changeContaminationLevel(omicron, -100);
 
         // assert
         assertThat(context.getContaminations()).hasSize(3);
-        assertThat(context.getContaminationByLoad(WILD).getLevel()).isEqualTo(10 + 23 + 230 + 2300);
-        assertThat(context.getContaminationByLoad(OMICRON).getLevel()).isZero();
-        assertThat(context.getContaminationByLoad(BA2).getLevel()).isEqualTo(200);
+        assertThat(context.getContaminationByLoad(wild).getLevel()).isEqualTo(10 + 23 + 230 + 2300);
+        assertThat(context.getContaminationByLoad(omicron).getLevel()).isZero();
+        assertThat(context.getContaminationByLoad(ba2).getLevel()).isEqualTo(200);
     }
 
     @Test
     @DisplayName("Should normalize: sort contaminations by load and remove empty")
     void normalize() {
         // given
-        Context context = context(HOUSEHOLD, 10, contamination(10, WILD));
+        Context context = context(HOUSEHOLD, 10, contamination(10, wild));
 
-        context.changeContaminationLevel(BA2, 10f);
-        context.changeContaminationLevel(OMICRON, 20f);
-        context.changeContaminationLevel(DELTA, 30f);
+        context.changeContaminationLevel(ba2, 10f);
+        context.changeContaminationLevel(omicron, 20f);
+        context.changeContaminationLevel(delta, 30f);
         context.updateAgentCount(50);
-        context.getContaminationByLoad(OMICRON).setLevel(0f);
-        context.getContaminationByLoad(ALPHA).setLevel(0f);
+        context.getContaminationByLoad(omicron).setLevel(0f);
+        context.getContaminationByLoad(alpha).setLevel(0f);
 
         // execute
         context.normalize();
 
         // execute
-        assertThat(context.getContaminations()).extracting(Contamination::getLoad).containsExactly(WILD, DELTA, BA2);
+        assertThat(context.getContaminations()).extracting(Contamination::getLoad).containsExactly(wild, delta, ba2);
         assertThat(context.getContaminations()).extracting(Contamination::getLevel).doesNotContain(0f);
     }
 
@@ -188,16 +188,16 @@ public class ContextIT {
     private List<Context> exampleData() {
         return List.of(
                 context(SCHOOL, 100,
-                        contamination(136, WILD),
-                        contamination(45, ALPHA),
-                        contamination(89, DELTA),
-                        contamination(5, OMICRON)),
+                        contamination(136, wild),
+                        contamination(45, alpha),
+                        contamination(89, delta),
+                        contamination(5, omicron)),
                 context(HOUSEHOLD, 5),
                 context(STREET_10, 50000,
-                        contamination(20000.23f, OMICRON)),
+                        contamination(20000.23f, omicron)),
                 context(WORKPLACE, 20,
-                        contamination(10, DELTA),
-                        contamination(10, OMICRON)),
+                        contamination(10, delta),
+                        contamination(10, omicron)),
                 context(HOUSEHOLD, 3)
         );
     }

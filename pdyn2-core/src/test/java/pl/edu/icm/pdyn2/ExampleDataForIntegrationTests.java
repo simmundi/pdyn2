@@ -64,12 +64,12 @@ import java.util.concurrent.atomic.AtomicReference;
 import static pl.edu.icm.pdyn2.ComponentCreator.*;
 
 public class ExampleDataForIntegrationTests {
-    public final Load wild = new Load("WILD", LoadClassification.VIRUS,-1,0,"");
-    public final Load alpha = new Load("ALPHA", LoadClassification.VIRUS,-1,1,"");
-    public final Load delta = new Load("DELTA", LoadClassification.VIRUS,-1,2,"");
-    public final Load omicron = new Load("OMICRON", LoadClassification.VIRUS,-1,3,"");
-    public final Load ba2 = new Load("BA2", LoadClassification.VIRUS,-1,4,"");
-    public final Load ba45 = new Load("BA45", LoadClassification.VIRUS,-1,5,"");
+    public final Load wild = new Load("WILD", LoadClassification.VIRUS,-1,0,"",1.0f);
+    public final Load alpha = new Load("ALPHA", LoadClassification.VIRUS,-1,1,"",10f);
+    public final Load delta = new Load("DELTA", LoadClassification.VIRUS,-1,2,"",10f);
+    public final Load omicron = new Load("OMICRON", LoadClassification.VIRUS,-1,3,"",10f);
+    public final Load ba2 = new Load("BA2", LoadClassification.VIRUS,-1,4,"",10f);
+    public final Load ba45 = new Load("BA45", LoadClassification.VIRUS,-1,5,"",10f);
     public final Load pfizer = new Load("PFIZER", LoadClassification.VACCINE,0,-1,"");
     public final Load astra = new Load("ASTRA", LoadClassification.VACCINE,1,-1,"");
     public final Load moderna = new Load("MODERNA", LoadClassification.VACCINE,2,-1,"");

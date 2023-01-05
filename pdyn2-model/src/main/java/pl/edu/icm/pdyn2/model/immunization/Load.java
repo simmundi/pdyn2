@@ -30,6 +30,7 @@ public class Load {
     private int vaccineEncoding;
     private int virusEncoding;
     private String stageTransitionsFilename;
+    private float relativeAlpha;
 
     public Load() {
 
@@ -45,6 +46,20 @@ public class Load {
         this.vaccineEncoding = vaccineEncoding;
         this.virusEncoding = virusEncoding;
         this.stageTransitionsFilename = stageTransitionsFilename;
+    }
+
+    public Load(String loadName,
+                LoadClassification classification,
+                int vaccineEncoding,
+                int virusEncoding,
+                String stageTransitionsFilename,
+                float relativeAlpha) {
+        this.loadName = loadName;
+        this.classification = classification;
+        this.vaccineEncoding = vaccineEncoding;
+        this.virusEncoding = virusEncoding;
+        this.stageTransitionsFilename = stageTransitionsFilename;
+        this.relativeAlpha = relativeAlpha;
     }
 
     public String getLoadName() {
@@ -85,6 +100,14 @@ public class Load {
 
     public void setStageTransitionsFilename(String stageTransitionsFilename) {
         this.stageTransitionsFilename = stageTransitionsFilename;
+    }
+
+    public float getRelativeAlpha() {
+        return relativeAlpha;
+    }
+
+    public void setRelativeAlpha(float relativeAlpha) {
+        this.relativeAlpha = relativeAlpha;
     }
 
     @Override
