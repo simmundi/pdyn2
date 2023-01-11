@@ -40,6 +40,7 @@ import pl.edu.icm.pdyn2.model.context.Context;
 import pl.edu.icm.pdyn2.model.context.ContextType;
 import pl.edu.icm.pdyn2.model.context.Inhabitant;
 import pl.edu.icm.pdyn2.model.immunization.Immunization;
+import pl.edu.icm.pdyn2.model.immunization.ImmunizationSources;
 import pl.edu.icm.pdyn2.model.immunization.Load;
 import pl.edu.icm.pdyn2.model.impact.Impact;
 import pl.edu.icm.pdyn2.model.progression.HealthStatus;
@@ -129,7 +130,8 @@ public class ExampleDataForIntegrationTests {
                 Travel.class,
                 Household.class,
                 MedicalHistory.class,
-                Impact.class);
+                Impact.class,
+                ImmunizationSources.class);
         engine = engineConfig.getEngine();
 
         AtomicReference<Session> sessionReference = new AtomicReference<>();

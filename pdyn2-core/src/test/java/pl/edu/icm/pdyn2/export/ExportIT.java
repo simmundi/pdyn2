@@ -34,15 +34,18 @@ import pl.edu.icm.pdyn2.MockRandomProvider;
 import pl.edu.icm.pdyn2.StatsService;
 import pl.edu.icm.pdyn2.administration.TestingConfig;
 import pl.edu.icm.pdyn2.administration.TestingService;
+import pl.edu.icm.pdyn2.model.context.ContextInfectivityClass;
+import pl.edu.icm.pdyn2.model.immunization.ImmunizationEvent;
 import pl.edu.icm.pdyn2.model.immunization.Load;
 import pl.edu.icm.pdyn2.model.progression.Stage;
 import pl.edu.icm.pdyn2.progression.DiseaseStageTransitionsService;
+import pl.edu.icm.trurl.sampleSpace.EnumSampleSpace;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 
-import static org.assertj.core.api.AssertionsForClassTypes.*;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -100,10 +103,22 @@ public class ExportIT {
                 randomProvider,
                 statsService,
                 agentStateService, new TestingConfig(1.0f));
+        var sowingSource = new EnumSampleSpace<>(ContextInfectivityClass.class);
+        var streetSource = new EnumSampleSpace<>(ContextInfectivityClass.class);
+        streetSource.changeOutcome(ContextInfectivityClass.STREET, 1.0f);
+        var universitySource = new EnumSampleSpace<>(ContextInfectivityClass.class);
+        universitySource.changeOutcome(ContextInfectivityClass.UNIVERSITY, 1.0f);
+        var householdSource = new EnumSampleSpace<>(ContextInfectivityClass.class);
+        householdSource.changeOutcome(ContextInfectivityClass.HOUSEHOLD, 1.0f);
+        var vaccination = new ImmunizationEvent();
+        vaccination.setLoad(Load.BOOSTER);
+        vaccination.setDay(0);
 
         agentStateService.infect(data.agent1, Load.WILD, 10);
+        agentStateService.addSourcesDistribution(data.agent1, sowingSource);
         agentStateService.progressToDiseaseStage(data.agent1, Stage.INFECTIOUS_SYMPTOMATIC, 7);
         agentStateService.infect(data.agentA, Load.DELTA, 3);
+        agentStateService.addSourcesDistribution(data.agentA, sowingSource);
         advance(3);
         agentStateService.progressToDiseaseStage(data.agent1, Stage.HEALTHY);
         advance(1);
@@ -111,9 +126,13 @@ public class ExportIT {
         advance(5);
         agentStateService.progressToDiseaseStage(data.agentA, Stage.HEALTHY);
         advance(1);
+        agentStateService.vaccinate(data.agent1, vaccination);
         agentStateService.infect(data.agent2, Load.ALPHA);
+        agentStateService.addSourcesDistribution(data.agent2, householdSource);
         agentStateService.infect(data.agent3, Load.DELTA);
+        agentStateService.addSourcesDistribution(data.agent3, householdSource);
         agentStateService.infect(data.agent7, Load.OMICRON);
+        agentStateService.addSourcesDistribution(data.agent7, universitySource);
         advance(7);
         testingService.maybeTestAgent(data.agent7);
         agentStateService.progressToDiseaseStage(data.agent7, Stage.INFECTIOUS_SYMPTOMATIC);
@@ -124,6 +143,7 @@ public class ExportIT {
         advance(2);
         agentStateService.progressToDiseaseStage(data.agent7, Stage.DECEASED);
         agentStateService.infect(data.agentA, Load.OMICRON);
+        agentStateService.addSourcesDistribution(data.agentA, householdSource);
         advance(7);
         agentStateService.progressToDiseaseStage(data.agentA, Stage.INFECTIOUS_SYMPTOMATIC);
         advance(6);
@@ -136,11 +156,12 @@ public class ExportIT {
         exporter.export();
 
         // assert
-        assertThat(results.toString()).isEqualTo("id,dzien_zakazenia,miejsce_zakazenia,odmiana_wirusa,odmiana_szczepionki,historia_stanow,test,x,y,wiek\n" +
-                "100006,-10,0,0,-1,26,0,50,50,18\n" +
-                "100012,10,0,3,-1,458,1,52,50,18\n" +
-                "100015,-3,0,2,-1,22,0,52,50,18\n" +
-                "100015,29,0,3,-1,298,0,52,50,18\n");
+        assertThat(results.toString()).isEqualTo("id,dzien_zakazenia,odmiana_wirusa,odmiana_szczepionki,historia_stanow,test,x,y,wiek,workplaceInfluence,kindergartenInfluence,schoolInfluence,universityInfluence,streetInfluence,bigUniversityInfluence,householdInfluence\n" +
+                "100006,-10,0,-1,26,0,50,50,18,0.0,0.0,0.0,0.0,0.0,0.0,0.0\n" +
+                "100006,0,-1,1,0,0,50,50,18,0.0,0.0,0.0,0.0,0.0,0.0,0.0\n" +
+                "100012,10,3,-1,458,1,52,50,18,0.0,0.0,0.0,1.0,0.0,0.0,0.0\n" +
+                "100015,-3,2,-1,22,0,52,50,18,0.0,0.0,0.0,0.0,0.0,0.0,0.0\n" +
+                "100015,29,3,-1,298,0,52,50,18,0.0,0.0,0.0,0.0,0.0,0.0,1.0\n");
     }
 
     private void advance(int days) {

@@ -29,21 +29,15 @@ import pl.edu.icm.pdyn2.model.administration.Record;
 import pl.edu.icm.pdyn2.model.administration.RecordType;
 import pl.edu.icm.pdyn2.model.context.ContextInfectivityClass;
 import pl.edu.icm.pdyn2.model.context.Inhabitant;
-import pl.edu.icm.pdyn2.model.immunization.Immunization;
-import pl.edu.icm.pdyn2.model.immunization.ImmunizationEvent;
-import pl.edu.icm.pdyn2.model.immunization.Load;
-import pl.edu.icm.pdyn2.model.immunization.LoadClassification;
+import pl.edu.icm.pdyn2.model.immunization.*;
 import pl.edu.icm.pdyn2.model.progression.Stage;
 import pl.edu.icm.pdyn2.progression.DiseaseStageTransitionsService;
 import pl.edu.icm.trurl.ecs.util.EntityIterator;
 import pl.edu.icm.trurl.ecs.util.Selectors;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -75,8 +69,10 @@ public class EpidemicExporter {
             OutputStream outputStream = this.workDir.openForWriting(new File(diseaseExportFilename));
             OutputStreamWriter streamWriter = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8);
             BufferedWriter bufferedWriter = new BufferedWriter(streamWriter);
-            bufferedWriter.write("id,dzien_zakazenia,miejsce_zakazenia,odmiana_wirusa," +
-                    "odmiana_szczepionki,historia_stanow,test,x,y,wiek\n");
+            bufferedWriter.write("id,dzien_zakazenia,odmiana_wirusa," +
+                    "odmiana_szczepionki,historia_stanow,test,x,y,wiek,workplaceInfluence," +
+                    "kindergartenInfluence,schoolInfluence,universityInfluence,streetInfluence," +
+                    "bigUniversityInfluence,householdInfluence\n");
             board.getEngine().execute(EntityIterator
                     .select(selectors.allWithComponents(Inhabitant.class))
                     .detachEntities()
@@ -94,26 +90,37 @@ public class EpidemicExporter {
                         if (immunization != null) {
                             var medicalHistory = e.get(MedicalHistory.class);
                             var events = immunization.getEvents();
-                            List<Record> records = null;
-                            if (medicalHistory != null) {
-                                records = medicalHistory.getRecords();
-                            }
+                            var sources = e.get(ImmunizationSources.class);
+List<ImmunizationSource> sourceList = sources != null ? sources.getImmunizationSources() : new ArrayList<>();
+List<Record> records = medicalHistory != null ? medicalHistory.getRecords() : null;
+                            var sourceNumber = 0;
                             for (ImmunizationEvent event : events) {
                                 try {
                                     var history = event.getDiseaseHistory();
                                     var load = event.getLoad();
                                     var startDay = startDayFromDiseaseHistory(event.getLoad(), history, age, event.getDay());
-                                    var possibleTestDay = startDay + transitionsService.durationOf(load, Stage.LATENT, age);
+                                    var possibleTestDay = possibleTestedDay(startDay, load, age);
+                                    var source = new ImmunizationSource();
+                                    if (load.classification == LoadClassification.VIRUS) {
+                                        source = sourceList.get(sourceNumber);
+                                        sourceNumber++;
+                                    }
                                     bufferedWriter.write(e.getId() + ",");
                                     bufferedWriter.write(startDay + ",");
-                                    bufferedWriter.write(infectionContext(ContextInfectivityClass.HOUSEHOLD) + ",");
                                     bufferedWriter.write(diseaseLoad(load) + ",");
                                     bufferedWriter.write(vaccineLoad(load) + ",");
                                     bufferedWriter.write(history + ",");
                                     bufferedWriter.write(testedValue(load, possibleTestDay, records) + ",");
                                     bufferedWriter.write(cell.getLegacyPdynCol() + ",");
                                     bufferedWriter.write(cell.getLegacyPdynRow() + ",");
-                                    bufferedWriter.write(Integer.toString(age));
+                                    bufferedWriter.write(age + ",");
+                                    bufferedWriter.write(source.getWorkplaceInfluence() + ",");
+                                    bufferedWriter.write(source.getKindergartenInfluence() + ",");
+                                    bufferedWriter.write(source.getSchoolInfluence() + ",");
+                                    bufferedWriter.write(source.getUniversityInfluence() + ",");
+                                    bufferedWriter.write(source.getStreetInfluence() + ",");
+                                    bufferedWriter.write(source.getBigUniversityInfluence() + ",");
+                                    bufferedWriter.write(Float.toString(source.getHouseholdInfluence()));
                                     bufferedWriter.write("\n");
                                 } catch (IOException exception) {
                                     throw new IllegalStateException(exception);
@@ -200,7 +207,17 @@ public class EpidemicExporter {
         }
     }
 
+    private int possibleTestedDay(int startDay, Load load, int age) {
+        if (load.classification == LoadClassification.VACCINE) {
+            return 0;
+        } else return startDay + transitionsService.durationOf(load, Stage.LATENT, age);
+
+    }
+
     private int startDayFromDiseaseHistory(Load load, int history, int age, int endDay) {
+        if (load.classification == LoadClassification.VACCINE) {
+            return endDay;
+        }
         var stages = Arrays.stream(Stage.values())
                 .sorted(Comparator.comparingInt(Stage::getEncoding).reversed())
                 .collect(Collectors.toList());

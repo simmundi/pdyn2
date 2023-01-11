@@ -23,6 +23,7 @@ import pl.edu.icm.board.Board;
 import pl.edu.icm.board.model.Household;
 import pl.edu.icm.board.model.Person;
 import pl.edu.icm.pdyn2.AgentStateService;
+import pl.edu.icm.pdyn2.model.context.ContextInfectivityClass;
 import pl.edu.icm.pdyn2.model.immunization.ImmunizationEvent;
 import pl.edu.icm.pdyn2.model.immunization.Load;
 import pl.edu.icm.pdyn2.model.immunization.LoadClassification;
@@ -31,6 +32,7 @@ import pl.edu.icm.pdyn2.progression.DiseaseStageTransitionsService;
 import pl.edu.icm.pdyn2.time.SimulationTimer;
 import pl.edu.icm.trurl.ecs.util.EntityIterator;
 import pl.edu.icm.trurl.ecs.util.Selectors;
+import pl.edu.icm.trurl.sampleSpace.EnumSampleSpace;
 import pl.edu.icm.trurl.util.Status;
 
 import java.util.*;
@@ -98,6 +100,10 @@ public class ImmunizationEventsImporterFromAgentId {
                                 event.setDay(
                                         endDayFromDiseaseHistory(event.getLoad(), event.getDiseaseHistory(), age, event.getDay()));
                                 agentStateService.addImmunizationEvent(memberEntity, event);
+                                if(event.getLoad().classification == LoadClassification.VIRUS) {
+                                    agentStateService.addSourcesDistribution(memberEntity,
+                                            new EnumSampleSpace<>(ContextInfectivityClass.class));
+                                }
                                 status.tick();
                             }
                         }
