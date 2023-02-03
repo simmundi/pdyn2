@@ -35,8 +35,8 @@ public class ImmunizationStrategyFromPdyn1Rewritten implements ImmunizationStrat
     private final Map<ImmunizationStage, Map<Load, Map<Load, Double>>> crossImmunity = new EnumMap<>(ImmunizationStage.class);
 
     @WithFactory
-    public ImmunizationStrategyFromPdyn1Rewritten(ImmunizationStrategyProvider provider) {
-        provider.registerImmunizationStrategy(this);
+    public ImmunizationStrategyFromPdyn1Rewritten() {
+
         sFunction.putAll(Map.of(
                 ImmunizationStage.LATENTNY, new EnumMap<Load, IntToDoubleFunction>(Map.of(
                         Load.WILD, day -> day < 90 ? 1.0 : max(0.800000, 1.0 - 0.00133333 * (day - 90)),

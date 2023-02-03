@@ -18,9 +18,19 @@
 
 package pl.edu.icm.pdyn2.immunization;
 
+import net.snowyhollows.bento.annotation.ImplementationSwitch;
+import net.snowyhollows.bento.annotation.ImplementationSwitch.When;
 import pl.edu.icm.pdyn2.model.immunization.Immunization;
 import pl.edu.icm.pdyn2.model.immunization.Load;
 
+@ImplementationSwitch(
+        configKey = "immunizationStrategy",
+        cases = {
+                @When(name="pdyn1_rewritten", implementation = ImmunizationStrategyFromPdyn1Rewritten.class),
+                @When(name="constant", implementation = SimpleImmunizationStrategy.class),
+                @When(name="pdyn1_precalculated", implementation = ImmunizationStrategyFromPdyn1.class)
+        }
+)
 public interface ImmunizationStrategy {
     float getImmunizationCoefficient(Immunization immunization,
                                      ImmunizationStage immunizationStage,

@@ -26,9 +26,8 @@ public class SimpleImmunizationStrategy implements ImmunizationStrategy {
     private final float simpleImmunizationStrategyValue;
 
     @WithFactory
-    public SimpleImmunizationStrategy(ImmunizationStrategyProvider provider, float simpleImmunizationStrategyValue){
+    public SimpleImmunizationStrategy(float simpleImmunizationStrategyValue){
         this.simpleImmunizationStrategyValue = simpleImmunizationStrategyValue;
-        provider.registerImmunizationStrategy(this);
     }
 
     @Override

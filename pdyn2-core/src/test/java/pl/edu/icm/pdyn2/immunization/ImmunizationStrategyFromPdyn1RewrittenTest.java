@@ -43,7 +43,6 @@ class ImmunizationStrategyFromPdyn1RewrittenTest {
     Immunization immunization2;
     ImmunizationEvent immunizationEvent1 = new ImmunizationEvent();
     ImmunizationEvent immunizationEvent2 = new ImmunizationEvent();
-    private final ImmunizationStrategyProvider provider = new ImmunizationStrategyProvider();
 
     @BeforeEach
     void setup() {
@@ -58,13 +57,12 @@ class ImmunizationStrategyFromPdyn1RewrittenTest {
     @Test
     void getImmunizationCoefficient() {
         //given
-        var immunizationStrategy = new ImmunizationStrategyFromPdyn1Rewritten(provider);
+        var immunizationStrategy = new ImmunizationStrategyFromPdyn1Rewritten();
         //execute
         var coef1 = immunizationStrategy.getImmunizationCoefficient(immunization1, ImmunizationStage.LATENTNY, Load.OMICRON, 73);
         var coef2 = immunizationStrategy.getImmunizationCoefficient(immunization2, ImmunizationStage.LATENTNY, Load.OMICRON, 73);
         //assert
         assertThat(coef1).isEqualTo(0.9f);
         assertThat(coef2).isEqualTo(0.76f);
-        assertThat(provider.getImmunizationStrategy()).isEqualTo(immunizationStrategy);
     }
 }

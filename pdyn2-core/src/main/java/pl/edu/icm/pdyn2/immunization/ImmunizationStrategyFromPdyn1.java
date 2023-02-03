@@ -29,10 +29,8 @@ public class ImmunizationStrategyFromPdyn1 implements ImmunizationStrategy {
     private final ImmunizationFromCsvProvider immunizationFromCsvProvider;
 
     @WithFactory
-    public ImmunizationStrategyFromPdyn1(ImmunizationStrategyProvider provider,
-                                         ImmunizationFromCsvProvider immunizationFromCsvProvider) {
+    public ImmunizationStrategyFromPdyn1(ImmunizationFromCsvProvider immunizationFromCsvProvider) {
         this.immunizationFromCsvProvider = immunizationFromCsvProvider;
-        provider.registerImmunizationStrategy(this);
         try {
             immunizationFromCsvProvider.load();
         } catch (IOException e) {

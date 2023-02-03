@@ -30,14 +30,12 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @ExtendWith(MockitoExtension.class)
 class SimpleImmunizationStrategyTest {
     @Mock
-    ImmunizationStrategyProvider provider;
-    @Mock
     Immunization immunization;
 
     @Test
     void getImmunizationCoefficient() {
         //given
-        var simpleImmunizationStrategy = new SimpleImmunizationStrategy(provider, 0.3f);
+        var simpleImmunizationStrategy = new SimpleImmunizationStrategy(0.3f);
         //execute
         var coef = simpleImmunizationStrategy.getImmunizationCoefficient(immunization,
                 ImmunizationStage.LATENTNY,

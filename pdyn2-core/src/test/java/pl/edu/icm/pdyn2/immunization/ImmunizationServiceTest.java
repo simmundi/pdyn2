@@ -34,20 +34,17 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class ImmunizationServiceTest {
     @Mock
-    ImmunizationStrategyProvider mockprovider;
-    @Mock
     ImmunizationStrategy immunizationStrategy;
 
     @BeforeEach
     void before() {
-        when(mockprovider.getImmunizationStrategy()).thenReturn(immunizationStrategy);
         when(immunizationStrategy.getImmunizationCoefficient(any(), any(), any(), anyInt())).thenReturn(0.5f);
     }
 
     @Test
     void getImmunizationCoefficient() {
         //given
-        var immunizationService = new ImmunizationService(mockprovider);
+        var immunizationService = new ImmunizationService(immunizationStrategy);
         //execute
         var coef = immunizationService.getImmunizationCoefficient(new Immunization(),
                 ImmunizationStage.LATENTNY,

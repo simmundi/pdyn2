@@ -26,8 +26,8 @@ public class ImmunizationService {
     private final ImmunizationStrategy immunizationStrategy;
 
     @WithFactory
-    public ImmunizationService(ImmunizationStrategyProvider provider) {
-        this.immunizationStrategy = provider.getImmunizationStrategy();
+    public ImmunizationService(ImmunizationStrategy immunizationStrategy) {
+        this.immunizationStrategy = immunizationStrategy;
     }
 
     public float getImmunizationCoefficient(Immunization immunization,
