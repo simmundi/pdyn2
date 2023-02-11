@@ -51,7 +51,7 @@ import java.util.*;
 
 import static it.unimi.dsi.fastutil.ints.IntArrays.shuffle;
 
-public class SowingFromDistribution implements SowingStrategy {
+public class SowingFromDistribution implements SowingService {
 
     private final InfectedLoaderFromDistribution loader;
     private final StatsService statsService;
@@ -61,7 +61,6 @@ public class SowingFromDistribution implements SowingStrategy {
     private final Random random;
     private final PopulationService populationService;
     private final AgentStateService agentStateService;
-    private final Selectors selectors;
     private final DiseaseStageTransitionsService diseaseStageTransitionsService;
     private final TestingService testingService;
 
@@ -74,20 +73,16 @@ public class SowingFromDistribution implements SowingStrategy {
     private final Set<String> terytWithWrongType = new HashSet<>();
 
     @WithFactory
-    public SowingFromDistribution(SowingStrategyProvider provider,
-                                  InfectedLoaderFromDistribution loader,
+    public SowingFromDistribution(InfectedLoaderFromDistribution loader,
                                   StatsService statsService,
                                   Board board,
                                   RandomProvider randomProvider,
                                   CommuneManager communeManager,
                                   PopulationService populationService,
                                   AgentStateService agentStateService,
-                                  Selectors selectors,
                                   DiseaseStageTransitionsService diseaseStageTransitionsService,
                                   TestingService testingService) {
         this.statsService = statsService;
-        provider.registerInitialSowingStrategy(this);
-        this.selectors = selectors;
         this.loader = loader;
         this.board = board;
         this.randomGenerator = randomProvider.getRandomGenerator(InfectedLoaderFromDistribution.class);

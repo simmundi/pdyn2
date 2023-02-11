@@ -101,6 +101,8 @@ public class ExampleDataForIntegrationTests {
 
     public ExampleDataForIntegrationTests(boolean sharedSession) {
         config = Bento.createRoot();
+        config.register("contextService", "behaviourBased");
+        config.register("contextImpactService", "basic");
         config.register("gridRows", rows);
         config.register("gridColumns", cols);
         config.register("alpha", 0.5f);

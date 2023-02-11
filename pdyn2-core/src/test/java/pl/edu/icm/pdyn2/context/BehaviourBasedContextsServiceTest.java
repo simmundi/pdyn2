@@ -42,11 +42,11 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
-class ContextsServiceTest {
+class BehaviourBasedContextsServiceTest {
     @Mock
     private AreaIndex areaIndex;
     @InjectMocks
-    ContextsService contextsService;
+    BehaviourBasedContextsService contextsService;
 
     @Test
     @DisplayName("Should find all the contexts of a routine-following agent")

@@ -18,17 +18,14 @@
 
 package pl.edu.icm.pdyn2.sowing;
 
-import net.snowyhollows.bento.annotation.WithFactory;
+import net.snowyhollows.bento.annotation.ImplementationSwitch;
 
-public class SowingService {
-    private final SowingStrategy sowingStrategy;
-
-    @WithFactory
-    public SowingService(SowingStrategyProvider provider) {
-        this.sowingStrategy = provider.getInitialSowingStrategy();
-    }
-
-    public void sow() {
-        sowingStrategy.sow();
-    }
+@ImplementationSwitch(
+        configKey = "sowingStrategy",
+        cases = {
+                @ImplementationSwitch.When(name="fromAgentId", implementation = SowingFromAgentId.class),
+                @ImplementationSwitch.When(name="fromDistribution", implementation = SowingFromDistribution.class),
+        }
+)public interface SowingService {
+    void sow();
 }

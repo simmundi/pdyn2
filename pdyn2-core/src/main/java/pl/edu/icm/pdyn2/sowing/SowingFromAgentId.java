@@ -22,7 +22,6 @@ import net.snowyhollows.bento.annotation.WithFactory;
 import pl.edu.icm.board.Board;
 import pl.edu.icm.board.model.Household;
 import pl.edu.icm.pdyn2.AgentStateService;
-import pl.edu.icm.pdyn2.index.AreaClusteredSelectors;
 import pl.edu.icm.pdyn2.model.context.ContextInfectivityClass;
 import pl.edu.icm.pdyn2.model.immunization.Load;
 import pl.edu.icm.pdyn2.model.progression.Stage;
@@ -38,7 +37,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class SowingFromAgentId implements SowingStrategy {
+public class SowingFromAgentId implements SowingService {
 
     private final InfectedLoaderFromAgentId infectedLoaderFromAgentId;
     private final Board board;
@@ -47,15 +46,12 @@ public class SowingFromAgentId implements SowingStrategy {
 
     @WithFactory
     public SowingFromAgentId(InfectedLoaderFromAgentId infectedLoaderFromAgentId,
-                                SowingStrategyProvider provider,
                                 Board board,
-                                AreaClusteredSelectors areaClusteredSelectors,
                                 StaticSelectors staticSelectors, AgentStateService agentStateService) {
         this.infectedLoaderFromAgentId = infectedLoaderFromAgentId;
         this.board = board;
         this.staticSelectors = staticSelectors;
         this.agentStateService = agentStateService;
-        provider.registerInitialSowingStrategy(this);
     }
 
     public void sow() {

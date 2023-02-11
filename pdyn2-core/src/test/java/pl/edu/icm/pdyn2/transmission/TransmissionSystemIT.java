@@ -40,6 +40,7 @@ import pl.edu.icm.board.util.RandomForChunkProvider;
 import pl.edu.icm.board.util.RandomProvider;
 import pl.edu.icm.pdyn2.AgentStateService;
 import pl.edu.icm.pdyn2.StatsService;
+import pl.edu.icm.pdyn2.context.BehaviourBasedContextsService;
 import pl.edu.icm.pdyn2.context.ContextsService;
 import pl.edu.icm.pdyn2.immunization.ImmunizationService;
 import pl.edu.icm.pdyn2.index.AreaClusteredSelectors;
@@ -140,7 +141,7 @@ class TransmissionSystemIT {
         board.load(TransmissionSystemBuilder.class.getResourceAsStream("/transmissionTest.csv"));
         when(randomProvider.getRandomGenerator(TransmissionSystemBuilder.class)).thenReturn(randomGenerator);
         when(randomProvider.getRandomForChunkProvider(TransmissionSystemBuilder.class)).thenReturn(randomForChunkProvider);
-        contextsService = new ContextsService(areaIndex);
+        contextsService = new BehaviourBasedContextsService(areaIndex);
         transmissionService = new TransmissionService(contextsService, relativeAlphaConfig, transmissionConfig, simulationTimer, immunizationService);
         transmissionSystemBuilder = new TransmissionSystemBuilder(
                 transmissionService,

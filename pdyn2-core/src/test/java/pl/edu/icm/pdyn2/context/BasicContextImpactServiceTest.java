@@ -27,7 +27,7 @@ import pl.edu.icm.board.model.Person;
 import pl.edu.icm.pdyn2.ComponentCreator;
 import pl.edu.icm.pdyn2.EntityMocker;
 import pl.edu.icm.pdyn2.model.context.ContextType;
-import pl.edu.icm.pdyn2.transmission.ContextImpactService;
+import pl.edu.icm.pdyn2.transmission.BasicContextImpactService;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -36,12 +36,12 @@ import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.data.Offset.offset;
 
 @ExtendWith(MockitoExtension.class)
-class ContextImpactServiceTest {
+class BasicContextImpactServiceTest {
 
     EntityMocker entityMocker = new EntityMocker(null);
 
     @InjectMocks
-    ContextImpactService fractionService;
+    BasicContextImpactService fractionService;
 
     @Test
     @DisplayName("Should generally return one")

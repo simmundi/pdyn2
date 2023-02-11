@@ -54,8 +54,6 @@ public class SowingFromDistributionIT {
     @Mock
     private WorkDir workDir;
     @Mock
-    private SowingStrategyProvider sowingStrategyProvider;
-    @Mock
     private CommuneManager communeManager;
     @Mock
     private StatsService statsService;
@@ -92,7 +90,7 @@ public class SowingFromDistributionIT {
                 randomProvider,
                 workDir);
 
-        var sowingFromDistribution = new SowingFromDistribution(sowingStrategyProvider,
+        var sowingFromDistribution = new SowingFromDistribution(
                 loader,
                 statsService,
                 board,
@@ -100,7 +98,6 @@ public class SowingFromDistributionIT {
                 communeManager,
                 populationService,
                 agentStateService,
-                data.selectors,
                 diseaseStageTransitionsService,
                 testingService);
         data.session.close();
