@@ -27,10 +27,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.edu.icm.board.model.Household;
 import pl.edu.icm.board.util.RandomProvider;
-import pl.edu.icm.pdyn2.AgentStateService;
-import pl.edu.icm.pdyn2.ExampleDataForIntegrationTests;
-import pl.edu.icm.pdyn2.MockRandomProvider;
-import pl.edu.icm.pdyn2.StatsService;
+import pl.edu.icm.pdyn2.*;
 import pl.edu.icm.pdyn2.index.CommuneClusteredSelectors;
 import pl.edu.icm.pdyn2.model.immunization.Immunization;
 import pl.edu.icm.pdyn2.model.immunization.ImmunizationEvent;
@@ -50,7 +47,8 @@ import static pl.edu.icm.trurl.ecs.util.Systems.sequence;
 
 @ExtendWith(MockitoExtension.class)
 public class VaccinationIT {
-    private final ExampleDataForIntegrationTests data = new ExampleDataForIntegrationTests(true);
+    private final BasicConfig basicConfig = new BasicConfig();
+    private final ExampleDataForIntegrationTests data = new ExampleDataForIntegrationTests(basicConfig, true);
     private final AgentStateService agentStateService = data.agentStateService;
     private final SimulationTimer simulationTimer = data.simulationTimer;
     @Mock
@@ -83,7 +81,7 @@ public class VaccinationIT {
     @Test
     @DisplayName("Should vaccinate agents according to the given data")
     public void test() {
-        var loader = new VaccinationFromCsvLoader("/vaccinationTest.csv", workDir);
+        var loader = new VaccinationFromCsvLoader("/vaccinationTest.csv", workDir, basicConfig.loads);
         var vaccinationService = new VaccinationService(agentStateService,
                 randomProvider,
                 communeClusteredSelectors,
@@ -91,17 +89,17 @@ public class VaccinationIT {
                 statsService);
         var vaccinationSystemBuilder = new VaccinationFromCsvSystemBuilder(loader,
                 simulationTimer,
-                vaccinationService);
+                vaccinationService, basicConfig.stages);
         vaccinationSystemBuilder.load();
 
         var event1 = new ImmunizationEvent();
         event1.setDay(0);
-        event1.setLoad(Load.PFIZER);
+        event1.setLoad(basicConfig.loads.PFIZER);
 
         agentStateService.vaccinate(data.agent1, event1);
         agentStateService.vaccinate(data.agent7, event1);
         agentStateService.vaccinate(data.agent8, event1);
-        agentStateService.infect(data.agent9, Load.OMICRON);
+        agentStateService.infect(data.agent9, basicConfig.loads.OMICRON);
 
         data.session.close();
         var vaccinationSystem = vaccinationSystemBuilder.buildVaccinationSystem();
@@ -111,12 +109,12 @@ public class VaccinationIT {
             ));
         }
 
-        assertThat(data.agent1.get(Immunization.class).getEvents().get(0).getLoad()).isEqualTo(Load.PFIZER);
-        assertThat(data.agent2.get(Immunization.class).getEvents().get(0).getLoad()).isEqualTo(Load.PFIZER);
-        assertThat(data.agent3.get(Immunization.class).getEvents().get(0).getLoad()).isEqualTo(Load.PFIZER);
-        assertThat(data.agent4.get(Immunization.class).getEvents().get(0).getLoad()).isEqualTo(Load.BOOSTER);
-        assertThat(data.agent5.get(Immunization.class).getEvents().get(0).getLoad()).isEqualTo(Load.BOOSTER);
-        assertThat(data.agent6.get(Immunization.class).getEvents().get(0).getLoad()).isEqualTo(Load.BOOSTER);
-        assertThat(data.agentA.get(Immunization.class).getEvents().get(0).getLoad()).isEqualTo(Load.PFIZER);
+        assertThat(data.agent1.get(Immunization.class).getEvents().get(0).getLoad()).isEqualTo(basicConfig.loads.PFIZER);
+        assertThat(data.agent2.get(Immunization.class).getEvents().get(0).getLoad()).isEqualTo(basicConfig.loads.PFIZER);
+        assertThat(data.agent3.get(Immunization.class).getEvents().get(0).getLoad()).isEqualTo(basicConfig.loads.PFIZER);
+        assertThat(data.agent4.get(Immunization.class).getEvents().get(0).getLoad()).isEqualTo(basicConfig.loads.BOOSTER);
+        assertThat(data.agent5.get(Immunization.class).getEvents().get(0).getLoad()).isEqualTo(basicConfig.loads.BOOSTER);
+        assertThat(data.agent6.get(Immunization.class).getEvents().get(0).getLoad()).isEqualTo(basicConfig.loads.BOOSTER);
+        assertThat(data.agentA.get(Immunization.class).getEvents().get(0).getLoad()).isEqualTo(basicConfig.loads.PFIZER);
     }
 }

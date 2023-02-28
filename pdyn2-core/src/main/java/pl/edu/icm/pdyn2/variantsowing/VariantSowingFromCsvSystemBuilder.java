@@ -22,6 +22,7 @@ import net.snowyhollows.bento.annotation.WithFactory;
 import pl.edu.icm.board.model.Person;
 import pl.edu.icm.pdyn2.model.progression.HealthStatus;
 import pl.edu.icm.pdyn2.model.progression.Stage;
+import pl.edu.icm.pdyn2.model.progression.Stages;
 import pl.edu.icm.pdyn2.time.SimulationTimer;
 import pl.edu.icm.trurl.ecs.EntitySystem;
 import pl.edu.icm.trurl.util.Status;
@@ -34,15 +35,18 @@ public class VariantSowingFromCsvSystemBuilder {
     private final VariantSowingService variantSowingService;
     private final SimulationTimer simulationTimer;
     private final Map<Integer, Set<VariantSowingRecord>> sowingRecords = new HashMap<>();
+    private final Stages stages;
 
 
     @WithFactory
     public VariantSowingFromCsvSystemBuilder(VariantSowingFromCsvLoader variantSowingFromCsvLoader,
                                              VariantSowingService variantSowingService,
-                                             SimulationTimer simulationTimer) {
+                                             SimulationTimer simulationTimer,
+                                             Stages stages) {
         this.loader = variantSowingFromCsvLoader;
         this.variantSowingService = variantSowingService;
         this.simulationTimer = simulationTimer;
+        this.stages = stages;
     }
 
     public void load() {
@@ -86,7 +90,7 @@ public class VariantSowingFromCsvSystemBuilder {
             var session = sessionFactory.create();
             for (VariantSowingRecord record : sowingRecords.get(currentDay)) {
                 variantSowingService.sowVariant(session, record.getLoad(), record.getSowingCount(), record.getTeryts(), status,
-                        HealthStatus.class, hs -> hs.getStage() == Stage.LATENT && hs.getDiseaseLoad() != record.getLoad(), false,
+                        HealthStatus.class, hs -> hs.getStage() == stages.LATENT && hs.getDiseaseLoad() != record.getLoad(), false,
                         Person.class, person -> person.getAge() >= record.getMinAge() && person.getAge() <= record.getMaxAge(), false);
             }
             session.close();

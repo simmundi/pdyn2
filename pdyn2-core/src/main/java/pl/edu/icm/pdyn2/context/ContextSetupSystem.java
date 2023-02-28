@@ -24,9 +24,10 @@ import pl.edu.icm.pdyn2.model.behaviour.Behaviour;
 import pl.edu.icm.pdyn2.model.behaviour.BehaviourType;
 import pl.edu.icm.pdyn2.model.context.Context;
 import pl.edu.icm.pdyn2.model.context.ContextType;
+import pl.edu.icm.pdyn2.model.context.ContextTypes;
 import pl.edu.icm.pdyn2.model.context.Inhabitant;
 import pl.edu.icm.pdyn2.model.progression.HealthStatus;
-import pl.edu.icm.pdyn2.model.progression.Stage;
+import pl.edu.icm.pdyn2.model.progression.Stages;
 import pl.edu.icm.trurl.ecs.Entity;
 import pl.edu.icm.trurl.ecs.EntitySystem;
 import pl.edu.icm.trurl.ecs.SessionFactory;
@@ -37,10 +38,15 @@ import pl.edu.icm.trurl.util.Status;
 public class ContextSetupSystem implements EntitySystem {
 
     private final Selectors selectors;
+    private final Stages stages;
+    private final ContextTypes contextTypes;
 
     @WithFactory
-    public ContextSetupSystem(Selectors selectors) {
+    public ContextSetupSystem(Selectors selectors,
+                              Stages stages, ContextTypes contextTypes) {
         this.selectors = selectors;
+        this.stages = stages;
+        this.contextTypes = contextTypes;
     }
 
     @Override
@@ -52,7 +58,7 @@ public class ContextSetupSystem implements EntitySystem {
             if (entity.get(Household.class) != null) {
                 Entity householdEntity = entity;
                 Household household = householdEntity.get(Household.class);
-                householdEntity.add(new Context(ContextType.HOUSEHOLD));
+                householdEntity.add(new Context(contextTypes.HOUSEHOLD));
                 for (Entity householdMember : household.getMembers()) {
                     householdMember.add(defaultBehaviour());
                     householdMember.add(defaultHealthStatus());
@@ -65,24 +71,24 @@ public class ContextSetupSystem implements EntitySystem {
                     householdMember.add(inhabitant);
                 }
             } else if (entity.get(Workplace.class) != null) {
-                entity.add(new Context(ContextType.WORKPLACE));
+                entity.add(new Context(contextTypes.WORKPLACE));
             } else if (entity.get(EducationalInstitution.class) != null) {
                 var eduInst = entity.get(EducationalInstitution.class);
                 switch (eduInst.getLevel()) {
                     case BU:
-                        entity.add(new Context(ContextType.BIG_UNIVERSITY));
+                        entity.add(new Context(contextTypes.BIG_UNIVERSITY));
                         break;
                     case U:
-                        entity.add(new Context(ContextType.UNIVERSITY));
+                        entity.add(new Context(contextTypes.UNIVERSITY));
                         break;
                     case K:
-                        entity.add(new Context(ContextType.KINDERGARTEN));
+                        entity.add(new Context(contextTypes.KINDERGARTEN));
                         break;
                     case H: // thru
                     case P: // thru
                     case PH: // thru
                     default:
-                        entity.add(new Context(ContextType.SCHOOL));
+                        entity.add(new Context(contextTypes.SCHOOL));
                 }
             }
         }).execute(sessionFactory);
@@ -96,7 +102,7 @@ public class ContextSetupSystem implements EntitySystem {
 
     private HealthStatus defaultHealthStatus() {
         HealthStatus healthStatus = new HealthStatus();
-        healthStatus.transitionTo(Stage.HEALTHY, 0);
+        healthStatus.transitionTo(stages.HEALTHY, 0);
         return healthStatus;
     }
 

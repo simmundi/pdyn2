@@ -25,7 +25,7 @@ import pl.edu.icm.pdyn2.model.behaviour.BehaviourType;
 import pl.edu.icm.pdyn2.model.immunization.Immunization;
 import pl.edu.icm.pdyn2.model.immunization.ImmunizationEvent;
 import pl.edu.icm.pdyn2.model.progression.HealthStatus;
-import pl.edu.icm.pdyn2.model.progression.Stage;
+import pl.edu.icm.pdyn2.model.progression.Stages;
 import pl.edu.icm.pdyn2.time.SimulationTimer;
 import pl.edu.icm.trurl.ecs.EntitySystem;
 import pl.edu.icm.trurl.util.Status;
@@ -38,14 +38,18 @@ public class VaccinationFromCsvSystemBuilder {
     private final SimulationTimer simulationTimer;
     private final Map<Integer, Set<VaccinationRecord>> vaccinationRecords = new HashMap<>();
     private final VaccinationService vaccinationService;
+    private final Stages stages;
 
 
     @WithFactory
     public VaccinationFromCsvSystemBuilder(VaccinationFromCsvLoader vaccinationFromCsvLoader,
-                                           SimulationTimer simulationTimer, VaccinationService vaccinationService) {
+                                           SimulationTimer simulationTimer,
+                                           VaccinationService vaccinationService,
+                                           Stages stages) {
         this.loader = vaccinationFromCsvLoader;
         this.simulationTimer = simulationTimer;
         this.vaccinationService = vaccinationService;
+        this.stages = stages;
     }
 
     public void load() {
@@ -98,7 +102,7 @@ public class VaccinationFromCsvSystemBuilder {
                         record.getTeryts(),
                         status,
                         HealthStatus.class,
-                        hs -> hs.getStage() == Stage.HEALTHY,
+                        hs -> hs.getStage() == stages.HEALTHY,
                         false,
                         Behaviour.class,
                         b -> b.getType() == BehaviourType.ROUTINE,

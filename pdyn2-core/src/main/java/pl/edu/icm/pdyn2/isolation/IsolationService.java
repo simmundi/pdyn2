@@ -25,6 +25,7 @@ import pl.edu.icm.pdyn2.AgentStateService;
 import pl.edu.icm.pdyn2.StatsService;
 import pl.edu.icm.pdyn2.model.progression.HealthStatus;
 import pl.edu.icm.pdyn2.model.progression.Stage;
+import pl.edu.icm.pdyn2.model.progression.Stages;
 import pl.edu.icm.trurl.ecs.Entity;
 
 public final class IsolationService {
@@ -32,23 +33,26 @@ public final class IsolationService {
     private final StatsService statsService;
     private final AgentStateService agentStateService;
     private final IsolationConfig isolationConfig;
+    private final Stages stages;
 
     @WithFactory
     public IsolationService(RandomProvider randomProvider,
                             StatsService statsService,
                             AgentStateService agentStateService,
-                            IsolationConfig isolationConfig) {
+                            IsolationConfig isolationConfig,
+                            Stages stages) {
         this.randomGenerator = randomProvider.getRandomGenerator(IsolationService.class);
         this.statsService = statsService;
         this.agentStateService = agentStateService;
         this.isolationConfig = isolationConfig;
+        this.stages = stages;
     }
 
     public void maybeIsolateAgent(Entity agentEntity) {
         float baseProbabilityOfSelfIsolation = isolationConfig.getBaseProbabilityOfSelfIsolation();
         float selfIsolationWeight = isolationConfig.getSelfIsolationWeight();
 
-        if (baseProbabilityOfSelfIsolation > 0 && agentEntity.get(HealthStatus.class).getStage() == Stage.INFECTIOUS_SYMPTOMATIC) {
+        if (baseProbabilityOfSelfIsolation > 0 && agentEntity.get(HealthStatus.class).getStage() == stages.INFECTIOUS_SYMPTOMATIC) {
             if (randomGenerator.nextFloat() < baseProbabilityOfSelfIsolation * selfIsolationWeight) {
                 // recklessly stays at home
             } else {

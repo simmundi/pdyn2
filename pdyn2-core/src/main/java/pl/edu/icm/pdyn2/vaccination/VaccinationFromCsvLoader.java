@@ -23,6 +23,7 @@ import com.univocity.parsers.csv.CsvParserSettings;
 import net.snowyhollows.bento.annotation.WithFactory;
 import net.snowyhollows.bento.config.WorkDir;
 import pl.edu.icm.pdyn2.model.immunization.Load;
+import pl.edu.icm.pdyn2.model.immunization.Loads;
 import pl.edu.icm.trurl.store.array.ArrayStore;
 
 import java.io.File;
@@ -35,16 +36,18 @@ public class VaccinationFromCsvLoader {
     private final String vaccinationFilename;
     private final WorkDir workDir;
     private VaccinationRecordFromCsvMapper mapper;
+    private final Loads loads;
 
     @WithFactory
-    public VaccinationFromCsvLoader(String vaccinationFilename, WorkDir workDir) {
+    public VaccinationFromCsvLoader(String vaccinationFilename, WorkDir workDir, Loads loads) {
         this.vaccinationFilename = vaccinationFilename;
         this.workDir = workDir;
+        this.loads = loads;
     }
 
     public void load() throws IOException {
         if (mapper == null) {
-            mapper = new VaccinationRecordFromCsvMapper();
+            mapper = new VaccinationRecordFromCsvMapper(loads);
             var vaccinationStore = new ArrayStore(1000);
             mapper.configureStore(vaccinationStore);
             mapper.attachStore(vaccinationStore);
@@ -86,9 +89,9 @@ public class VaccinationFromCsvLoader {
     private Load load(String vaccineLoad) {
         switch (vaccineLoad) {
             case "0":
-                return Load.PFIZER;
+                return loads.PFIZER;
             case "1":
-                return Load.BOOSTER;
+                return loads.BOOSTER;
         }
         throw new IllegalArgumentException("Could not find value for: vaccine=" + vaccineLoad);
     }

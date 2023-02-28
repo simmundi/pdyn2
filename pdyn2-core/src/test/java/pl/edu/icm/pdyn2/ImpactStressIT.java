@@ -26,7 +26,6 @@ import pl.edu.icm.pdyn2.model.behaviour.Behaviour;
 import pl.edu.icm.pdyn2.model.behaviour.BehaviourMapper;
 import pl.edu.icm.pdyn2.model.behaviour.BehaviourType;
 import pl.edu.icm.pdyn2.model.context.Context;
-import pl.edu.icm.pdyn2.model.context.ContextType;
 import pl.edu.icm.pdyn2.model.context.Inhabitant;
 import pl.edu.icm.pdyn2.model.immunization.Load;
 import pl.edu.icm.pdyn2.model.progression.HealthStatus;
@@ -40,22 +39,19 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
-import static org.assertj.core.api.Assertions.*;
-import static pl.edu.icm.pdyn2.ComponentCreator.behaviour;
-import static pl.edu.icm.pdyn2.ComponentCreator.context;
-import static pl.edu.icm.pdyn2.ComponentCreator.health;
-import static pl.edu.icm.pdyn2.ComponentCreator.household;
-import static pl.edu.icm.pdyn2.ComponentCreator.inhabitant;
-import static pl.edu.icm.pdyn2.ComponentCreator.person;
-import static pl.edu.icm.pdyn2.ComponentCreator.travel;
+import static org.assertj.core.api.Assertions.assertThat;
+import static pl.edu.icm.pdyn2.ComponentCreator.*;
 
 public class ImpactStressIT {
     public static final int AGENT_COUNT = 100000;
     public static final int TOTAL_TEST_TIME_IN_MILLIS = 10000;
-    EmptyDataForIntegrationTests data = new EmptyDataForIntegrationTests();
+
+    BasicConfig basicConfig = new BasicConfig();
+
+    EmptyDataForIntegrationTests data = new EmptyDataForIntegrationTests(basicConfig);
     BehaviourType[] behaviours = { BehaviourType.ROUTINE, BehaviourType.PRIVATE_TRAVEL, BehaviourType.HOSPITALIZED };
-    Load[] loads = { Load.WILD, Load.ALPHA, Load.OMICRON };
-    Stage[] stages = { Stage.HEALTHY, Stage.INFECTIOUS_SYMPTOMATIC, Stage.INFECTIOUS_ASYMPTOMATIC };
+    Load[] loads = { basicConfig.loads.WILD, basicConfig.loads.ALPHA, basicConfig.loads.OMICRON };
+    Stage[] stages = { basicConfig.stages.HEALTHY, basicConfig.stages.INFECTIOUS_SYMPTOMATIC, basicConfig.stages.INFECTIOUS_ASYMPTOMATIC };
 
     Random random = new Random(0);
 
@@ -71,16 +67,16 @@ public class ImpactStressIT {
         data.engine.execute(s -> {
             Session session = s.create();
 
-            Entity householdEntity = session.createEntity(household(), context(ContextType.HOUSEHOLD));
+            Entity householdEntity = session.createEntity(household(), context(basicConfig.contextTypes.HOUSEHOLD));
             Household household = householdEntity.get(Household.class);
 
-            Entity resort = session.createEntity(household(), context(ContextType.HOUSEHOLD));
+            Entity resort = session.createEntity(household(), context(basicConfig.contextTypes.HOUSEHOLD));
 
             for (int i = 0; i < AGENT_COUNT; i++) {
                 household.getMembers().add(
                         session.createEntity(
                                 behaviour(BehaviourType.ROUTINE),
-                                health(null, Stage.HEALTHY),
+                                health(null, basicConfig.stages.HEALTHY),
                                 person(18, Person.Sex.M),
                                 travel(resort),
                                 inhabitant(householdEntity)));
@@ -189,7 +185,7 @@ public class ImpactStressIT {
     }
 
     private void cleanAgent(Entity agent) {
-        modifyAgent(agent, BehaviourType.ROUTINE, Stage.HEALTHY, null);
+        modifyAgent(agent, BehaviourType.ROUTINE, basicConfig.stages.HEALTHY, null);
     }
 
     private void randomizeAgent(Entity agent) {

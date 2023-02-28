@@ -27,10 +27,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.edu.icm.board.model.Household;
 import pl.edu.icm.board.util.RandomProvider;
-import pl.edu.icm.pdyn2.AgentStateService;
-import pl.edu.icm.pdyn2.ExampleDataForIntegrationTests;
-import pl.edu.icm.pdyn2.MockRandomProvider;
-import pl.edu.icm.pdyn2.StatsService;
+import pl.edu.icm.pdyn2.*;
 import pl.edu.icm.pdyn2.index.CommuneClusteredSelectors;
 import pl.edu.icm.pdyn2.model.immunization.Load;
 import pl.edu.icm.pdyn2.model.progression.HealthStatus;
@@ -49,7 +46,8 @@ import static pl.edu.icm.trurl.ecs.util.Systems.sequence;
 
 @ExtendWith(MockitoExtension.class)
 public class VariantSowingIT {
-    private final ExampleDataForIntegrationTests data = new ExampleDataForIntegrationTests(true);
+    private final BasicConfig basicConfig = new BasicConfig();
+    private final ExampleDataForIntegrationTests data = new ExampleDataForIntegrationTests(basicConfig, true);
     private final AgentStateService agentStateService = data.agentStateService;
     private final SimulationTimer simulationTimer = data.simulationTimer;
     @Mock
@@ -82,7 +80,7 @@ public class VariantSowingIT {
     @Test
     @DisplayName("Should change load according to the given data")
     public void test(){
-        var loader = new VariantSowingFromCsvLoader("/variantSowingTest.csv", workDir);
+        var loader = new VariantSowingFromCsvLoader("/variantSowingTest.csv", workDir, basicConfig.loads);
         var variantSowingService = new VariantSowingService(agentStateService,
                 randomProvider,
                 communeClusteredSelectors,
@@ -90,16 +88,16 @@ public class VariantSowingIT {
                 statsService);
         var variantSowingSystemBuilder = new VariantSowingFromCsvSystemBuilder(loader,
                 variantSowingService,
-                simulationTimer);
+                simulationTimer, basicConfig.stages);
         variantSowingSystemBuilder.load();
 
-        agentStateService.infect(data.agent1, Load.ALPHA);
-        agentStateService.infect(data.agent2, Load.WILD);
-        agentStateService.infect(data.agent3, Load.WILD);
-        agentStateService.infect(data.agent4, Load.ALPHA);
-        agentStateService.infect(data.agent5, Load.ALPHA);
-        agentStateService.infect(data.agent6, Load.ALPHA);
-        agentStateService.infect(data.agentA, Load.WILD);
+        agentStateService.infect(data.agent1, basicConfig.loads.ALPHA);
+        agentStateService.infect(data.agent2, basicConfig.loads.WILD);
+        agentStateService.infect(data.agent3, basicConfig.loads.WILD);
+        agentStateService.infect(data.agent4, basicConfig.loads.ALPHA);
+        agentStateService.infect(data.agent5, basicConfig.loads.ALPHA);
+        agentStateService.infect(data.agent6, basicConfig.loads.ALPHA);
+        agentStateService.infect(data.agentA, basicConfig.loads.WILD);
         data.session.close();
 
         var variantSowing = variantSowingSystemBuilder.buildVariantSowingSystem();
@@ -107,12 +105,12 @@ public class VariantSowingIT {
             data.engine.execute(sequence(variantSowing, simulationTimer));
         }
 
-        assertThat(data.agent1.get(HealthStatus.class).getDiseaseLoad()).isEqualTo(Load.ALPHA);
-        assertThat(data.agent2.get(HealthStatus.class).getDiseaseLoad()).isEqualTo(Load.ALPHA);
-        assertThat(data.agent3.get(HealthStatus.class).getDiseaseLoad()).isEqualTo(Load.ALPHA);
-        assertThat(data.agent4.get(HealthStatus.class).getDiseaseLoad()).isEqualTo(Load.DELTA);
-        assertThat(data.agent5.get(HealthStatus.class).getDiseaseLoad()).isEqualTo(Load.DELTA);
-        assertThat(data.agent6.get(HealthStatus.class).getDiseaseLoad()).isEqualTo(Load.DELTA);
-        assertThat(data.agentA.get(HealthStatus.class).getDiseaseLoad()).isEqualTo(Load.ALPHA);
+        assertThat(data.agent1.get(HealthStatus.class).getDiseaseLoad()).isEqualTo(basicConfig.loads.ALPHA);
+        assertThat(data.agent2.get(HealthStatus.class).getDiseaseLoad()).isEqualTo(basicConfig.loads.ALPHA);
+        assertThat(data.agent3.get(HealthStatus.class).getDiseaseLoad()).isEqualTo(basicConfig.loads.ALPHA);
+        assertThat(data.agent4.get(HealthStatus.class).getDiseaseLoad()).isEqualTo(basicConfig.loads.DELTA);
+        assertThat(data.agent5.get(HealthStatus.class).getDiseaseLoad()).isEqualTo(basicConfig.loads.DELTA);
+        assertThat(data.agent6.get(HealthStatus.class).getDiseaseLoad()).isEqualTo(basicConfig.loads.DELTA);
+        assertThat(data.agentA.get(HealthStatus.class).getDiseaseLoad()).isEqualTo(basicConfig.loads.ALPHA);
     }
 }

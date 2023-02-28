@@ -18,13 +18,21 @@
 
 package pl.edu.icm.pdyn2.progression;
 
+import net.snowyhollows.bento.annotation.WithFactory;
 import pl.edu.icm.pdyn2.model.progression.Stage;
+import pl.edu.icm.pdyn2.model.progression.Stages;
 import pl.edu.icm.trurl.sampleSpace.EnumSampleSpace;
+import pl.edu.icm.trurl.sampleSpace.SoftEnumSampleSpace;
 
 class TransitionOracle {
     private Stage stage;
-    private final EnumSampleSpace<Stage> outcomes = new EnumSampleSpace<>(Stage.class);
+    private final SoftEnumSampleSpace<Stage> outcomes;
     private int duration;
+
+    @WithFactory
+    public TransitionOracle(Stages stages) {
+        outcomes = new SoftEnumSampleSpace<>(stages);
+    }
 
     public Stage getStage() {
         return stage;
@@ -46,7 +54,7 @@ class TransitionOracle {
         outcomes.changeOutcome(outcome, probability);
     }
 
-    public EnumSampleSpace<Stage> getOutcomes() {
+    public SoftEnumSampleSpace<Stage> getOutcomes() {
         return outcomes;
     }
 }

@@ -23,26 +23,26 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import pl.edu.icm.pdyn2.model.immunization.Load;
+import pl.edu.icm.pdyn2.model.BasicConfig;
 import pl.edu.icm.pdyn2.model.impact.Impact;
 import pl.edu.icm.pdyn2.model.progression.HealthStatus;
-import pl.edu.icm.pdyn2.model.progression.Stage;
 import pl.edu.icm.trurl.ecs.mapper.Mapper;
 import pl.edu.icm.trurl.ecs.mapper.Mappers;
 import pl.edu.icm.trurl.store.Store;
 import pl.edu.icm.trurl.store.array.ArrayStore;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 class ImpactIT {
 
+    private BasicConfig basicConfig = new BasicConfig();
     private Mapper<Impact> mapper;
     Store store = new ArrayStore(10);
 
     @BeforeEach
     void before() {
-        mapper = Mappers.create(Impact.class);
+        mapper = new Mappers(basicConfig.bento).create(Impact.class);
         mapper.configureAndAttach(store);
     }
 
@@ -51,8 +51,8 @@ class ImpactIT {
     public void save() {
         // given
         var health = new HealthStatus();
-        health.setDiseaseLoad(Load.BA2);
-        health.setStage(Stage.INFECTIOUS_ASYMPTOMATIC);
+        health.setDiseaseLoad(basicConfig.loads.BA2);
+        health.setStage(basicConfig.stages.INFECTIOUS_ASYMPTOMATIC);
         var behavior = new Behaviour();
         behavior.transitionTo(BehaviourType.DORMANT, 2);
         var impact = new Impact();
@@ -73,8 +73,8 @@ class ImpactIT {
     public void isDifferentFrom() {
         // given
         var health = new HealthStatus();
-        health.setDiseaseLoad(Load.BA2);
-        health.setStage(Stage.INFECTIOUS_ASYMPTOMATIC);
+        health.setDiseaseLoad(basicConfig.loads.BA2);
+        health.setStage(basicConfig.stages.INFECTIOUS_ASYMPTOMATIC);
         var behavior = new Behaviour();
         behavior.transitionTo(BehaviourType.ROUTINE, 2);
         var impact = new Impact();
@@ -93,8 +93,8 @@ class ImpactIT {
     public void isDifferentFrom__same() {
         // given
         var health = new HealthStatus();
-        health.setDiseaseLoad(Load.BA2);
-        health.setStage(Stage.INFECTIOUS_ASYMPTOMATIC);
+        health.setDiseaseLoad(basicConfig.loads.BA2);
+        health.setStage(basicConfig.stages.INFECTIOUS_ASYMPTOMATIC);
         var behavior = new Behaviour();
         var impact = new Impact();
         // execute

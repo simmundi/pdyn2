@@ -24,6 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import pl.edu.icm.pdyn2.BasicConfig;
 import pl.edu.icm.pdyn2.model.immunization.Load;
 
 import java.io.File;
@@ -35,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class ImmunizationFromCsvProviderTest {
+    private final BasicConfig basicConfig = new BasicConfig();
 
     @Mock
     private WorkDir workDir;
@@ -48,6 +50,7 @@ class ImmunizationFromCsvProviderTest {
         when(this.workDir.openForReading(new File("crossImmunityTest2.csv"))).thenReturn(ImmunizationFromCsvProviderTest.class.getResourceAsStream("/crossImmunityTest2.csv"));
 
         immunizationFromCsvProvider = new ImmunizationFromCsvProvider(workDir,
+                basicConfig.loads,
                 "sFunctionTest.csv",
                 "sFunctionTest.csv",
                 "sFunctionTest.csv",
@@ -61,12 +64,12 @@ class ImmunizationFromCsvProviderTest {
     @Test
     void test() throws IOException {
         immunizationFromCsvProvider.load();
-        assertEquals(immunizationFromCsvProvider.getSFunction(Load.ALPHA, ImmunizationStage.HOSPITALIZOWANY_PRZED_OIOM, 10), 0.1);
-        assertEquals(immunizationFromCsvProvider.getSFunction(Load.PFIZER, ImmunizationStage.OBJAWOWY, 6), 0.39);
-        assertEquals(immunizationFromCsvProvider.getSFunction(Load.DELTA, ImmunizationStage.LATENTNY, 0), 0.88);
-        assertEquals(immunizationFromCsvProvider.getCrossImmunity(Load.PFIZER, Load.ALPHA, ImmunizationStage.LATENTNY), 0.999);
-        assertEquals(immunizationFromCsvProvider.getCrossImmunity(Load.ALPHA, Load.DELTA, ImmunizationStage.HOSPITALIZOWANY_PRZED_OIOM), 0.977);
-        assertEquals(immunizationFromCsvProvider.getCrossImmunity(Load.WILD, Load.WILD, ImmunizationStage.HOSPITALIZOWANY_BEZ_OIOM), 0.99999);
-        assertEquals(immunizationFromCsvProvider.getCrossImmunity(Load.DELTA, Load.ALPHA, ImmunizationStage.OBJAWOWY), 0.8);
+        assertEquals(immunizationFromCsvProvider.getSFunction(basicConfig.loads.ALPHA, ImmunizationStage.HOSPITALIZOWANY_PRZED_OIOM, 10), 0.1);
+        assertEquals(immunizationFromCsvProvider.getSFunction(basicConfig.loads.PFIZER, ImmunizationStage.OBJAWOWY, 6), 0.39);
+        assertEquals(immunizationFromCsvProvider.getSFunction(basicConfig.loads.DELTA, ImmunizationStage.LATENTNY, 0), 0.88);
+        assertEquals(immunizationFromCsvProvider.getCrossImmunity(basicConfig.loads.PFIZER, basicConfig.loads.ALPHA, ImmunizationStage.LATENTNY), 0.999);
+        assertEquals(immunizationFromCsvProvider.getCrossImmunity(basicConfig.loads.ALPHA, basicConfig.loads.DELTA, ImmunizationStage.HOSPITALIZOWANY_PRZED_OIOM), 0.977);
+        assertEquals(immunizationFromCsvProvider.getCrossImmunity(basicConfig.loads.WILD, basicConfig.loads.WILD, ImmunizationStage.HOSPITALIZOWANY_BEZ_OIOM), 0.99999);
+        assertEquals(immunizationFromCsvProvider.getCrossImmunity(basicConfig.loads.DELTA, basicConfig.loads.ALPHA, ImmunizationStage.OBJAWOWY), 0.8);
     }
 }

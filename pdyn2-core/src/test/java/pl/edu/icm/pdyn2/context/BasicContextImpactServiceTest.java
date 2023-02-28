@@ -22,11 +22,15 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.edu.icm.board.model.Person;
+import pl.edu.icm.pdyn2.BasicConfig;
 import pl.edu.icm.pdyn2.ComponentCreator;
 import pl.edu.icm.pdyn2.EntityMocker;
+import pl.edu.icm.pdyn2.model.AgeRanges;
 import pl.edu.icm.pdyn2.model.context.ContextType;
+import pl.edu.icm.pdyn2.model.context.ContextTypes;
 import pl.edu.icm.pdyn2.transmission.BasicContextImpactService;
 
 import java.util.Arrays;
@@ -38,8 +42,12 @@ import static org.assertj.core.data.Offset.offset;
 @ExtendWith(MockitoExtension.class)
 class BasicContextImpactServiceTest {
 
-    EntityMocker entityMocker = new EntityMocker(null);
+    BasicConfig basicConfig = new BasicConfig();
 
+    @Spy
+    AgeRanges ageRanges = basicConfig.ageRanges;
+    @Spy
+    ContextTypes contextTypes = basicConfig.contextTypes;
     @InjectMocks
     BasicContextImpactService fractionService;
 
@@ -49,10 +57,10 @@ class BasicContextImpactServiceTest {
         // given
         var person = ComponentCreator.person(25, Person.Sex.K);
 
-        var household = ComponentCreator.context(ContextType.HOUSEHOLD);
-        var school = ComponentCreator.context(ContextType.SCHOOL);
-        var workspace = ComponentCreator.context(ContextType.WORKPLACE);
-        var university = ComponentCreator.context(ContextType.UNIVERSITY);
+        var household = ComponentCreator.context(basicConfig.contextTypes.HOUSEHOLD);
+        var school = ComponentCreator.context(basicConfig.contextTypes.SCHOOL);
+        var workspace = ComponentCreator.context(basicConfig.contextTypes.WORKPLACE);
+        var university = ComponentCreator.context(basicConfig.contextTypes.UNIVERSITY);
 
         // execute
         var householdFraction = fractionService.calculateInfluenceFractionFor(person, household);
@@ -72,10 +80,10 @@ class BasicContextImpactServiceTest {
     void calculateLoadFractionFor__streets() {
         // given
         var agent = ComponentCreator.person(62, Person.Sex.K);
-        var streets = Arrays.stream(ContextType.streetContexts()).map(type ->
+        var streets = basicConfig.contextTypes.streetContexts().stream().map(type ->
             ComponentCreator.context(type)
         ).collect(Collectors.toList());
-        var street60 = ComponentCreator.context(ContextType.STREET_60);
+        var street60 = ComponentCreator.context(basicConfig.contextTypes.STREET_60);
 
         // execute
         var mainFraction = fractionService.calculateInfluenceFractionFor(agent, street60);

@@ -19,6 +19,7 @@
 package pl.edu.icm.pdyn2.model.context;
 
 import pl.edu.icm.pdyn2.model.immunization.Load;
+import pl.edu.icm.trurl.ecs.annotation.EnumManagedBy;
 import pl.edu.icm.trurl.ecs.annotation.NotMapped;
 import pl.edu.icm.trurl.ecs.annotation.WithMapper;
 import pl.edu.icm.trurl.ecs.mapper.feature.CanBeNormalized;
@@ -37,6 +38,7 @@ import static pl.edu.icm.pdyn2.model.context.Integerizer.toInt;
 @WithMapper
 public final class Context
         implements IsDirtyMarked, CanResolveConflicts<Context>, CanBeNormalized, RequiresSetup {
+    @EnumManagedBy(ContextTypes.class)
     private ContextType contextType;
     private int agentCount;
     private int originalAgentCount;

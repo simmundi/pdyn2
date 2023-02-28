@@ -23,28 +23,31 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import pl.edu.icm.pdyn2.model.context.ContextInfectivityClass;
-import pl.edu.icm.pdyn2.model.immunization.ImmunizationSources;
-import pl.edu.icm.pdyn2.transmission.ContextImpactService;
 import pl.edu.icm.pdyn2.model.behaviour.Behaviour;
 import pl.edu.icm.pdyn2.model.behaviour.BehaviourType;
-import pl.edu.icm.pdyn2.model.context.ContextType;
-import pl.edu.icm.pdyn2.model.immunization.Load;
+import pl.edu.icm.pdyn2.model.context.ContextInfectivityClass;
+import pl.edu.icm.pdyn2.model.immunization.ImmunizationSources;
 import pl.edu.icm.pdyn2.model.progression.HealthStatus;
-import pl.edu.icm.pdyn2.model.progression.Stage;
+import pl.edu.icm.pdyn2.model.progression.Stages;
 import pl.edu.icm.pdyn2.model.travel.Travel;
 import pl.edu.icm.pdyn2.time.SimulationTimer;
+import pl.edu.icm.pdyn2.transmission.ContextImpactService;
 import pl.edu.icm.trurl.ecs.Entity;
 import pl.edu.icm.trurl.sampleSpace.EnumSampleSpace;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class AgentStateServiceTest {
+
+    BasicConfig basicConfig = new BasicConfig();
+
+    @Spy
+    Stages stages = basicConfig.stages;
 
     @Mock
     SimulationTimer simulationTimer;
@@ -59,15 +62,15 @@ class AgentStateServiceTest {
     @DisplayName("Should infect a healthy agent")
     void infect() {
         // given
-        ExampleData data = new ExampleData();
+        ExampleData data = new ExampleData(basicConfig);
         when(simulationTimer.getDaysPassed()).thenReturn(123);
 
         // execute
-        agentStateService.infect(data.agent2, Load.ALPHA);
+        agentStateService.infect(data.agent2, basicConfig.loads.ALPHA);
         var result = data.agent2.get(HealthStatus.class);
 
         // assert
-        assertThat(result.getDiseaseLoad()).isEqualTo(Load.ALPHA);
+        assertThat(result.getDiseaseLoad()).isEqualTo(basicConfig.loads.ALPHA);
         assertThat(result.getDayOfLastChange()).isEqualTo(123);
     }
 
@@ -75,7 +78,7 @@ class AgentStateServiceTest {
     @DisplayName("Should initialize travel")
     void beginTravel() {
         // given
-        ExampleData data = new ExampleData();
+        ExampleData data = new ExampleData(basicConfig);
         when(simulationTimer.getDaysPassed()).thenReturn(7);
         agentStateService.activate(data.agent2);
 
@@ -95,7 +98,7 @@ class AgentStateServiceTest {
     @DisplayName("Should finalize travel")
     void endTravel() {
         // given
-        ExampleData data = new ExampleData();
+        ExampleData data = new ExampleData(basicConfig);
         when(simulationTimer.getDaysPassed()).thenReturn(11).thenReturn(15);
         agentStateService.activate(data.agent2);
         agentStateService.beginTravel(data.agent2, data.someRemoteHousehold);
@@ -113,7 +116,7 @@ class AgentStateServiceTest {
     @DisplayName("Should initialize quarantine")
     void beginQuarantine() {
         // given
-        ExampleData data = new ExampleData();
+        ExampleData data = new ExampleData(basicConfig);
         when(simulationTimer.getDaysPassed()).thenReturn(23);
 
         // execute
@@ -129,7 +132,7 @@ class AgentStateServiceTest {
     @DisplayName("Should end quarantine")
     void endQuarantine() {
         // given
-        ExampleData data = new ExampleData();
+        ExampleData data = new ExampleData(basicConfig);
         when(simulationTimer.getDaysPassed()).thenReturn(23).thenReturn(27);
         agentStateService.beginQuarantine(data.agent2);
 
@@ -146,19 +149,19 @@ class AgentStateServiceTest {
     @DisplayName("Should change load")
     void changeLoad() {
         // given
-        ExampleData data = new ExampleData();
+        ExampleData data = new ExampleData(basicConfig);
 
         // execute
-        agentStateService.changeLoad(data.agent3, Load.WILD);
+        agentStateService.changeLoad(data.agent3, basicConfig.loads.WILD);
 
         // assert
         var health = data.agent3.get(HealthStatus.class);
-        assertThat(health.getDiseaseLoad()).isEqualTo(Load.WILD);
+        assertThat(health.getDiseaseLoad()).isEqualTo(basicConfig.loads.WILD);
         assertThatIllegalArgumentException()
-                .isThrownBy(() -> agentStateService.changeLoad(data.agent1, Load.ALPHA))
+                .isThrownBy(() -> agentStateService.changeLoad(data.agent1, basicConfig.loads.ALPHA))
                 .withMessage("Only latent agents can have their load changed");
         assertThatIllegalArgumentException()
-                .isThrownBy(() -> agentStateService.changeLoad(data.agent3, Load.MODERNA))
+                .isThrownBy(() -> agentStateService.changeLoad(data.agent3, basicConfig.loads.MODERNA))
                 .withMessage("Variant can be changed only to another virus load");
     }
 
@@ -166,7 +169,7 @@ class AgentStateServiceTest {
     @DisplayName("should create ImmunizationSources component")
     void addSourcesDistribution() {
         // given
-        ExampleData data = new ExampleData();
+        ExampleData data = new ExampleData(basicConfig);
         EnumSampleSpace<ContextInfectivityClass> sourcesDistribution = new EnumSampleSpace<>(ContextInfectivityClass.class);
         sourcesDistribution.changeOutcome(ContextInfectivityClass.SCHOOL, 10f);
         sourcesDistribution.changeOutcome(ContextInfectivityClass.STREET, 12f);
@@ -182,17 +185,25 @@ class AgentStateServiceTest {
     }
 
     static class ExampleData {
-        EntityMocker build = new EntityMocker(null);
+        EntityMocker build;
 
-        Entity someRemoteHousehold = build.entityWithId(1, ComponentCreator.context(ContextType.HOUSEHOLD));
+        Entity someRemoteHousehold;
 
-        Entity agent1 = build.entityWithId(5,
-                ComponentCreator.health(Load.DELTA, Stage.INFECTIOUS_SYMPTOMATIC));
-        Entity agent2 = build.entityWithId(6,
-                ComponentCreator.health(Load.WILD, Stage.HEALTHY));
-        Entity agent3 = build.entityWithId(7,
-                ComponentCreator.health(Load.ALPHA, Stage.LATENT));
+        Entity agent1;
+        Entity agent2;
+        Entity agent3;
 
+        public ExampleData(BasicConfig basicConfig) {
+            build = new EntityMocker(basicConfig, null);
+            agent1 = build.entityWithId(5,
+                    ComponentCreator.health(basicConfig.loads.DELTA, basicConfig.stages.INFECTIOUS_SYMPTOMATIC));
+            agent2 = build.entityWithId(6,
+                    ComponentCreator.health(basicConfig.loads.WILD, basicConfig.stages.HEALTHY));
+            agent3 = build.entityWithId(7,
+                    ComponentCreator.health(basicConfig.loads.ALPHA, basicConfig.stages.LATENT));
+            someRemoteHousehold = build.entityWithId(1, ComponentCreator.context(basicConfig.contextTypes.HOUSEHOLD));
+
+        }
     }
 
 }

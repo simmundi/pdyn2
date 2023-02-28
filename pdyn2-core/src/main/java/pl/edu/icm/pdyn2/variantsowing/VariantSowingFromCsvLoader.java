@@ -23,6 +23,7 @@ import com.univocity.parsers.csv.CsvParserSettings;
 import net.snowyhollows.bento.annotation.WithFactory;
 import net.snowyhollows.bento.config.WorkDir;
 import pl.edu.icm.pdyn2.model.immunization.Load;
+import pl.edu.icm.pdyn2.model.immunization.Loads;
 import pl.edu.icm.trurl.store.array.ArrayStore;
 
 import java.io.File;
@@ -36,16 +37,18 @@ public class VariantSowingFromCsvLoader {
     private final String variantSowingFilename;
     private final WorkDir workDir;
     private VariantSowingRecordFromCsvMapper mapper;
+    private final Loads loads;
 
     @WithFactory
-    public VariantSowingFromCsvLoader(String variantSowingFilename, WorkDir workDir) {
+    public VariantSowingFromCsvLoader(String variantSowingFilename, WorkDir workDir, Loads loads) {
         this.variantSowingFilename = variantSowingFilename;
         this.workDir = workDir;
+        this.loads = loads;
     }
 
     public void load() throws IOException {
         if (mapper == null) {
-            mapper = new VariantSowingRecordFromCsvMapper();
+            mapper = new VariantSowingRecordFromCsvMapper(loads);
             var variantStore = new ArrayStore(1000);
             mapper.configureStore(variantStore);
             mapper.attachStore(variantStore);
@@ -88,17 +91,17 @@ public class VariantSowingFromCsvLoader {
     private Load load(String diseaseLoad) {
         switch (diseaseLoad) {
             case "0":
-                return Load.WILD;
+                return loads.WILD;
             case "1":
-                return Load.ALPHA;
+                return loads.ALPHA;
             case "2":
-                return Load.DELTA;
+                return loads.DELTA;
             case "3":
-                return Load.OMICRON;
+                return loads.OMICRON;
             case "4":
-                return Load.BA2;
+                return loads.BA2;
             case "5":
-                return Load.BA45;
+                return loads.BA45;
         }
         throw new IllegalArgumentException("Could not find value for: disease=" + diseaseLoad);
     }

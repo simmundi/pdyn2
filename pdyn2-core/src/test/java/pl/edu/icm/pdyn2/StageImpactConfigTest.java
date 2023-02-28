@@ -29,21 +29,22 @@ import static org.assertj.core.api.AssertionsForClassTypes.*;
 @ExtendWith(MockitoExtension.class)
 class StageImpactConfigTest {
 
+    BasicConfig basicConfig = new BasicConfig();
     @Test
     void getInfluenceOf() {
         //given
-        var stageShareConfig = new StageImpactConfig(0.1f, 1.0f);
+        var stageShareConfig = new StageImpactConfig(0.1f, 1.0f, basicConfig.stages);
         //execute
-        for (var stage : Stage.values()) {
+        for (var stage : basicConfig.stages.values()) {
             float value = 0f;
-            switch (stage) {
-                case INFECTIOUS_ASYMPTOMATIC:
-                    value = 0.1f;
-                    break;
-                case INFECTIOUS_SYMPTOMATIC:
-                    value = 1f;
-                    break;
+
+            if (stage == basicConfig.stages.INFECTIOUS_ASYMPTOMATIC) {
+                value = 0.1f;
             }
+            if (stage == basicConfig.stages.INFECTIOUS_SYMPTOMATIC) {
+                value = 1f;
+            }
+
             //assert
             assertThat(stageShareConfig.getInfluenceOf(stage)).isEqualTo(value);
         }

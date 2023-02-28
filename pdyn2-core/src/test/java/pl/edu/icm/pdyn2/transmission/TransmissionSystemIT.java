@@ -18,6 +18,7 @@
 
 package pl.edu.icm.pdyn2.transmission;
 
+import net.snowyhollows.bento.config.Configurer;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -25,7 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import pl.edu.icm.board.Board;
+import pl.edu.icm.board.EngineIo;
 import pl.edu.icm.board.geography.GeographicalServices;
 import pl.edu.icm.board.model.AdministrationUnit;
 import pl.edu.icm.board.model.Area;
@@ -39,6 +40,7 @@ import pl.edu.icm.board.model.Workplace;
 import pl.edu.icm.board.util.RandomForChunkProvider;
 import pl.edu.icm.board.util.RandomProvider;
 import pl.edu.icm.pdyn2.AgentStateService;
+import pl.edu.icm.pdyn2.BasicConfig;
 import pl.edu.icm.pdyn2.StatsService;
 import pl.edu.icm.pdyn2.context.BehaviourBasedContextsService;
 import pl.edu.icm.pdyn2.context.ContextsService;
@@ -52,6 +54,7 @@ import pl.edu.icm.pdyn2.model.progression.HealthStatus;
 import pl.edu.icm.pdyn2.time.SimulationTimer;
 import pl.edu.icm.trurl.csv.CsvWriter;
 import pl.edu.icm.trurl.ecs.EngineConfiguration;
+import pl.edu.icm.trurl.ecs.EngineConfigurationFactory;
 import pl.edu.icm.trurl.ecs.EntitySystem;
 import pl.edu.icm.trurl.ecs.util.Selectors;
 import pl.edu.icm.trurl.store.tablesaw.TablesawStore;
@@ -66,10 +69,11 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class TransmissionSystemIT {
+    private BasicConfig basicConfig = new BasicConfig();
 
     private TransmissionSystemBuilder transmissionSystemBuilder;
 
-    private Board board;
+    private EngineIo board;
 
     @Mock
     private AreaIndex areaIndex;
@@ -118,10 +122,9 @@ class TransmissionSystemIT {
 
     @BeforeEach
     void before() throws IOException {
-        EngineConfiguration engineConfiguration = new EngineConfiguration();
-        engineConfiguration.setStoreFactory(new TablesawStoreFactory());
+        EngineConfiguration engineConfig = new Configurer().setParam("trurl.engine.storeFactory", TablesawStoreFactory.class.getName()).getConfig().get(EngineConfigurationFactory.IT);
         CsvWriter csvWriter = new CsvWriter();
-        board = new Board(engineConfiguration, csvWriter, null, null);
+        board = new EngineIo(engineConfig, csvWriter, null, null);
         board.require(
                 Area.class,
                 Location.class,
@@ -137,19 +140,19 @@ class TransmissionSystemIT {
                 Context.class,
                 Immunization.class
         );
-        areaClusteredSelectors = new AreaClusteredSelectors(engineConfiguration, 10, 10);
+        areaClusteredSelectors = new AreaClusteredSelectors(engineConfig, 10, 10);
         board.load(TransmissionSystemBuilder.class.getResourceAsStream("/transmissionTest.csv"));
         when(randomProvider.getRandomGenerator(TransmissionSystemBuilder.class)).thenReturn(randomGenerator);
         when(randomProvider.getRandomForChunkProvider(TransmissionSystemBuilder.class)).thenReturn(randomForChunkProvider);
         contextsService = new BehaviourBasedContextsService(areaIndex);
-        transmissionService = new TransmissionService(contextsService, relativeAlphaConfig, transmissionConfig, simulationTimer, immunizationService);
+        transmissionService = new TransmissionService(contextsService, relativeAlphaConfig, transmissionConfig, simulationTimer, basicConfig.loads, basicConfig.stages, immunizationService);
         transmissionSystemBuilder = new TransmissionSystemBuilder(
                 transmissionService,
                 agentStateService,
                 areaClusteredSelectors,
                 selectors,
                 statsService,
-                randomProvider);
+                randomProvider, basicConfig.loads, basicConfig.stages);
 
         transmissionSystem = transmissionSystemBuilder.buildTransmissionSystem();
 

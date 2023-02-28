@@ -27,11 +27,14 @@ import pl.edu.icm.pdyn2.index.AreaClusteredSelectors;
 import pl.edu.icm.pdyn2.model.context.ContextInfectivityClass;
 import pl.edu.icm.pdyn2.model.context.Inhabitant;
 import pl.edu.icm.pdyn2.model.immunization.Load;
+import pl.edu.icm.pdyn2.model.immunization.Loads;
 import pl.edu.icm.pdyn2.model.progression.Stage;
+import pl.edu.icm.pdyn2.model.progression.Stages;
 import pl.edu.icm.trurl.ecs.EntitySystem;
 import pl.edu.icm.trurl.ecs.util.EntityIterator;
 import pl.edu.icm.trurl.ecs.util.Selectors;
 import pl.edu.icm.trurl.sampleSpace.EnumSampleSpace;
+import pl.edu.icm.trurl.sampleSpace.SoftEnumSampleSpace;
 
 public class TransmissionSystemBuilder {
     private final TransmissionService transmissionService;
@@ -41,6 +44,8 @@ public class TransmissionSystemBuilder {
     private final StatsService statsService;
 
     private final RandomForChunkProvider randomForChunkProvider;
+    private final Loads loads;
+    private final Stages stages;
 
     @WithFactory
     public TransmissionSystemBuilder(TransmissionService transmissionService,
@@ -48,13 +53,15 @@ public class TransmissionSystemBuilder {
                                      AreaClusteredSelectors areaClusteredSelectors,
                                      Selectors selectors,
                                      StatsService statsService,
-                                     RandomProvider randomProvider) {
+                                     RandomProvider randomProvider, Loads loads, Stages stages) {
         this.transmissionService = transmissionService;
         this.agentStateService = agentStateService;
         this.areaClusteredSelectors = areaClusteredSelectors;
         this.selectors = selectors;
         this.statsService = statsService;
         this.randomForChunkProvider = randomProvider.getRandomForChunkProvider(TransmissionSystemBuilder.class);
+        this.loads = loads;
+        this.stages = stages;
     }
 
     public EntitySystem buildTransmissionSystem() {
@@ -67,8 +74,8 @@ public class TransmissionSystemBuilder {
                         return;
                     }
 
-                    EnumSampleSpace<Load> exposurePerLoad =
-                            new EnumSampleSpace<>(Load.class);
+                    SoftEnumSampleSpace<Load> exposurePerLoad =
+                            new SoftEnumSampleSpace<>(loads);
                     EnumSampleSpace<ContextInfectivityClass> exposurePerContext = new EnumSampleSpace<>(ContextInfectivityClass.class);
                     transmissionService.gatherExposurePerLoadAndContextForAgent(
                             exposurePerLoad,
@@ -84,7 +91,7 @@ public class TransmissionSystemBuilder {
                         if (adjustedProbability > 0 && random.nextDouble() <= adjustedProbability) {
                             agentStateService.infect(agent, chosenLoad);
                             agentStateService.addSourcesDistribution(agent, exposurePerContext);
-                            statsService.tickStageChange(Stage.LATENT);
+                            statsService.tickStageChange(stages.LATENT);
                         }
                     }
                 });

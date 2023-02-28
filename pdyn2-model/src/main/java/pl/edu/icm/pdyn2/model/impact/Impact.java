@@ -21,8 +21,11 @@ package pl.edu.icm.pdyn2.model.impact;
 import pl.edu.icm.pdyn2.model.behaviour.Behaviour;
 import pl.edu.icm.pdyn2.model.behaviour.BehaviourType;
 import pl.edu.icm.pdyn2.model.immunization.Load;
+import pl.edu.icm.pdyn2.model.immunization.Loads;
 import pl.edu.icm.pdyn2.model.progression.HealthStatus;
 import pl.edu.icm.pdyn2.model.progression.Stage;
+import pl.edu.icm.pdyn2.model.progression.Stages;
+import pl.edu.icm.trurl.ecs.annotation.EnumManagedBy;
 import pl.edu.icm.trurl.ecs.annotation.WithMapper;
 
 import java.util.Objects;
@@ -30,7 +33,9 @@ import java.util.Objects;
 @WithMapper(namespace = "impact")
 public class Impact {
     private BehaviourType type;
+    @EnumManagedBy(Stages.class)
     private Stage stage;
+    @EnumManagedBy(Loads.class)
     private Load load;
 
     public void affect(Behaviour behaviour, HealthStatus healthStatus) {

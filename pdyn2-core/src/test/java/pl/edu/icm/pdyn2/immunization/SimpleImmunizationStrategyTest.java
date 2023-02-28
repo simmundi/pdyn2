@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import pl.edu.icm.pdyn2.BasicConfig;
 import pl.edu.icm.pdyn2.model.immunization.Immunization;
 import pl.edu.icm.pdyn2.model.immunization.Load;
 
@@ -29,6 +30,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 class SimpleImmunizationStrategyTest {
+    final BasicConfig basicConfig = new BasicConfig();
     @Mock
     Immunization immunization;
 
@@ -39,7 +41,7 @@ class SimpleImmunizationStrategyTest {
         //execute
         var coef = simpleImmunizationStrategy.getImmunizationCoefficient(immunization,
                 ImmunizationStage.LATENTNY,
-                Load.WILD,
+                basicConfig.loads.WILD,
                 0);
         //assert
         assertThat(coef).isEqualTo(0.3f);

@@ -19,6 +19,8 @@
 package pl.edu.icm.pdyn2.vaccination;
 
 import pl.edu.icm.pdyn2.model.immunization.Load;
+import pl.edu.icm.pdyn2.model.immunization.Loads;
+import pl.edu.icm.trurl.ecs.annotation.EnumManagedBy;
 import pl.edu.icm.trurl.ecs.annotation.WithMapper;
 
 @WithMapper
@@ -27,6 +29,7 @@ public class VaccinationRecordFromCsv {
     private String teryts;
     private int minAge;
     private int maxAge;
+    @EnumManagedBy(Loads.class)
     private Load load;
     private int vaccineCount;
 

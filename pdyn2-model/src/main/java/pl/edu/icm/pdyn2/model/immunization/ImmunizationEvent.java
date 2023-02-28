@@ -18,11 +18,13 @@
 
 package pl.edu.icm.pdyn2.model.immunization;
 
+import pl.edu.icm.trurl.ecs.annotation.EnumManagedBy;
 import pl.edu.icm.trurl.ecs.annotation.WithMapper;
 
 @WithMapper
 public class ImmunizationEvent {
     private int day;
+    @EnumManagedBy(Loads.class)
     private Load load;
     private int diseaseHistory;
 

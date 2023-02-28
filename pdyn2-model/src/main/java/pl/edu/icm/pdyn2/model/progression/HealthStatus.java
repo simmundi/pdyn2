@@ -19,21 +19,24 @@
 package pl.edu.icm.pdyn2.model.progression;
 
 import pl.edu.icm.pdyn2.model.immunization.Load;
+import pl.edu.icm.pdyn2.model.immunization.Loads;
+import pl.edu.icm.trurl.ecs.annotation.EnumManagedBy;
 import pl.edu.icm.trurl.ecs.annotation.WithMapper;
 
 @WithMapper(namespace = "health_status")
 public class HealthStatus {
-    private Stage stage = Stage.HEALTHY;
+    @EnumManagedBy(Stages.class)
+    private Stage stage;
+    @EnumManagedBy(Loads.class)
     private Load diseaseLoad;
     private int dayOfLastChange;
-    private int diseaseHistory = 0;
+    private int diseaseHistory;
+
+    public HealthStatus() {
+    }
 
     public HealthStatus(Load diseaseLoad) {
         this.diseaseLoad = diseaseLoad;
-    }
-
-    public HealthStatus() {
-        this.diseaseLoad = Load.WILD;
     }
 
     public Stage getStage() {
@@ -84,13 +87,11 @@ public class HealthStatus {
     }
 
     public static HealthStatus of(Load load) {
-        HealthStatus healthStatus = new HealthStatus();
-        healthStatus.setDiseaseLoad(load);
-        return healthStatus;
+        return new HealthStatus(load);
     }
 
     private void addStageToHistory(Stage stage) {
-        diseaseHistory += stage.getEncoding();
+        diseaseHistory += stage.encoding;
     }
 
     @Override

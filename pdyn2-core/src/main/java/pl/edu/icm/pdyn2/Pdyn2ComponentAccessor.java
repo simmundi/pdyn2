@@ -40,9 +40,7 @@ import pl.edu.icm.trurl.ecs.EngineConfiguration;
 public class Pdyn2ComponentAccessor implements ComponentAccessor {
 
     @WithFactory
-    public Pdyn2ComponentAccessor(EngineConfiguration engineConfiguration) {
-        engineConfiguration.setComponentIndexer(this);
-        engineConfiguration.addComponentClasses(components());
+    public Pdyn2ComponentAccessor() {
     }
 
     @Override

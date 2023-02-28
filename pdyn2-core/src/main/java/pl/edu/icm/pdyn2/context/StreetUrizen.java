@@ -24,6 +24,7 @@ import pl.edu.icm.board.model.Area;
 import pl.edu.icm.board.model.Location;
 import pl.edu.icm.pdyn2.model.context.Context;
 import pl.edu.icm.pdyn2.model.context.ContextType;
+import pl.edu.icm.pdyn2.model.context.ContextTypes;
 import pl.edu.icm.trurl.ecs.Engine;
 import pl.edu.icm.trurl.ecs.EngineConfiguration;
 import pl.edu.icm.trurl.ecs.Entity;
@@ -38,12 +39,17 @@ import static pl.edu.icm.trurl.ecs.util.EntityIterator.select;
 public class StreetUrizen {
     private final EngineConfiguration engineConfiguration;
     private final Selectors selectors;
+    private final ContextTypes contextTypes;
 
-    public final static ContextType[] STREET_CONTEXTS = ContextType.streetContexts();
+    public final ContextType[] STREET_CONTEXTS;
     @WithFactory
-    public StreetUrizen(EngineConfiguration engineConfiguration, Selectors selectors) {
+    public StreetUrizen(EngineConfiguration engineConfiguration,
+                        Selectors selectors,
+                        ContextTypes contextTypes) {
         this.engineConfiguration = engineConfiguration;
         this.selectors = selectors;
+        this.contextTypes = contextTypes;
+        STREET_CONTEXTS = contextTypes.streetContexts().toArray(contextTypes.emptyArray());
     }
 
     public void buildStreets() {

@@ -20,20 +20,24 @@ package pl.edu.icm.pdyn2.transmission;
 
 import net.snowyhollows.bento.annotation.WithFactory;
 import pl.edu.icm.pdyn2.model.immunization.Load;
+import pl.edu.icm.pdyn2.model.immunization.Loads;
 
 public class RelativeAlphaConfig {
-    float alphaAlpha;
-    float alphaDelta;
-    float alphaOmicron;
-    float alphaBA2;
-    float alphaBA45;
+    private final Loads loads;
+    private final float alphaAlpha;
+    private final float alphaDelta;
+    private final float alphaOmicron;
+    private final float alphaBA2;
+    private final float alphaBA45;
 
     @WithFactory
-    public RelativeAlphaConfig(float alphaAlpha,
+    public RelativeAlphaConfig(Loads loads,
+                               float alphaAlpha,
                                float alphaDelta,
                                float alphaOmicron,
                                float alphaBA2,
                                float alphaBA45) {
+        this.loads = loads;
         this.alphaAlpha = alphaAlpha;
         this.alphaDelta = alphaDelta;
         this.alphaOmicron = alphaOmicron;
@@ -42,22 +46,25 @@ public class RelativeAlphaConfig {
     }
 
     public float getRelativeAlpha(Load load) {
-        switch (load) {
-            case ALPHA:
-                return alphaAlpha;
-            case DELTA:
-                return alphaDelta;
-            case OMICRON:
-                return alphaOmicron;
-            case BA2:
-                return alphaBA2;
-            case BA45:
-                return alphaBA45;
-            case WILD:
-                return 1.0f;
-            default:
-                throw new IllegalArgumentException("Invalid load: " + load +
-                        " Relative alpha available for loads: ALPHA, DELTA, OMICRON, BA2, BA45, WILD");
+        if (load == loads.ALPHA) {
+            return alphaAlpha;
         }
+        if (load == loads.DELTA) {
+            return alphaDelta;
+        }
+        if (load == loads.OMICRON) {
+            return alphaOmicron;
+        }
+        if (load == loads.BA2) {
+            return alphaBA2;
+        }
+        if (load == loads.BA45) {
+            return alphaBA45;
+        }
+        if (load == loads.WILD) {
+            return 1.0f;
+        }
+        throw new IllegalArgumentException("Invalid load: " + load.name() +
+                " Relative alpha available for loads: ALPHA, DELTA, OMICRON, BA2, BA45, WILD");
     }
 }

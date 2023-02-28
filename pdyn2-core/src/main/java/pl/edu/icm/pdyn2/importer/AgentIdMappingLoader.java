@@ -44,7 +44,7 @@ public class AgentIdMappingLoader {
         }
         mapper = new ExportedIdMapper();
 
-        var store = new ArrayStore();
+        var store = new ArrayStore(1024);
         mapper.configureAndAttach(store);
         var orcStoreService = new OrcStoreService();
         orcStoreService.read(store, filename);

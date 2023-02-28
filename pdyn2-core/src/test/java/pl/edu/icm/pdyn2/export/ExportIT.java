@@ -26,18 +26,13 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import pl.edu.icm.board.Board;
+import pl.edu.icm.board.EngineIo;
 import pl.edu.icm.board.util.RandomProvider;
-import pl.edu.icm.pdyn2.AgentStateService;
-import pl.edu.icm.pdyn2.ExampleDataForIntegrationTests;
-import pl.edu.icm.pdyn2.MockRandomProvider;
-import pl.edu.icm.pdyn2.StatsService;
+import pl.edu.icm.pdyn2.*;
 import pl.edu.icm.pdyn2.administration.TestingConfig;
 import pl.edu.icm.pdyn2.administration.TestingService;
 import pl.edu.icm.pdyn2.model.context.ContextInfectivityClass;
 import pl.edu.icm.pdyn2.model.immunization.ImmunizationEvent;
-import pl.edu.icm.pdyn2.model.immunization.Load;
-import pl.edu.icm.pdyn2.model.progression.Stage;
 import pl.edu.icm.pdyn2.progression.DiseaseStageTransitionsService;
 import pl.edu.icm.trurl.sampleSpace.EnumSampleSpace;
 
@@ -50,7 +45,8 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class ExportIT {
-    private final ExampleDataForIntegrationTests data = new ExampleDataForIntegrationTests(false);
+    private final BasicConfig basicConfig = new BasicConfig();
+    private final ExampleDataForIntegrationTests data = new ExampleDataForIntegrationTests(basicConfig, false);
     private final RandomProvider randomProvider = new MockRandomProvider();
     private final AgentStateService agentStateService = data.agentStateService;
     @Mock
@@ -59,7 +55,7 @@ public class ExportIT {
     private StatsService statsService;
     WorkDir workDir = data.workDir;
     @Mock
-    private Board board;
+    private EngineIo board;
     @Captor
     ArgumentCaptor<File> file;
 
@@ -73,20 +69,20 @@ public class ExportIT {
         results = new ByteArrayOutputStream();
         when(workDir.openForWriting(file.capture())).thenReturn(results);
 
-        when(transitionsService.durationOf(Load.WILD, Stage.INFECTIOUS_SYMPTOMATIC, 18)).thenReturn(6);
-        when(transitionsService.durationOf(Load.WILD, Stage.LATENT, 18)).thenReturn(7);
+        when(transitionsService.durationOf(basicConfig.loads.WILD, basicConfig.stages.INFECTIOUS_SYMPTOMATIC, 18)).thenReturn(6);
+        when(transitionsService.durationOf(basicConfig.loads.WILD, basicConfig.stages.LATENT, 18)).thenReturn(7);
 
-        when(transitionsService.durationOf(Load.OMICRON, Stage.HOSPITALIZED_ICU, 18)).thenReturn(2);
-        when(transitionsService.durationOf(Load.OMICRON, Stage.HOSPITALIZED_PRE_ICU, 18)).thenReturn(4);
-        when(transitionsService.durationOf(Load.OMICRON, Stage.INFECTIOUS_SYMPTOMATIC, 18)).thenReturn(6);
-        when(transitionsService.durationOf(Load.OMICRON, Stage.LATENT, 18)).thenReturn(7);
+        when(transitionsService.durationOf(basicConfig.loads.OMICRON, basicConfig.stages.HOSPITALIZED_ICU, 18)).thenReturn(2);
+        when(transitionsService.durationOf(basicConfig.loads.OMICRON, basicConfig.stages.HOSPITALIZED_PRE_ICU, 18)).thenReturn(4);
+        when(transitionsService.durationOf(basicConfig.loads.OMICRON, basicConfig.stages.INFECTIOUS_SYMPTOMATIC, 18)).thenReturn(6);
+        when(transitionsService.durationOf(basicConfig.loads.OMICRON, basicConfig.stages.LATENT, 18)).thenReturn(7);
 
-        when(transitionsService.durationOf(Load.DELTA, Stage.INFECTIOUS_ASYMPTOMATIC, 18)).thenReturn(5);
-        when(transitionsService.durationOf(Load.DELTA, Stage.LATENT, 18)).thenReturn(7);
+        when(transitionsService.durationOf(basicConfig.loads.DELTA, basicConfig.stages.INFECTIOUS_ASYMPTOMATIC, 18)).thenReturn(5);
+        when(transitionsService.durationOf(basicConfig.loads.DELTA, basicConfig.stages.LATENT, 18)).thenReturn(7);
 
-        when(transitionsService.durationOf(Load.OMICRON, Stage.HOSPITALIZED_NO_ICU, 18)).thenReturn(3);
-        when(transitionsService.durationOf(Load.OMICRON, Stage.INFECTIOUS_SYMPTOMATIC, 18)).thenReturn(6);
-        when(transitionsService.durationOf(Load.OMICRON, Stage.LATENT, 18)).thenReturn(7);
+        when(transitionsService.durationOf(basicConfig.loads.OMICRON, basicConfig.stages.HOSPITALIZED_NO_ICU, 18)).thenReturn(3);
+        when(transitionsService.durationOf(basicConfig.loads.OMICRON, basicConfig.stages.INFECTIOUS_SYMPTOMATIC, 18)).thenReturn(6);
+        when(transitionsService.durationOf(basicConfig.loads.OMICRON, basicConfig.stages.LATENT, 18)).thenReturn(7);
     }
 
     @Test
@@ -96,7 +92,7 @@ public class ExportIT {
                 board,
                 workDir,
                 transitionsService,
-                data.selectors);
+                data.selectors, basicConfig.loads, basicConfig.stages);
 
         TestingService testingService = new TestingService(
                 data.simulationTimer,
@@ -111,45 +107,45 @@ public class ExportIT {
         var householdSource = new EnumSampleSpace<>(ContextInfectivityClass.class);
         householdSource.changeOutcome(ContextInfectivityClass.HOUSEHOLD, 1.0f);
         var vaccination = new ImmunizationEvent();
-        vaccination.setLoad(Load.BOOSTER);
+        vaccination.setLoad(basicConfig.loads.BOOSTER);
         vaccination.setDay(0);
 
-        agentStateService.infect(data.agent1, Load.WILD, 10);
+        agentStateService.infect(data.agent1, basicConfig.loads.WILD, 10);
         agentStateService.addSourcesDistribution(data.agent1, sowingSource);
-        agentStateService.progressToDiseaseStage(data.agent1, Stage.INFECTIOUS_SYMPTOMATIC, 7);
-        agentStateService.infect(data.agentA, Load.DELTA, 3);
+        agentStateService.progressToDiseaseStage(data.agent1, basicConfig.stages.INFECTIOUS_SYMPTOMATIC, 7);
+        agentStateService.infect(data.agentA, basicConfig.loads.DELTA, 3);
         agentStateService.addSourcesDistribution(data.agentA, sowingSource);
         advance(3);
-        agentStateService.progressToDiseaseStage(data.agent1, Stage.HEALTHY);
+        agentStateService.progressToDiseaseStage(data.agent1, basicConfig.stages.HEALTHY);
         advance(1);
-        agentStateService.progressToDiseaseStage(data.agentA, Stage.INFECTIOUS_ASYMPTOMATIC);
+        agentStateService.progressToDiseaseStage(data.agentA, basicConfig.stages.INFECTIOUS_ASYMPTOMATIC);
         advance(5);
-        agentStateService.progressToDiseaseStage(data.agentA, Stage.HEALTHY);
+        agentStateService.progressToDiseaseStage(data.agentA, basicConfig.stages.HEALTHY);
         advance(1);
         agentStateService.vaccinate(data.agent1, vaccination);
-        agentStateService.infect(data.agent2, Load.ALPHA);
+        agentStateService.infect(data.agent2, basicConfig.loads.ALPHA);
         agentStateService.addSourcesDistribution(data.agent2, householdSource);
-        agentStateService.infect(data.agent3, Load.DELTA);
+        agentStateService.infect(data.agent3, basicConfig.loads.DELTA);
         agentStateService.addSourcesDistribution(data.agent3, householdSource);
-        agentStateService.infect(data.agent7, Load.OMICRON);
+        agentStateService.infect(data.agent7, basicConfig.loads.OMICRON);
         agentStateService.addSourcesDistribution(data.agent7, universitySource);
         advance(7);
         testingService.maybeTestAgent(data.agent7);
-        agentStateService.progressToDiseaseStage(data.agent7, Stage.INFECTIOUS_SYMPTOMATIC);
+        agentStateService.progressToDiseaseStage(data.agent7, basicConfig.stages.INFECTIOUS_SYMPTOMATIC);
         advance(6);
-        agentStateService.progressToDiseaseStage(data.agent7, Stage.HOSPITALIZED_PRE_ICU);
+        agentStateService.progressToDiseaseStage(data.agent7, basicConfig.stages.HOSPITALIZED_PRE_ICU);
         advance(4);
-        agentStateService.progressToDiseaseStage(data.agent7, Stage.HOSPITALIZED_ICU);
+        agentStateService.progressToDiseaseStage(data.agent7, basicConfig.stages.HOSPITALIZED_ICU);
         advance(2);
-        agentStateService.progressToDiseaseStage(data.agent7, Stage.DECEASED);
-        agentStateService.infect(data.agentA, Load.OMICRON);
+        agentStateService.progressToDiseaseStage(data.agent7, basicConfig.stages.DECEASED);
+        agentStateService.infect(data.agentA, basicConfig.loads.OMICRON);
         agentStateService.addSourcesDistribution(data.agentA, householdSource);
         advance(7);
-        agentStateService.progressToDiseaseStage(data.agentA, Stage.INFECTIOUS_SYMPTOMATIC);
+        agentStateService.progressToDiseaseStage(data.agentA, basicConfig.stages.INFECTIOUS_SYMPTOMATIC);
         advance(6);
-        agentStateService.progressToDiseaseStage(data.agentA, Stage.HOSPITALIZED_NO_ICU);
+        agentStateService.progressToDiseaseStage(data.agentA, basicConfig.stages.HOSPITALIZED_NO_ICU);
         advance(3);
-        agentStateService.progressToDiseaseStage(data.agentA, Stage.DECEASED);
+        agentStateService.progressToDiseaseStage(data.agentA, basicConfig.stages.DECEASED);
         data.session.close();
 
         // execute

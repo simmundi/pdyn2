@@ -19,6 +19,7 @@
 package pl.edu.icm.pdyn2;
 
 import net.snowyhollows.bento.Bento;
+import net.snowyhollows.bento.config.Configurer;
 import net.snowyhollows.bento.config.WorkDir;
 import net.snowyhollows.bento.config.WorkDirFactory;
 import org.mockito.Mockito;
@@ -46,6 +47,7 @@ import pl.edu.icm.trurl.ecs.EngineConfigurationFactory;
 import pl.edu.icm.trurl.ecs.util.Selectors;
 import pl.edu.icm.trurl.ecs.util.SelectorsFactory;
 import pl.edu.icm.trurl.store.array.ArrayStoreFactory;
+import pl.edu.icm.trurl.store.tablesaw.TablesawStoreFactory;
 
 public class EmptyDataForIntegrationTests {
     public Selectors selectors;
@@ -59,8 +61,8 @@ public class EmptyDataForIntegrationTests {
     public final int rows = 100;
     public final WorkDir workDir = Mockito.mock(WorkDir.class);
 
-    public EmptyDataForIntegrationTests() {
-        config = Bento.createRoot();
+    public EmptyDataForIntegrationTests(BasicConfig basicConfig) {
+        config = basicConfig.bento;
         config.register("contextService", "behaviourBased");
         config.register("contextImpactService", "basic");
         config.register("gridRows", rows);
@@ -70,15 +72,15 @@ public class EmptyDataForIntegrationTests {
         config.register("asymptomaticInfluenceShare", 0.1);
         config.register("symptomaticInfluenceShare", 1.0);
         config.register(WorkDirFactory.IT, workDir);
+
         agentStateService = config.get(AgentStateServiceFactory.IT);
         contextsService = config.get(ContextsServiceFactory.IT);
         agentImpactService = config.get(AgentImpactServiceFactory.IT);
         simulationTimer = config.get(SimulationTimerFactory.IT);
         selectors = config.get(SelectorsFactory.IT);
 
-        EngineConfiguration engineConfig = config.get(EngineConfigurationFactory.IT);
-        engineConfig.setStoreFactory(new ArrayStoreFactory());
-        engineConfig.addComponentClasses(
+        EngineConfiguration engineConfiguration = config.get(EngineConfigurationFactory.IT);
+        engineConfiguration.addComponentClasses(
                 Person.class,
                 Location.class,
                 Area.class,
@@ -91,6 +93,6 @@ public class EmptyDataForIntegrationTests {
                 Household.class,
                 MedicalHistory.class,
                 Impact.class);
-        engine = engineConfig.getEngine();
+        engine = engineConfiguration.getEngine();
     }
 }

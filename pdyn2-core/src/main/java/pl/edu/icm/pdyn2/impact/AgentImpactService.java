@@ -21,6 +21,7 @@ package pl.edu.icm.pdyn2.impact;
 import net.snowyhollows.bento.annotation.WithFactory;
 import pl.edu.icm.board.model.Person;
 import pl.edu.icm.pdyn2.StatsService;
+import pl.edu.icm.pdyn2.model.progression.Stages;
 import pl.edu.icm.pdyn2.transmission.ContextImpactService;
 import pl.edu.icm.pdyn2.context.ContextsService;
 import pl.edu.icm.pdyn2.model.behaviour.Behaviour;
@@ -40,15 +41,21 @@ public class AgentImpactService {
     private final ContextImpactService contextImpactService;
     private final StatsService statsService;
     private final StageImpactConfig stageImpactConfig;
+    private final Stages stages;
     private final int REMOVE = -1;
     private final int ADD = 1;
 
     @WithFactory
-    public AgentImpactService(ContextsService contextsService, ContextImpactService contextImpactService, StatsService statsService, StageImpactConfig stageImpactConfig) {
+    public AgentImpactService(ContextsService contextsService,
+                              ContextImpactService contextImpactService,
+                              StatsService statsService,
+                              StageImpactConfig stageImpactConfig,
+                              Stages stages) {
         this.contextsService = contextsService;
         this.contextImpactService = contextImpactService;
         this.statsService = statsService;
         this.stageImpactConfig = stageImpactConfig;
+        this.stages = stages;
     }
 
     public void updateImpact(Entity agentEntity) {
@@ -66,7 +73,7 @@ public class AgentImpactService {
     }
 
     private void applyAgentInfluence(Entity agentEntity, Impact impact, Person person, int sign) {
-        Stage currentStage = impact.getStage() == null ? Stage.HEALTHY : impact.getStage();
+        Stage currentStage = impact.getStage() == null ? stages.HEALTHY : impact.getStage();
         Load load = currentStage.isInfectious() ? impact.getLoad() : null;
 
         float activityDelta = sign;

@@ -26,6 +26,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.edu.icm.board.geography.KilometerGridCell;
+import pl.edu.icm.pdyn2.BasicConfig;
 import pl.edu.icm.pdyn2.ComponentCreator;
 import pl.edu.icm.pdyn2.EntityMocker;
 import pl.edu.icm.pdyn2.index.AreaIndex;
@@ -43,6 +44,7 @@ import static org.assertj.core.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class BehaviourBasedContextsServiceTest {
+    private final BasicConfig basicConfig = new BasicConfig();
     @Mock
     private AreaIndex areaIndex;
     @InjectMocks
@@ -52,7 +54,7 @@ class BehaviourBasedContextsServiceTest {
     @DisplayName("Should find all the contexts of a routine-following agent")
     void findActiveContextsForAgent() {
         // given
-        ExampleData data = new ExampleData();
+        ExampleData data = new ExampleData(basicConfig);
 
         // execute
         var result = contextsService.findActiveContextsForAgent(data.agent1).collect(Collectors.toSet());
@@ -68,7 +70,7 @@ class BehaviourBasedContextsServiceTest {
     @DisplayName("Should return zero contexts for a dead agent")
     void findActiveContextsForAgent__dead() {
         // given
-        ExampleData data = new ExampleData();
+        ExampleData data = new ExampleData(basicConfig);
         data.agent1.getOrCreate(Behaviour.class).transitionTo(BehaviourType.DEAD, 0);
 
         // execute
@@ -82,7 +84,7 @@ class BehaviourBasedContextsServiceTest {
     @DisplayName("Should return just home contexts for isolating agnets")
     void findActiveContextsForAgent__isolating() {
         // given
-        ExampleData data = new ExampleData();
+        ExampleData data = new ExampleData(basicConfig);
         data.agent1.get(Behaviour.class).transitionTo(BehaviourType.SELF_ISOLATION, 0);
         data.agent2.get(Behaviour.class).transitionTo(BehaviourType.QUARANTINE, 0);
 
@@ -99,7 +101,7 @@ class BehaviourBasedContextsServiceTest {
     @DisplayName("Should return zero contexts for a hospitalized agent")
     void findActiveContextsForAgent__hospitalized() {
         // given
-        ExampleData data = new ExampleData();
+        ExampleData data = new ExampleData(basicConfig);
         data.agent1.get(Behaviour.class).transitionTo(BehaviourType.HOSPITALIZED, 0);
 
         // execute
@@ -113,7 +115,7 @@ class BehaviourBasedContextsServiceTest {
     @DisplayName("Should return current place of stay")
     void findActiveContextsForAgent__traveling() {
         // given
-        ExampleData data = new ExampleData();
+        ExampleData data = new ExampleData(basicConfig);
         data.agent2.get(Behaviour.class).transitionTo(BehaviourType.PRIVATE_TRAVEL, 0);
         data.agent2.add(new Travel()).setStayingAt(data.relativesHome);
 
@@ -125,22 +127,35 @@ class BehaviourBasedContextsServiceTest {
     }
 
     static class ExampleData {
-        Session session = Mockito.mock(Session.class);
-        EntityMocker build = new EntityMocker(session);
+        Session session;
+        EntityMocker build;
 
-        Entity home = build.entityWithId(1, ComponentCreator.context(ContextType.HOUSEHOLD),
-                ComponentCreator.location(KilometerGridCell.fromPl1992ENKilometers(5, 5)));
-        Entity work = build.entityWithId(2, ComponentCreator.context(ContextType.WORKPLACE));
-        Entity school = build.entityWithId(3, ComponentCreator.context(ContextType.SCHOOL));
-        Entity relativesHome = build.entityWithId(4, ComponentCreator.context(ContextType.HOUSEHOLD),
-                ComponentCreator.location(KilometerGridCell.fromLegacyPdynCoordinates(0, 0)));
+        Entity home;
+        Entity work;
+        Entity school;
+        Entity relativesHome;
 
-        Entity agent1 = build.entityWithId(5,
-                ComponentCreator.inhabitant(home, work, school),
-                ComponentCreator.behaviour(BehaviourType.ROUTINE));
-        Entity agent2 = build.entityWithId(6,
-                ComponentCreator.inhabitant(home, work, school),
-                ComponentCreator.behaviour(BehaviourType.ROUTINE));
+        Entity agent1;
+        Entity agent2;
+
+        public ExampleData(BasicConfig basicConfig) {
+            session = Mockito.mock(Session.class);
+            build = new EntityMocker(basicConfig, session);
+
+            home = build.entityWithId(1, ComponentCreator.context(basicConfig.contextTypes.HOUSEHOLD),
+                    ComponentCreator.location(KilometerGridCell.fromPl1992ENKilometers(5, 5)));
+            work = build.entityWithId(2, ComponentCreator.context(basicConfig.contextTypes.WORKPLACE));
+            school = build.entityWithId(3, ComponentCreator.context(basicConfig.contextTypes.SCHOOL));
+            relativesHome = build.entityWithId(4, ComponentCreator.context(basicConfig.contextTypes.HOUSEHOLD),
+                    ComponentCreator.location(KilometerGridCell.fromLegacyPdynCoordinates(0, 0)));
+
+            agent1 = build.entityWithId(5,
+                    ComponentCreator.inhabitant(home, work, school),
+                    ComponentCreator.behaviour(BehaviourType.ROUTINE));
+            agent2 = build.entityWithId(6,
+                    ComponentCreator.inhabitant(home, work, school),
+                    ComponentCreator.behaviour(BehaviourType.ROUTINE));
+        }
     }
 
 }

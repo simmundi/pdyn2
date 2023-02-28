@@ -19,12 +19,14 @@
 package pl.edu.icm.pdyn2.sowing;
 
 import net.snowyhollows.bento.annotation.WithFactory;
-import pl.edu.icm.board.Board;
+import pl.edu.icm.board.EngineIo;
 import pl.edu.icm.board.model.Household;
 import pl.edu.icm.pdyn2.AgentStateService;
 import pl.edu.icm.pdyn2.model.context.ContextInfectivityClass;
 import pl.edu.icm.pdyn2.model.immunization.Load;
+import pl.edu.icm.pdyn2.model.immunization.Loads;
 import pl.edu.icm.pdyn2.model.progression.Stage;
+import pl.edu.icm.pdyn2.model.progression.Stages;
 import pl.edu.icm.trurl.ecs.selector.Selector;
 import pl.edu.icm.trurl.ecs.util.EntityIterator;
 import pl.edu.icm.trurl.ecs.util.StaticSelectors;
@@ -40,18 +42,22 @@ import java.util.stream.Collectors;
 public class SowingFromAgentId implements SowingService {
 
     private final InfectedLoaderFromAgentId infectedLoaderFromAgentId;
-    private final Board board;
+    private final EngineIo board;
     private final StaticSelectors staticSelectors;
     private final AgentStateService agentStateService;
+    private final Loads loads;
+    private final Stages stages;
 
     @WithFactory
     public SowingFromAgentId(InfectedLoaderFromAgentId infectedLoaderFromAgentId,
-                                Board board,
-                                StaticSelectors staticSelectors, AgentStateService agentStateService) {
+                             EngineIo board,
+                             StaticSelectors staticSelectors, AgentStateService agentStateService, Loads loads, Stages stages) {
         this.infectedLoaderFromAgentId = infectedLoaderFromAgentId;
         this.board = board;
         this.staticSelectors = staticSelectors;
         this.agentStateService = agentStateService;
+        this.loads = loads;
+        this.stages = stages;
     }
 
     public void sow() {
@@ -80,13 +86,13 @@ public class SowingFromAgentId implements SowingService {
                 var id = agentId.getAndIncrement();
                 if (infectedMap.containsKey(id)) {
                     status.tick();
-                    agentStateService.infect(memberEntity, Load.WILD);
+                    agentStateService.infect(memberEntity, loads.WILD);
                     agentStateService.addSourcesDistribution(memberEntity,
                             new EnumSampleSpace<>(ContextInfectivityClass.class));
                     int elapsedDays = infectedMap.get(id).getElapsedDays();
-                    Stage stage = Stage.LATENT;
+                    Stage stage = stages.LATENT;
                     if (elapsedDays > 5) {
-                        stage = Stage.INFECTIOUS_SYMPTOMATIC;
+                        stage = stages.INFECTIOUS_SYMPTOMATIC;
                         elapsedDays -= 5;
                     }
                     agentStateService.progressToDiseaseStage(memberEntity, stage, elapsedDays);

@@ -21,7 +21,7 @@ package pl.edu.icm.pdyn2.sowing;
 import net.snowyhollows.bento.annotation.WithFactory;
 import org.apache.commons.math3.random.RandomAdaptor;
 import org.apache.commons.math3.random.RandomGenerator;
-import pl.edu.icm.board.Board;
+import pl.edu.icm.board.EngineIo;
 import pl.edu.icm.board.agesex.AgeSex;
 import pl.edu.icm.board.geography.KilometerGridCell;
 import pl.edu.icm.board.geography.commune.AdministrationAreaType;
@@ -37,7 +37,9 @@ import pl.edu.icm.pdyn2.administration.TestingService;
 import pl.edu.icm.pdyn2.model.context.ContextInfectivityClass;
 import pl.edu.icm.pdyn2.model.immunization.ImmunizationSources;
 import pl.edu.icm.pdyn2.model.immunization.Load;
+import pl.edu.icm.pdyn2.model.immunization.Loads;
 import pl.edu.icm.pdyn2.model.progression.Stage;
+import pl.edu.icm.pdyn2.model.progression.Stages;
 import pl.edu.icm.pdyn2.progression.DiseaseStageTransitionsService;
 import pl.edu.icm.trurl.bin.BinPool;
 import pl.edu.icm.trurl.ecs.Entity;
@@ -55,8 +57,10 @@ public class SowingFromDistribution implements SowingService {
 
     private final InfectedLoaderFromDistribution loader;
     private final StatsService statsService;
-    private final Board board;
+    private final EngineIo board;
     private final CommuneManager communeManager;
+    private final Loads loads;
+    private final Stages stages;
     private final RandomGenerator randomGenerator;
     private final Random random;
     private final PopulationService populationService;
@@ -75,7 +79,9 @@ public class SowingFromDistribution implements SowingService {
     @WithFactory
     public SowingFromDistribution(InfectedLoaderFromDistribution loader,
                                   StatsService statsService,
-                                  Board board,
+                                  EngineIo board,
+                                  Loads loads,
+                                  Stages stages,
                                   RandomProvider randomProvider,
                                   CommuneManager communeManager,
                                   PopulationService populationService,
@@ -85,6 +91,8 @@ public class SowingFromDistribution implements SowingService {
         this.statsService = statsService;
         this.loader = loader;
         this.board = board;
+        this.loads = loads;
+        this.stages = stages;
         this.randomGenerator = randomProvider.getRandomGenerator(InfectedLoaderFromDistribution.class);
         this.communeManager = communeManager;
         this.populationService = populationService;
@@ -179,10 +187,10 @@ public class SowingFromDistribution implements SowingService {
                         var memberAgeSex = AgeSex.fromAgeSex(age, person.getSex());
                         if (ageSex.containsKey(memberAgeSex) && ageSex.get(memberAgeSex) > 0) {
                             var stage = states.sample(randomGenerator.nextDouble()).pick();
-                            var durationLatentny = diseaseStageTransitionsService.durationOf(Load.WILD, Stage.LATENT, age);
+                            var durationLatentny = diseaseStageTransitionsService.durationOf(loads.WILD, stages.LATENT, age);
                             var symptomatic = symptoms.sample(randomGenerator.nextDouble()).pick();
 
-                            agentStateService.infect(member, Load.WILD, stage);
+                            agentStateService.infect(member, loads.WILD, stage);
                             agentStateService.addSourcesDistribution(member,
                                     new EnumSampleSpace<>(ContextInfectivityClass.class));
                             status.tick();
@@ -190,43 +198,43 @@ public class SowingFromDistribution implements SowingService {
                                 testingService.maybeTestAgentOnDay(member, stage - durationLatentny);
                                 if (symptomatic) {
                                     agentStateService.progressToDiseaseStage(member,
-                                            Stage.INFECTIOUS_SYMPTOMATIC,
+                                            stages.INFECTIOUS_SYMPTOMATIC,
                                             stage - durationLatentny);
-                                    var durationSymptomatic = diseaseStageTransitionsService.durationOf(Load.WILD,
-                                            Stage.INFECTIOUS_SYMPTOMATIC,
+                                    var durationSymptomatic = diseaseStageTransitionsService.durationOf(loads.WILD,
+                                            stages.INFECTIOUS_SYMPTOMATIC,
                                             age);
                                     var daysInNextStage = stage - durationLatentny - durationSymptomatic;
                                     if (daysInNextStage >= 0) {
-                                        var nextStage = diseaseStageTransitionsService.outcomeOf(Stage.INFECTIOUS_SYMPTOMATIC,
+                                        var nextStage = diseaseStageTransitionsService.outcomeOf(stages.INFECTIOUS_SYMPTOMATIC,
                                                 member,
-                                                Load.WILD,
+                                                loads.WILD,
                                                 random.nextDouble());
                                         agentStateService.progressToDiseaseStage(member, nextStage, daysInNextStage);
                                         statsService.tickStageChange(nextStage);
                                     } else {
-                                        statsService.tickStageChange(Stage.INFECTIOUS_SYMPTOMATIC);
+                                        statsService.tickStageChange(stages.INFECTIOUS_SYMPTOMATIC);
                                     }
                                 } else {
                                     agentStateService.progressToDiseaseStage(member,
-                                            Stage.INFECTIOUS_ASYMPTOMATIC,
+                                            stages.INFECTIOUS_ASYMPTOMATIC,
                                             stage - durationLatentny);
-                                    var durationAsymptomatic = diseaseStageTransitionsService.durationOf(Load.WILD,
-                                            Stage.INFECTIOUS_ASYMPTOMATIC,
+                                    var durationAsymptomatic = diseaseStageTransitionsService.durationOf(loads.WILD,
+                                            stages.INFECTIOUS_ASYMPTOMATIC,
                                             age);
                                     var daysInNextStage = stage - durationLatentny - durationAsymptomatic;
                                     if (daysInNextStage >= 0) {
-                                        var nextStage = diseaseStageTransitionsService.outcomeOf(Stage.INFECTIOUS_SYMPTOMATIC,
+                                        var nextStage = diseaseStageTransitionsService.outcomeOf(stages.INFECTIOUS_SYMPTOMATIC,
                                                 member,
-                                                Load.WILD,
+                                                loads.WILD,
                                                 random.nextDouble());
                                         agentStateService.progressToDiseaseStage(member, nextStage, daysInNextStage);
                                         statsService.tickStageChange(nextStage);
                                     } else {
-                                        statsService.tickStageChange(Stage.INFECTIOUS_ASYMPTOMATIC);
+                                        statsService.tickStageChange(stages.INFECTIOUS_ASYMPTOMATIC);
                                     }
                                 }
                             } else {
-                                statsService.tickStageChange(Stage.LATENT);
+                                statsService.tickStageChange(stages.LATENT);
                             }
                             ageSex.compute(memberAgeSex, (a, v) -> v - 1);
                             infected++;

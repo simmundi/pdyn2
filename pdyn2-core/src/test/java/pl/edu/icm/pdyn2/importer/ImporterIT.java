@@ -25,8 +25,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import pl.edu.icm.board.Board;
+import pl.edu.icm.board.EngineIo;
 import pl.edu.icm.pdyn2.AgentStateService;
+import pl.edu.icm.pdyn2.BasicConfig;
 import pl.edu.icm.pdyn2.ExampleDataForIntegrationTests;
 import pl.edu.icm.pdyn2.model.immunization.Immunization;
 import pl.edu.icm.pdyn2.model.immunization.Load;
@@ -41,12 +42,13 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class ImporterIT {
-    private final ExampleDataForIntegrationTests data = new ExampleDataForIntegrationTests(false);
+    private final BasicConfig basicConfig = new BasicConfig();
+    private final ExampleDataForIntegrationTests data = new ExampleDataForIntegrationTests(basicConfig, false);
     private final AgentStateService agentStateService = data.agentStateService;
     @Mock
     private DiseaseStageTransitionsService transitionsService;
     @Mock
-    private Board board;
+    private EngineIo board;
     @Mock
     private WorkDir workDir;
 
@@ -58,20 +60,20 @@ public class ImporterIT {
                 .getResourceAsStream("/importerTest.csv"));
         when(board.getEngine()).thenReturn(data.session.getEngine());
 
-        when(transitionsService.durationOf(Load.WILD, Stage.INFECTIOUS_SYMPTOMATIC, 18)).thenReturn(6);
-        when(transitionsService.durationOf(Load.WILD, Stage.LATENT, 18)).thenReturn(7);
+        when(transitionsService.durationOf(basicConfig.loads.WILD, basicConfig.stages.INFECTIOUS_SYMPTOMATIC, 18)).thenReturn(6);
+        when(transitionsService.durationOf(basicConfig.loads.WILD, basicConfig.stages.LATENT, 18)).thenReturn(7);
 
-        when(transitionsService.durationOf(Load.OMICRON, Stage.HOSPITALIZED_ICU, 18)).thenReturn(2);
-        when(transitionsService.durationOf(Load.OMICRON, Stage.HOSPITALIZED_PRE_ICU, 18)).thenReturn(4);
-        when(transitionsService.durationOf(Load.OMICRON, Stage.INFECTIOUS_SYMPTOMATIC, 18)).thenReturn(6);
-        when(transitionsService.durationOf(Load.OMICRON, Stage.LATENT, 18)).thenReturn(7);
+        when(transitionsService.durationOf(basicConfig.loads.OMICRON, basicConfig.stages.HOSPITALIZED_ICU, 18)).thenReturn(2);
+        when(transitionsService.durationOf(basicConfig.loads.OMICRON, basicConfig.stages.HOSPITALIZED_PRE_ICU, 18)).thenReturn(4);
+        when(transitionsService.durationOf(basicConfig.loads.OMICRON, basicConfig.stages.INFECTIOUS_SYMPTOMATIC, 18)).thenReturn(6);
+        when(transitionsService.durationOf(basicConfig.loads.OMICRON, basicConfig.stages.LATENT, 18)).thenReturn(7);
 
-        when(transitionsService.durationOf(Load.DELTA, Stage.INFECTIOUS_ASYMPTOMATIC, 18)).thenReturn(5);
-        when(transitionsService.durationOf(Load.DELTA, Stage.LATENT, 18)).thenReturn(7);
+        when(transitionsService.durationOf(basicConfig.loads.DELTA, basicConfig.stages.INFECTIOUS_ASYMPTOMATIC, 18)).thenReturn(5);
+        when(transitionsService.durationOf(basicConfig.loads.DELTA, basicConfig.stages.LATENT, 18)).thenReturn(7);
 
-        when(transitionsService.durationOf(Load.OMICRON, Stage.HOSPITALIZED_NO_ICU, 18)).thenReturn(3);
-        when(transitionsService.durationOf(Load.OMICRON, Stage.INFECTIOUS_SYMPTOMATIC, 18)).thenReturn(6);
-        when(transitionsService.durationOf(Load.OMICRON, Stage.LATENT, 18)).thenReturn(7);
+        when(transitionsService.durationOf(basicConfig.loads.OMICRON, basicConfig.stages.HOSPITALIZED_NO_ICU, 18)).thenReturn(3);
+        when(transitionsService.durationOf(basicConfig.loads.OMICRON, basicConfig.stages.INFECTIOUS_SYMPTOMATIC, 18)).thenReturn(6);
+        when(transitionsService.durationOf(basicConfig.loads.OMICRON, basicConfig.stages.LATENT, 18)).thenReturn(7);
     }
 
     @Test
@@ -85,7 +87,9 @@ public class ImporterIT {
                 data.selectors,
                 agentStateService,
                 data.simulationTimer,
-                transitionsService);
+                transitionsService,
+                basicConfig.loads,
+                basicConfig.stages);
         data.session.close();
         var orcFilename = String.valueOf(ImporterIT.class.getResource("/importerTest.orc"));
         importer.importEvents("/importerTest.csv", orcFilename, 1000);
@@ -93,18 +97,18 @@ public class ImporterIT {
 
         assertThat(data.allAgents.get(1).get(Immunization.class).getEvents().get(0).getDay()).isEqualTo(-997);
         assertThat(data.allAgents.get(1).get(Immunization.class).getEvents().get(0).getDiseaseHistory()).isEqualTo(26);
-        assertThat(data.allAgents.get(1).get(Immunization.class).getEvents().get(0).getLoad()).isEqualTo(Load.WILD);
+        assertThat(data.allAgents.get(1).get(Immunization.class).getEvents().get(0).getLoad()).isEqualTo(basicConfig.loads.WILD);
         assertThat(data.allAgents.get(0).get(Immunization.class).getEvents().get(0).getDay()).isEqualTo(-971);
         assertThat(data.allAgents.get(0).get(Immunization.class).getEvents().get(0).getDiseaseHistory()).isEqualTo(458);
-        assertThat(data.allAgents.get(0).get(Immunization.class).getEvents().get(0).getLoad()).isEqualTo(Load.OMICRON);
+        assertThat(data.allAgents.get(0).get(Immunization.class).getEvents().get(0).getLoad()).isEqualTo(basicConfig.loads.OMICRON);
         assertThat(data.allAgents.get(2).get(Immunization.class).getEvents().get(0).getDay()).isEqualTo(-991);
         assertThat(data.allAgents.get(2).get(Immunization.class).getEvents().get(0).getDiseaseHistory()).isEqualTo(22);
-        assertThat(data.allAgents.get(2).get(Immunization.class).getEvents().get(0).getLoad()).isEqualTo(Load.DELTA);
+        assertThat(data.allAgents.get(2).get(Immunization.class).getEvents().get(0).getLoad()).isEqualTo(basicConfig.loads.DELTA);
         assertThat(data.allAgents.get(1).get(Immunization.class).getEvents().get(1).getDay()).isEqualTo(-955);
         assertThat(data.allAgents.get(1).get(Immunization.class).getEvents().get(1).getDiseaseHistory()).isEqualTo(298);
-        assertThat(data.allAgents.get(1).get(Immunization.class).getEvents().get(1).getLoad()).isEqualTo(Load.OMICRON);
+        assertThat(data.allAgents.get(1).get(Immunization.class).getEvents().get(1).getLoad()).isEqualTo(basicConfig.loads.OMICRON);
         assertThat(data.allAgents.get(0).get(Immunization.class).getEvents().get(1).getDay()).isEqualTo(-900);
         assertThat(data.allAgents.get(0).get(Immunization.class).getEvents().get(1).getDiseaseHistory()).isEqualTo(0);
-        assertThat(data.allAgents.get(0).get(Immunization.class).getEvents().get(1).getLoad()).isEqualTo(Load.BOOSTER);
+        assertThat(data.allAgents.get(0).get(Immunization.class).getEvents().get(1).getLoad()).isEqualTo(basicConfig.loads.BOOSTER);
     }
 }

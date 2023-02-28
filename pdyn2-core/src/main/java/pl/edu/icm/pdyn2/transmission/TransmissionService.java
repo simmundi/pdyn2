@@ -27,11 +27,13 @@ import pl.edu.icm.pdyn2.model.context.Context;
 import pl.edu.icm.pdyn2.model.context.ContextInfectivityClass;
 import pl.edu.icm.pdyn2.model.immunization.Immunization;
 import pl.edu.icm.pdyn2.model.immunization.Load;
+import pl.edu.icm.pdyn2.model.immunization.Loads;
 import pl.edu.icm.pdyn2.model.progression.HealthStatus;
-import pl.edu.icm.pdyn2.model.progression.Stage;
+import pl.edu.icm.pdyn2.model.progression.Stages;
 import pl.edu.icm.pdyn2.time.SimulationTimer;
 import pl.edu.icm.trurl.ecs.Entity;
 import pl.edu.icm.trurl.sampleSpace.EnumSampleSpace;
+import pl.edu.icm.trurl.sampleSpace.SoftEnumSampleSpace;
 
 /**
  * Logic for transmission of the disease.
@@ -43,20 +45,27 @@ public class TransmissionService {
     private final TransmissionConfig transmissionConfig;
     private final ContextsService contextsService;
     private final SimulationTimer simulationTimer;
+    private final Loads loads;
+    private final Stages stages;
     private final ImmunizationService immunizationService;
-    private final EnumSampleSpace<Load> relativeAlpha = new EnumSampleSpace<>(Load.class);
+    private final SoftEnumSampleSpace<Load> relativeAlpha;
 
     @WithFactory
     public TransmissionService(ContextsService contextsService,
                                RelativeAlphaConfig relativeAlphaConfig,
                                TransmissionConfig transmissionConfig,
                                SimulationTimer simulationTimer,
+                               Loads loads,
+                               Stages stages,
                                ImmunizationService immunizationService) {
+        this.relativeAlpha = new SoftEnumSampleSpace<>(loads);
         this.contextsService = contextsService;
         this.transmissionConfig = transmissionConfig;
         this.simulationTimer = simulationTimer;
+        this.loads = loads;
+        this.stages = stages;
         this.immunizationService = immunizationService;
-        for (Load currentLoad : Load.viruses()) {
+        for (Load currentLoad : loads.viruses()) {
             relativeAlpha.changeOutcome(currentLoad, relativeAlphaConfig.getRelativeAlpha(currentLoad));
         }
     }
@@ -69,7 +78,7 @@ public class TransmissionService {
      */
     public boolean consideredForInfection(Entity agent) {
         HealthStatus healthStatus = agent.get(HealthStatus.class);
-        return healthStatus.getStage() == Stage.HEALTHY;
+        return healthStatus.getStage() == stages.HEALTHY;
     }
 
 
@@ -82,9 +91,9 @@ public class TransmissionService {
      * @param entity      the agent entity
      * @return
      */
-    public void gatherExposurePerLoadAndContextForAgent(EnumSampleSpace<Load> infectivity,
-                                                                         EnumSampleSpace<ContextInfectivityClass> infectionSourceSampleSpace,
-                                                                         Entity entity) {
+    public void gatherExposurePerLoadAndContextForAgent(SoftEnumSampleSpace<Load> infectivity,
+                                                        EnumSampleSpace<ContextInfectivityClass> infectionSourceSampleSpace,
+                                                        Entity entity) {
         var contexts = contextsService.findActiveContextsForAgent(entity);
         contexts.forEach(context -> {
             addContextInfectivity(context, infectivity);
@@ -110,7 +119,7 @@ public class TransmissionService {
      * @param randomDouble    number between 0 to 1
      * @return
      */
-    public Load selectLoad(EnumSampleSpace<Load> exposurePerLoad, double randomDouble) {
+    public Load selectLoad(SoftEnumSampleSpace<Load> exposurePerLoad, double randomDouble) {
         // this should never choose "default", because for valid randomDouble (less than 1) the value
         // will always be below total.
         return exposurePerLoad.sampleOrDefault(randomDouble * exposurePerLoad.sumOfProbabilities());
@@ -134,7 +143,7 @@ public class TransmissionService {
         return probability * coefficient;
     }
 
-    private void addContextInfectivity(Context context, EnumSampleSpace<Load> infectivity) {
+    private void addContextInfectivity(Context context, SoftEnumSampleSpace<Load> infectivity) {
         var weight = transmissionConfig.getTotalWeightForContextType(context.getContextType());
         var agentCount = context.getAgentCount();
         for (Contamination contamination : context.getContaminations()) {

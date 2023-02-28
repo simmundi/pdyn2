@@ -24,16 +24,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import pl.edu.icm.board.Board;
+import pl.edu.icm.board.EngineIo;
 import pl.edu.icm.board.geography.commune.AdministrationAreaType;
 import pl.edu.icm.board.geography.commune.Commune;
 import pl.edu.icm.board.geography.commune.CommuneManager;
 import pl.edu.icm.board.geography.commune.PopulationService;
 import pl.edu.icm.board.util.RandomProvider;
-import pl.edu.icm.pdyn2.AgentStateService;
-import pl.edu.icm.pdyn2.ExampleDataForIntegrationTests;
-import pl.edu.icm.pdyn2.MockRandomProvider;
-import pl.edu.icm.pdyn2.StatsService;
+import pl.edu.icm.pdyn2.*;
 import pl.edu.icm.pdyn2.administration.TestingService;
 import pl.edu.icm.pdyn2.model.progression.HealthStatus;
 import pl.edu.icm.pdyn2.model.progression.Stage;
@@ -49,7 +46,8 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class SowingFromDistributionIT {
-    private final ExampleDataForIntegrationTests data = new ExampleDataForIntegrationTests(false);
+    private final BasicConfig basicConfig = new BasicConfig();
+    private final ExampleDataForIntegrationTests data = new ExampleDataForIntegrationTests(basicConfig, false);
     private final RandomProvider randomProvider = new MockRandomProvider();
     @Mock
     private WorkDir workDir;
@@ -62,7 +60,7 @@ public class SowingFromDistributionIT {
     @Mock
     private DiseaseStageTransitionsService diseaseStageTransitionsService;
     @Mock
-    private Board board;
+    private EngineIo board;
     @Mock
     private TestingService testingService;
 
@@ -94,6 +92,8 @@ public class SowingFromDistributionIT {
                 loader,
                 statsService,
                 board,
+                basicConfig.loads,
+                basicConfig.stages,
                 randomProvider,
                 communeManager,
                 populationService,
@@ -107,10 +107,10 @@ public class SowingFromDistributionIT {
 
         // assert
         assertThat(data.engine.streamDetached().filter(e -> e.get(HealthStatus.class) != null)
-                .filter(e -> e.get(HealthStatus.class).getStage().equals(Stage.INFECTIOUS_SYMPTOMATIC)).count()).isEqualTo(1);
+                .filter(e -> e.get(HealthStatus.class).getStage().equals(basicConfig.stages.INFECTIOUS_SYMPTOMATIC)).count()).isEqualTo(1);
         assertThat(data.engine.streamDetached().filter(e -> e.get(HealthStatus.class) != null)
-                .filter(e -> e.get(HealthStatus.class).getStage().equals(Stage.LATENT)).count()).isEqualTo(1);
+                .filter(e -> e.get(HealthStatus.class).getStage().equals(basicConfig.stages.LATENT)).count()).isEqualTo(1);
         assertThat(data.engine.streamDetached().filter(e -> e.get(HealthStatus.class) != null)
-                .filter(e -> e.get(HealthStatus.class).getStage().equals(Stage.INFECTIOUS_ASYMPTOMATIC)).count()).isEqualTo(1);
+                .filter(e -> e.get(HealthStatus.class).getStage().equals(basicConfig.stages.INFECTIOUS_ASYMPTOMATIC)).count()).isEqualTo(1);
     }
 }

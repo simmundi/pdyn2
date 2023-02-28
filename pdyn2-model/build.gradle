@@ -1,7 +1,10 @@
 dependencies {
     annotationProcessor "pl.edu.icm.em:trurl-generator:${trurlVersion}"
+    annotationProcessor "net.snowyhollows.bento:bento-generator:${bentoVersion}"
 
     api "pl.edu.icm.em:trurl-core:${trurlVersion}"
+    implementation "net.snowyhollows.bento:bento-core:${bentoVersion}"
+    testImplementation "net.snowyhollows.bento:bento-config:${bentoVersion}"
 }
 
 publishing {

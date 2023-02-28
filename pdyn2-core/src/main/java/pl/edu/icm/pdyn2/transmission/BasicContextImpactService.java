@@ -21,19 +21,29 @@ package pl.edu.icm.pdyn2.transmission;
 import net.snowyhollows.bento.annotation.WithFactory;
 import pl.edu.icm.board.model.Person;
 import pl.edu.icm.pdyn2.model.AgeRange;
+import pl.edu.icm.pdyn2.model.AgeRanges;
 import pl.edu.icm.pdyn2.model.context.Context;
 import pl.edu.icm.pdyn2.model.context.ContextType;
+import pl.edu.icm.pdyn2.model.context.ContextTypes;
 import pl.edu.icm.trurl.sampleSpace.EnumSampleSpace;
+import pl.edu.icm.trurl.sampleSpace.SoftEnumSampleSpace;
 
 /**
  * Logic for fractional membership in contexts.
  */
 public class BasicContextImpactService implements ContextImpactService {
 
-    private final float[] fractions = new float[AGE_RANGE_COUNT * CONTEXT_TYPE_COUNT];
+    private final ContextTypes contextTypes;
+    private final AgeRanges ageRanges;
+    private final float[] fractions;
+    private final int contextTypeCount;
 
     @WithFactory
-    public BasicContextImpactService() {
+    public BasicContextImpactService(ContextTypes contextTypes, AgeRanges ageRanges) {
+        this.contextTypes = contextTypes;
+        this.ageRanges = ageRanges;
+        contextTypeCount = contextTypes.values().size();
+        fractions = new float[contextTypes.values().size() * ageRanges.values().size()];
         fillWithOnes();
         fillFractionsForStreets();
     }
@@ -52,12 +62,12 @@ public class BasicContextImpactService implements ContextImpactService {
      */
     @Override
     public float calculateInfluenceFractionFor(Person person, Context context) {
-        AgeRange ageRange = AgeRange.of(person.getAge());
+        AgeRange ageRange = ageRanges.of(person.getAge());
         return fractions[idxFor(ageRange, context.getContextType())];
     }
 
     private int idxFor(AgeRange ageRange, ContextType contextType) {
-        return ageRange.ordinal() * CONTEXT_TYPE_COUNT + contextType.ordinal();
+        return ageRange.ordinal() * contextTypeCount + contextType.ordinal();
     }
 
     private void fillWithOnes() {
@@ -67,17 +77,17 @@ public class BasicContextImpactService implements ContextImpactService {
     }
 
     private void fillFractionsForStreets() {
-        for (AgeRange ageRange : AgeRange.values()) {
-            EnumSampleSpace<ContextType> sampleSpace = new EnumSampleSpace<>(ContextType.class);
+        for (AgeRange ageRange : ageRanges.values()) {
+            SoftEnumSampleSpace<ContextType> sampleSpace = new SoftEnumSampleSpace<>(contextTypes);
             int ageBin = ageRange.ordinal();
-            for (ContextType streetContext : ContextType.streetContexts()) {
-                int distance = ageBin - (streetContext.ordinal() - ContextType.STREET_00.ordinal());
+            for (ContextType streetContext : contextTypes.streetContexts()) {
+                int distance = ageBin - (streetContext.ordinal() - contextTypes.STREET_00.ordinal());
                 int distanceSquared = distance * distance;
                 sampleSpace.changeOutcome(streetContext, (float) Math.exp( - distanceSquared / 2.0));
             }
             sampleSpace.normalize();
 
-            for (ContextType streetContext : ContextType.streetContexts()) {
+            for (ContextType streetContext : contextTypes.streetContexts()) {
                 int idx = idxFor(ageRange, streetContext);
                 fractions[idx] = sampleSpace.getProbability(streetContext);
             }

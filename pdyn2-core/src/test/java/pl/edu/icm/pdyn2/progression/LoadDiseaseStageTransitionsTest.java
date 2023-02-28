@@ -26,6 +26,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.edu.icm.board.model.Person;
+import pl.edu.icm.pdyn2.BasicConfig;
 import pl.edu.icm.pdyn2.immunization.ImmunizationService;
 import pl.edu.icm.pdyn2.immunization.ImmunizationStage;
 import pl.edu.icm.pdyn2.model.immunization.Load;
@@ -41,6 +42,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class LoadDiseaseStageTransitionsTest {
+    private BasicConfig basicConfig = new BasicConfig();
 
     private LoadDiseaseStageTransitions loadDiseaseStageTransitions;
 
@@ -67,7 +69,9 @@ class LoadDiseaseStageTransitionsTest {
                 immunizationService,
                 simulationTimer,
                 workDir,
-                Load.OMICRON);
+                basicConfig.stages,
+                basicConfig.ageRanges,
+                basicConfig.loads.OMICRON);
         when(immunizationService.getImmunizationCoefficient(any(),
                 eq(ImmunizationStage.OBJAWOWY), any(), anyInt())).thenReturn(1.0f);
         when(immunizationService.getImmunizationCoefficient(any(),
@@ -94,17 +98,17 @@ class LoadDiseaseStageTransitionsTest {
     @DisplayName("Should load and parse the transition table")
     void getPossibleTransitions() {
         var p1 = loadDiseaseStageTransitions
-                .getPossibleTransitions(Stage.INFECTIOUS_SYMPTOMATIC, entity1);
+                .getPossibleTransitions(basicConfig.stages.INFECTIOUS_SYMPTOMATIC, entity1);
 
-        assertThat(p1.getProbability(Stage.HOSPITALIZED_PRE_ICU)).isEqualTo(0.001f);
-        assertThat(p1.getProbability(Stage.HOSPITALIZED_NO_ICU)).isEqualTo(0.006f);
-        assertThat(p1.getProbability(Stage.HEALTHY)).isEqualTo(0.992f);
-        assertThat(p1.getProbability(Stage.DECEASED)).isEqualTo(0.001f);
+        assertThat(p1.getProbability(basicConfig.stages.HOSPITALIZED_PRE_ICU)).isEqualTo(0.001f);
+        assertThat(p1.getProbability(basicConfig.stages.HOSPITALIZED_NO_ICU)).isEqualTo(0.006f);
+        assertThat(p1.getProbability(basicConfig.stages.HEALTHY)).isEqualTo(0.992f);
+        assertThat(p1.getProbability(basicConfig.stages.DECEASED)).isEqualTo(0.001f);
 
         var p2 = loadDiseaseStageTransitions
-                .getPossibleTransitions(Stage.LATENT, entity2);
+                .getPossibleTransitions(basicConfig.stages.LATENT, entity2);
 
-        assertThat(p2.getProbability(Stage.INFECTIOUS_ASYMPTOMATIC)).isEqualTo(1.0f);
-        assertThat(p2.getProbability(Stage.INFECTIOUS_SYMPTOMATIC)).isEqualTo(0.0f);
+        assertThat(p2.getProbability(basicConfig.stages.INFECTIOUS_ASYMPTOMATIC)).isEqualTo(1.0f);
+        assertThat(p2.getProbability(basicConfig.stages.INFECTIOUS_SYMPTOMATIC)).isEqualTo(0.0f);
     }
 }

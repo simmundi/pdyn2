@@ -24,16 +24,27 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import pl.edu.icm.pdyn2.BasicConfig;
+import pl.edu.icm.pdyn2.model.AgeRanges;
 import pl.edu.icm.pdyn2.model.immunization.Load;
 import pl.edu.icm.pdyn2.model.progression.Stage;
+import pl.edu.icm.pdyn2.model.progression.Stages;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class LoadDiseaseStageTransitionsReaderTest {
+    BasicConfig basicConfig = new BasicConfig();
+
+    @Spy
+    AgeRanges ageRanges = basicConfig.ageRanges;
+    @Spy
+    Stages stages = basicConfig.stages;
 
     @Mock
     WorkDir workDir;
@@ -49,9 +60,9 @@ class LoadDiseaseStageTransitionsReaderTest {
                 LoadDiseaseStageTransitionsTest.class.getResourceAsStream("/stanCzasTest.txt"));
 
         // execute
-        LoadDiseaseStageTransitions transition = reader.readFromFile("stan_czas.txt", Load.WILD);
+        LoadDiseaseStageTransitions transition = reader.readFromFile("stan_czas.txt", basicConfig.loads.WILD);
 
         // assert
-        assertThat(transition.durationOf(Stage.LATENT, 7)).isPositive();
+        assertThat(transition.durationOf(basicConfig.stages.LATENT, 7)).isPositive();
     }
 }

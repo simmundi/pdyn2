@@ -68,7 +68,7 @@ public class DiseaseProgressionSystemBuilder {
                     Person person = entity.get(Person.class);
                     Stage currentStage = health.getStage();
 
-                    if (!currentStage.hasOutcomes()) {
+                    if (!currentStage.isSick()) {
                         statsService.tickStage(currentStage);
                         return;
                     }

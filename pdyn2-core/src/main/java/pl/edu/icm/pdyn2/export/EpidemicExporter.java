@@ -20,7 +20,7 @@ package pl.edu.icm.pdyn2.export;
 
 import net.snowyhollows.bento.annotation.WithFactory;
 import net.snowyhollows.bento.config.WorkDir;
-import pl.edu.icm.board.Board;
+import pl.edu.icm.board.EngineIo;
 import pl.edu.icm.board.geography.KilometerGridCell;
 import pl.edu.icm.board.model.Location;
 import pl.edu.icm.board.model.Person;
@@ -31,6 +31,7 @@ import pl.edu.icm.pdyn2.model.context.ContextInfectivityClass;
 import pl.edu.icm.pdyn2.model.context.Inhabitant;
 import pl.edu.icm.pdyn2.model.immunization.*;
 import pl.edu.icm.pdyn2.model.progression.Stage;
+import pl.edu.icm.pdyn2.model.progression.Stages;
 import pl.edu.icm.pdyn2.progression.DiseaseStageTransitionsService;
 import pl.edu.icm.trurl.ecs.util.EntityIterator;
 import pl.edu.icm.trurl.ecs.util.Selectors;
@@ -44,24 +45,30 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class EpidemicExporter {
-    private final Board board;
+    private final EngineIo board;
     private final WorkDir workDir;
     private final String diseaseExportFilename;
     private final DiseaseStageTransitionsService transitionsService;
     private final Selectors selectors;
+    private final Loads loads;
+    private final Stages stages;
 
 
     @WithFactory
     public EpidemicExporter(String diseaseExportFilename,
-                            Board board,
+                            EngineIo board,
                             WorkDir workDir,
                             DiseaseStageTransitionsService transitionsService,
-                            Selectors selectors) {
+                            Selectors selectors,
+                            Loads loads,
+                            Stages stages) {
         this.diseaseExportFilename = diseaseExportFilename;
         this.board = board;
         this.workDir = workDir;
         this.transitionsService = transitionsService;
         this.selectors = selectors;
+        this.loads = loads;
+        this.stages = stages;
     }
 
     public void export() {
@@ -91,8 +98,8 @@ public class EpidemicExporter {
                             var medicalHistory = e.get(MedicalHistory.class);
                             var events = immunization.getEvents();
                             var sources = e.get(ImmunizationSources.class);
-List<ImmunizationSource> sourceList = sources != null ? sources.getImmunizationSources() : new ArrayList<>();
-List<Record> records = medicalHistory != null ? medicalHistory.getRecords() : null;
+                            List<ImmunizationSource> sourceList = sources != null ? sources.getImmunizationSources() : new ArrayList<>();
+                            List<Record> records = medicalHistory != null ? medicalHistory.getRecords() : null;
                             var sourceNumber = 0;
                             for (ImmunizationEvent event : events) {
                                 try {
@@ -170,47 +177,41 @@ List<Record> records = medicalHistory != null ? medicalHistory.getRecords() : nu
     }
 
     private String diseaseLoad(Load load) {
-        switch (load) {
-            case WILD:
-                return "0";
-            case ALPHA:
-                return "1";
-            case DELTA:
-                return "2";
-            case OMICRON:
-                return "3";
-            case ASTRA:
-            case PFIZER:
-            case MODERNA:
-            case BOOSTER:
-                return "-1";
-            default:
-                throw new IllegalArgumentException("Could not find value for: " + load);
+        if (load == loads.WILD) {
+            return "0";
         }
+        if (load == loads.ALPHA) {
+            return "1";
+        }
+        if (load == loads.DELTA) {
+            return "2";
+        }
+        if (load == loads.OMICRON) {
+            return "3";
+        }
+        if (load.classification == LoadClassification.VACCINE) {
+            return "-1";
+        }
+        throw new IllegalArgumentException("Could not find value for: " + load);
     }
 
     private String vaccineLoad(Load load) {
-        switch (load) {
-            case WILD:
-            case ALPHA:
-            case DELTA:
-            case OMICRON:
-                return "-1";
-            case ASTRA:
-            case PFIZER:
-            case MODERNA:
-                return "0";
-            case BOOSTER:
-                return "1";
-            default:
-                throw new IllegalArgumentException("Could not find value for: " + load);
+        if (load.classification == LoadClassification.VIRUS) {
+            return "-1";
         }
+        if (load == loads.BOOSTER) {
+            return "1";
+        }
+        if (load == loads.ASTRA || load == loads.PFIZER || load == loads.MODERNA) {
+            return "0";
+        }
+        throw new IllegalArgumentException("Could not find value for: " + load);
     }
 
     private int possibleTestedDay(int startDay, Load load, int age) {
         if (load.classification == LoadClassification.VACCINE) {
             return 0;
-        } else return startDay + transitionsService.durationOf(load, Stage.LATENT, age);
+        } else return startDay + transitionsService.durationOf(load, stages.LATENT, age);
 
     }
 
@@ -218,13 +219,13 @@ List<Record> records = medicalHistory != null ? medicalHistory.getRecords() : nu
         if (load.classification == LoadClassification.VACCINE) {
             return endDay;
         }
-        var stages = Arrays.stream(Stage.values())
+        var stagesValues = stages.values().stream()
                 .sorted(Comparator.comparingInt(Stage::getEncoding).reversed())
                 .collect(Collectors.toList());
-        for (Stage stage : stages) {
+        for (Stage stage : stagesValues) {
             if (history >= stage.getEncoding()) {
                 history -= stage.getEncoding();
-                if (stage != Stage.DECEASED && stage != Stage.HEALTHY) {
+                if (stage != stages.DECEASED && stage != stages.HEALTHY) {
                     endDay -= transitionsService.durationOf(load, stage, age);
                 }
             }

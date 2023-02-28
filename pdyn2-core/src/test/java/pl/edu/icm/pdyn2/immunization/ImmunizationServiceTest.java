@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import pl.edu.icm.pdyn2.BasicConfig;
 import pl.edu.icm.pdyn2.model.immunization.Immunization;
 import pl.edu.icm.pdyn2.model.immunization.Load;
 
@@ -33,6 +34,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ImmunizationServiceTest {
+    BasicConfig basicConfig = new BasicConfig();
     @Mock
     ImmunizationStrategy immunizationStrategy;
 
@@ -48,7 +50,7 @@ class ImmunizationServiceTest {
         //execute
         var coef = immunizationService.getImmunizationCoefficient(new Immunization(),
                 ImmunizationStage.LATENTNY,
-                Load.WILD,
+                basicConfig.loads.WILD,
                 0);
         //assert
         assertThat(coef).isEqualTo(0.5f);

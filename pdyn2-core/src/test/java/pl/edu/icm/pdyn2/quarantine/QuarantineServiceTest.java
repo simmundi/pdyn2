@@ -25,10 +25,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import pl.edu.icm.pdyn2.AgentStateService;
-import pl.edu.icm.pdyn2.ComponentCreator;
-import pl.edu.icm.pdyn2.EntityMocker;
-import pl.edu.icm.pdyn2.StatsService;
+import pl.edu.icm.pdyn2.*;
 import pl.edu.icm.pdyn2.model.behaviour.BehaviourType;
 import pl.edu.icm.pdyn2.time.SimulationTimer;
 import pl.edu.icm.trurl.ecs.Entity;
@@ -57,7 +54,8 @@ class QuarantineServiceTest {
     @InjectMocks
     QuarantineService quarantineService;
 
-    private EntityMocker entityMocker = new EntityMocker(null);
+    private final BasicConfig basicConfig = new BasicConfig();
+    private final EntityMocker entityMocker = new EntityMocker(basicConfig, null);
 
     @Test
     @DisplayName("Should end quarantine after 10 days")

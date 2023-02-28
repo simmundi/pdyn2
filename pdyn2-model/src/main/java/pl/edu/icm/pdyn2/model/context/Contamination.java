@@ -19,6 +19,8 @@
 package pl.edu.icm.pdyn2.model.context;
 
 import pl.edu.icm.pdyn2.model.immunization.Load;
+import pl.edu.icm.pdyn2.model.immunization.Loads;
+import pl.edu.icm.trurl.ecs.annotation.EnumManagedBy;
 import pl.edu.icm.trurl.ecs.annotation.NotMapped;
 import pl.edu.icm.trurl.ecs.annotation.WithMapper;
 import pl.edu.icm.trurl.ecs.mapper.feature.RequiresSetup;
@@ -28,6 +30,7 @@ import static pl.edu.icm.pdyn2.model.context.Integerizer.toInt;
 
 @WithMapper
 public final class Contamination implements RequiresSetup {
+    @EnumManagedBy(Loads.class)
     private Load load;
     private int level;
     @NotMapped private int originalLevel;

@@ -19,14 +19,12 @@
 package pl.edu.icm.pdyn2;
 
 import net.snowyhollows.bento.config.DefaultWorkDir;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.edu.icm.em.common.DebugTextFileService;
-import pl.edu.icm.pdyn2.model.progression.Stage;
 import tech.tablesaw.api.Table;
 
 import java.io.IOException;
@@ -36,6 +34,8 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 class StatsServiceTest {
+
+    BasicConfig basicConfig = new BasicConfig();
 
     TemporaryFolder folder = new TemporaryFolder();
     DebugTextFileService debugFileService;
@@ -49,7 +49,7 @@ class StatsServiceTest {
     @Test
     void createStatsOutputFileShouldNotAcceptSecondFile() {
         //given
-        var statsService = new StatsService(debugFileService);
+        var statsService = new StatsService(debugFileService, basicConfig.stages);
         //execute
         statsService.createStatsOutputFile(folder.getRoot() + "/disease_scenario.csv");
         //assert
@@ -61,7 +61,7 @@ class StatsServiceTest {
     @Test
     void writeDayToStatsOutputFileShouldThrowNullPointerException() {
         //given
-        var statsService = new StatsService(debugFileService);
+        var statsService = new StatsService(debugFileService, basicConfig.stages);
         //execute and assert
         assertThatThrownBy(statsService::writeDayToStatsOutputFile)
                 .isInstanceOf(NullPointerException.class);
@@ -70,30 +70,30 @@ class StatsServiceTest {
     @Test
     void writeStatsCorrectly() throws IOException {
         //given
-        var statsService = new StatsService(debugFileService);
+        var statsService = new StatsService(debugFileService, basicConfig.stages);
         var filename = folder.getRoot() + "/d_s.csv";
         //execute
         statsService.createStatsOutputFile(filename);
 
         //2 hospitalised_icu
         for (int i = 0; i < 2; i++) {
-            statsService.tickStage(Stage.HOSPITALIZED_ICU);
+            statsService.tickStage(basicConfig.stages.HOSPITALIZED_ICU);
         }
 
         //3 new latent
         for (int i = 0; i < 3; i++) {
-            statsService.tickStageChange(Stage.LATENT);
-            statsService.tickStage(Stage.LATENT);
+            statsService.tickStageChange(basicConfig.stages.LATENT);
+            statsService.tickStage(basicConfig.stages.LATENT);
         }
 
         //1 new hospitalized_icu
-        statsService.tickStageChange(Stage.HOSPITALIZED_ICU);
-        statsService.tickStage(Stage.HOSPITALIZED_ICU);
+        statsService.tickStageChange(basicConfig.stages.HOSPITALIZED_ICU);
+        statsService.tickStage(basicConfig.stages.HOSPITALIZED_ICU);
 
         //4 new hospitalized_pre_icu
         for (int i = 0; i < 4; i++) {
-            statsService.tickStageChange(Stage.HOSPITALIZED_PRE_ICU);
-            statsService.tickStage(Stage.HOSPITALIZED_PRE_ICU);
+            statsService.tickStageChange(basicConfig.stages.HOSPITALIZED_PRE_ICU);
+            statsService.tickStage(basicConfig.stages.HOSPITALIZED_PRE_ICU);
         }
 
         //5 tested positive

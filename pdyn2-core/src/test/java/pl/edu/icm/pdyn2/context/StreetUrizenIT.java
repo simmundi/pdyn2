@@ -18,6 +18,7 @@
 
 package pl.edu.icm.pdyn2.context;
 
+import net.snowyhollows.bento.config.Configurer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -26,8 +27,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import pl.edu.icm.board.geography.KilometerGridCell;
 import pl.edu.icm.board.model.Area;
 import pl.edu.icm.board.model.Location;
+import pl.edu.icm.pdyn2.BasicConfig;
 import pl.edu.icm.pdyn2.model.context.Context;
 import pl.edu.icm.trurl.ecs.EngineConfiguration;
+import pl.edu.icm.trurl.ecs.EngineConfigurationFactory;
 import pl.edu.icm.trurl.ecs.Session;
 import pl.edu.icm.trurl.ecs.util.Selectors;
 import pl.edu.icm.trurl.store.tablesaw.TablesawStoreFactory;
@@ -42,6 +45,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.*;
 
 @ExtendWith(MockitoExtension.class)
 class StreetUrizenIT {
+    private BasicConfig basicConfig = new BasicConfig();
     private EngineConfiguration engineConfiguration;
     private Selectors selectors;
     private final ArrayList<Location> locations = new ArrayList<>(List.of(
@@ -51,8 +55,7 @@ class StreetUrizenIT {
 
     @BeforeEach
     void before() {
-        engineConfiguration = new EngineConfiguration();
-        engineConfiguration.setStoreFactory(new TablesawStoreFactory());
+        engineConfiguration = new Configurer().setParam("trurl.engine.storeFactory", TablesawStoreFactory.class.getName()).getConfig().get(EngineConfigurationFactory.IT);
         selectors = new Selectors(engineConfiguration);
         engineConfiguration.addComponentClasses(Area.class, Location.class, Context.class);
         engineConfiguration.getEngine().execute(ctx -> {
@@ -69,7 +72,7 @@ class StreetUrizenIT {
     @Disabled("Should be turned into a unit test")
     void buildStreets() {
         //given
-        StreetUrizen streetUrizen = new StreetUrizen(engineConfiguration, selectors);
+        StreetUrizen streetUrizen = new StreetUrizen(engineConfiguration, selectors, basicConfig.contextTypes);
         //execute
         streetUrizen.buildStreets();
         var areaList = engineConfiguration.getEngine()

@@ -23,13 +23,17 @@ import pl.edu.icm.board.model.Person;
 import pl.edu.icm.pdyn2.immunization.ImmunizationService;
 import pl.edu.icm.pdyn2.immunization.ImmunizationStage;
 import pl.edu.icm.pdyn2.model.AgeRange;
+import pl.edu.icm.pdyn2.model.AgeRanges;
 import pl.edu.icm.pdyn2.model.immunization.Immunization;
 import pl.edu.icm.pdyn2.model.immunization.Load;
 import pl.edu.icm.pdyn2.model.progression.Stage;
+import pl.edu.icm.pdyn2.model.progression.Stages;
 import pl.edu.icm.pdyn2.time.SimulationTimer;
 import pl.edu.icm.trurl.ecs.Entity;
 import pl.edu.icm.trurl.sampleSpace.EnumSampleSpace;
+import pl.edu.icm.trurl.sampleSpace.SoftEnumSampleSpace;
 import pl.edu.icm.trurl.util.EnumTable;
+import pl.edu.icm.trurl.util.SoftEnumTable;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,16 +44,22 @@ import java.util.Scanner;
 
 public class LoadDiseaseStageTransitions {
     private final Load load;
-    private final EnumTable<AgeRange, Stage, TransitionOracle> stateTimeTransitions
-            = new EnumTable<>(AgeRange.class, Stage.class);
+    private final SoftEnumTable<AgeRange, Stage, TransitionOracle> stateTimeTransitions;
     private final ImmunizationService immunizationService;
     private final SimulationTimer simulationTimer;
+    private final Stages stages;
+    private final AgeRanges ageRanges;
 
     public LoadDiseaseStageTransitions(String infectionTransitionsFilename,
                                        ImmunizationService immunizationService,
                                        SimulationTimer simulationTimer,
                                        WorkDir workDir,
+                                       Stages stages,
+                                       AgeRanges ageRanges,
                                        Load load) {
+        this.stages = stages;
+        this.ageRanges = ageRanges;
+        stateTimeTransitions = new SoftEnumTable<>(ageRanges, stages);
         this.immunizationService = immunizationService;
         this.simulationTimer = simulationTimer;
         this.load = load;
@@ -59,12 +69,12 @@ public class LoadDiseaseStageTransitions {
             while (scanner.hasNext()) { // table for age group
                 scanner.nextLine(); // header
                 ArrayList<TransitionOracle> transitions = new ArrayList<>();
-                for (Stage stage : Stage.values()) { // rows (source states)
-                    TransitionOracle transitionOracle = new TransitionOracle();
+                for (Stage stage : stages.values()) { // rows (source states)
+                    TransitionOracle transitionOracle = new TransitionOracle(stages);
                     transitionOracle.setStage(stage);
                     transitions.add(transitionOracle);
                     scanner.next();
-                    for (Stage target : Stage.values()) { // columns (target states)
+                    for (Stage target : stages.values()) { // columns (target states)
                         if (target == stage) {
                             transitionOracle.setDuration(scanner.nextInt());
                         } else if (scanner.hasNextFloat()) {
@@ -75,7 +85,7 @@ public class LoadDiseaseStageTransitions {
                         }
                     }
                     var normalized = transitionOracle.getOutcomes().isNormalized();
-                    if (!normalized && stage != Stage.DECEASED && stage != Stage.HEALTHY) {
+                    if (!normalized && stage != stages.DECEASED && stage != stages.HEALTHY) {
                         throw new IllegalStateException("Probabilities for stage " + stage + " do not sum up to 1.0");
                     }
                 }
@@ -87,7 +97,7 @@ public class LoadDiseaseStageTransitions {
                 int ageFrom = Math.min(ageA, ageB);
                 int ageTo = Math.max(ageA, ageB);
 
-                AgeRange ageRange = AgeRange.ofRange(ageFrom, ageTo);
+                AgeRange ageRange = ageRanges.ofRange(ageFrom, ageTo);
                 if (scanner.hasNextLine()) {
                     scanner.nextLine();
                 }
@@ -102,7 +112,7 @@ public class LoadDiseaseStageTransitions {
     }
 
     public int durationOf(Stage stage, int age) {
-        return stateTimeTransitions.get(AgeRange.of(age), stage).getDuration();
+        return stateTimeTransitions.get(ageRanges.of(age), stage).getDuration();
     }
 
     public Stage outcomeOf(Stage stage,
@@ -111,39 +121,39 @@ public class LoadDiseaseStageTransitions {
         return getPossibleTransitions(stage, person).sample(random);
     }
 
-    public EnumSampleSpace<Stage> getPossibleTransitions(Stage stage,
-                                                         Entity person) {
-        var age = AgeRange.of(person.get(Person.class).getAge());
+    public SoftEnumSampleSpace<Stage> getPossibleTransitions(Stage stage,
+                                                             Entity person) {
+        var age = ageRanges.of(person.get(Person.class).getAge());
         var sampleSpace = stateTimeTransitions.get(age, stage).getOutcomes();
         var currentDay = simulationTimer.getDaysPassed();
         var immunization = person.get(Immunization.class);
 
-        if (sampleSpace.hasNonZeroProbability(Stage.INFECTIOUS_SYMPTOMATIC)) {
+        if (sampleSpace.hasNonZeroProbability(stages.INFECTIOUS_SYMPTOMATIC)) {
             var sigmaObjawowy = immunizationService.getImmunizationCoefficient(immunization,
                     ImmunizationStage.OBJAWOWY,
                     load,
                     currentDay);
-            sampleSpace.changeTwoOutcomes(Stage.INFECTIOUS_SYMPTOMATIC,
+            sampleSpace.changeTwoOutcomes(stages.INFECTIOUS_SYMPTOMATIC,
                     1 - sigmaObjawowy,
-                    Stage.INFECTIOUS_ASYMPTOMATIC);
+                    stages.INFECTIOUS_ASYMPTOMATIC);
         } else {
-            if (sampleSpace.hasNonZeroProbability(Stage.HOSPITALIZED_NO_ICU)) {
+            if (sampleSpace.hasNonZeroProbability(stages.HOSPITALIZED_NO_ICU)) {
                 var sigmaBezOiom = immunizationService.getImmunizationCoefficient(immunization,
                         ImmunizationStage.HOSPITALIZOWANY_BEZ_OIOM,
                         load,
                         currentDay);
-                sampleSpace.changeTwoOutcomes(Stage.HOSPITALIZED_NO_ICU,
+                sampleSpace.changeTwoOutcomes(stages.HOSPITALIZED_NO_ICU,
                         1 - sigmaBezOiom,
-                        Stage.HEALTHY);
+                        stages.HEALTHY);
             }
-            if (sampleSpace.hasNonZeroProbability(Stage.HOSPITALIZED_PRE_ICU)) {
+            if (sampleSpace.hasNonZeroProbability(stages.HOSPITALIZED_PRE_ICU)) {
                 var sigmaPrzedOiom = immunizationService.getImmunizationCoefficient(immunization,
                         ImmunizationStage.HOSPITALIZOWANY_PRZED_OIOM,
                         load,
                         currentDay);
-                sampleSpace.changeTwoOutcomes(Stage.HOSPITALIZED_PRE_ICU,
+                sampleSpace.changeTwoOutcomes(stages.HOSPITALIZED_PRE_ICU,
                         1 - sigmaPrzedOiom,
-                        Stage.HEALTHY);
+                        stages.HEALTHY);
             }
         }
         return sampleSpace;

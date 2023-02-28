@@ -22,20 +22,21 @@ import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import pl.edu.icm.pdyn2.AgentStateService;
+import pl.edu.icm.pdyn2.BasicConfig;
 import pl.edu.icm.pdyn2.ExampleDataForIntegrationTests;
 import pl.edu.icm.pdyn2.model.context.Context;
 import pl.edu.icm.pdyn2.model.immunization.Load;
-import pl.edu.icm.pdyn2.model.progression.Stage;
 import pl.edu.icm.trurl.ecs.Entity;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class AgentImpactServiceIT {
     private final static Offset<Float> VERY_CLOSE = Offset.offset(0.000001f);
+    BasicConfig basicConfig = new BasicConfig();
 
-    ExampleDataForIntegrationTests data = new ExampleDataForIntegrationTests(false);
+    ExampleDataForIntegrationTests data = new ExampleDataForIntegrationTests(basicConfig, false);
     AgentImpactService agentImpactService = data.agentImpactService;
     AgentStateService agentStateService = data.agentStateService;
 
@@ -67,14 +68,14 @@ public class AgentImpactServiceIT {
     @DisplayName("Should properly account for infection of two agents")
     void twoAgentsShedding() {
         // given
-        agentStateService.infect(data.agent2, Load.WILD);
-        agentStateService.progressToDiseaseStage(data.agent2, Stage.INFECTIOUS_SYMPTOMATIC);
+        agentStateService.infect(data.agent2, basicConfig.loads.WILD);
+        agentStateService.progressToDiseaseStage(data.agent2, basicConfig.stages.INFECTIOUS_SYMPTOMATIC);
 
-        agentStateService.infect(data.agent3, Load.WILD);
-        agentStateService.progressToDiseaseStage(data.agent3, Stage.INFECTIOUS_SYMPTOMATIC);
+        agentStateService.infect(data.agent3, basicConfig.loads.WILD);
+        agentStateService.progressToDiseaseStage(data.agent3, basicConfig.stages.INFECTIOUS_SYMPTOMATIC);
 
-        agentStateService.infect(data.agent4, Load.OMICRON);
-        agentStateService.progressToDiseaseStage(data.agent4, Stage.INFECTIOUS_SYMPTOMATIC);
+        agentStateService.infect(data.agent4, basicConfig.loads.OMICRON);
+        agentStateService.progressToDiseaseStage(data.agent4, basicConfig.stages.INFECTIOUS_SYMPTOMATIC);
 
         // execute
 
@@ -87,14 +88,14 @@ public class AgentImpactServiceIT {
         assertThat(agentCount(data.streetsB)).isCloseTo(10, VERY_CLOSE);
         assertThat(agentCount(data.streetsC)).isCloseTo(4, VERY_CLOSE);
 
-        assertThat(contaminationLevel(data.householdContext1, Load.WILD)).isEqualTo(2f);
-        assertThat(contaminationLevel(data.householdContext2, Load.WILD)).isZero();
-        assertThat(contaminationLevel(data.workplace, Load.WILD)).isZero();
-        assertThat(contaminationLevel(data.streetsA, Load.WILD)).isCloseTo(2f, VERY_CLOSE);
-        assertThat(contaminationLevel(data.streetsB, Load.WILD)).isCloseTo(2f, VERY_CLOSE);
-        assertThat(contaminationLevel(data.streetsC, Load.WILD)).isZero();
-        assertThat(contaminationLevel(data.school1, Load.WILD)).isEqualTo(2f);
-        assertThat(contaminationLevel(data.school1, Load.DELTA)).isZero();
+        assertThat(contaminationLevel(data.householdContext1, basicConfig.loads.WILD)).isEqualTo(2f);
+        assertThat(contaminationLevel(data.householdContext2, basicConfig.loads.WILD)).isZero();
+        assertThat(contaminationLevel(data.workplace, basicConfig.loads.WILD)).isZero();
+        assertThat(contaminationLevel(data.streetsA, basicConfig.loads.WILD)).isCloseTo(2f, VERY_CLOSE);
+        assertThat(contaminationLevel(data.streetsB, basicConfig.loads.WILD)).isCloseTo(2f, VERY_CLOSE);
+        assertThat(contaminationLevel(data.streetsC, basicConfig.loads.WILD)).isZero();
+        assertThat(contaminationLevel(data.school1, basicConfig.loads.WILD)).isEqualTo(2f);
+        assertThat(contaminationLevel(data.school1, basicConfig.loads.DELTA)).isZero();
     }
 
     private float agentCount(Entity contextEntity) {

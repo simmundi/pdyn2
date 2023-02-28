@@ -33,8 +33,5 @@ import pl.edu.icm.pdyn2.model.context.ContextType;
         }
 )
 public interface ContextImpactService {
-    int AGE_RANGE_COUNT = AgeRange.values().length;
-    int CONTEXT_TYPE_COUNT = ContextType.values().length;
-
     float calculateInfluenceFractionFor(Person person, Context context);
 }

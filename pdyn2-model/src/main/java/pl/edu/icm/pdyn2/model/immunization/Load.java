@@ -18,31 +18,21 @@
 
 package pl.edu.icm.pdyn2.model.immunization;
 
+import net.snowyhollows.bento.annotation.WithFactory;
+import net.snowyhollows.bento.soft.SoftEnum;
+import net.snowyhollows.bento.soft.SoftEnumManager;
+import pl.edu.icm.trurl.util.AbstractSoftEnum;
+
 import static pl.edu.icm.pdyn2.model.immunization.LoadClassification.VACCINE;
 import static pl.edu.icm.pdyn2.model.immunization.LoadClassification.VIRUS;
 
-public enum Load {
-    WILD(VIRUS),
-    ALPHA(VIRUS),
-    DELTA(VIRUS),
-    OMICRON(VIRUS),
-    BA2(VIRUS),
-    BA45(VIRUS),
-
-    PFIZER(VACCINE),
-    ASTRA(VACCINE),
-    MODERNA(VACCINE),
-    BOOSTER(VACCINE);
-
+public class Load extends AbstractSoftEnum {
     public final LoadClassification classification;
 
-    Load(LoadClassification classification) {
+    @WithFactory
+    public Load(String name, int ordinal, LoadClassification classification) {
+        super(name, ordinal);
         this.classification = classification;
     }
 
-    public static Load[] viruses() {
-        return new Load[]{
-                WILD, ALPHA, DELTA, OMICRON, BA2, BA45
-        };
-    }
 }

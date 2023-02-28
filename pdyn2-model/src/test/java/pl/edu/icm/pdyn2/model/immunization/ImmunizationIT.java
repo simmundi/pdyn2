@@ -21,6 +21,7 @@ package pl.edu.icm.pdyn2.model.immunization;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import pl.edu.icm.pdyn2.model.BasicConfig;
 import pl.edu.icm.trurl.ecs.mapper.Mapper;
 import pl.edu.icm.trurl.ecs.mapper.Mappers;
 import pl.edu.icm.trurl.store.Store;
@@ -32,23 +33,19 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.groups.Tuple.tuple;
-import static pl.edu.icm.pdyn2.model.immunization.Load.ALPHA;
-import static pl.edu.icm.pdyn2.model.immunization.Load.ASTRA;
-import static pl.edu.icm.pdyn2.model.immunization.Load.BOOSTER;
-import static pl.edu.icm.pdyn2.model.immunization.Load.DELTA;
-import static pl.edu.icm.pdyn2.model.immunization.Load.MODERNA;
-import static pl.edu.icm.pdyn2.model.immunization.Load.PFIZER;
+import static pl.edu.icm.pdyn2.model.immunization.Load.*;
 
 public class ImmunizationIT {
+    private BasicConfig basicConfig = new BasicConfig();
     private Mapper<Immunization> mapper;
 
     Store store = new ArrayStore(10);
 
     @BeforeEach
     void before() {
-        mapper = Mappers.create(Immunization.class);
+        mapper = new Mappers(basicConfig.bento).create(Immunization.class);
         mapper.configureStore(store);
         mapper.attachStore(store);
     }
@@ -78,18 +75,18 @@ public class ImmunizationIT {
         assertThat(items.stream().flatMap(i -> i.getEvents().stream()))
                 .extracting(ImmunizationEvent::getDay, ImmunizationEvent::getLoad)
                 .containsExactly(
-                        tuple(0, ALPHA),
-                        tuple(4, ASTRA),
-                        tuple(0, ALPHA),
+                        tuple(0, basicConfig.loads.ALPHA),
+                        tuple(4, basicConfig.loads.ASTRA),
+                        tuple(0, basicConfig.loads.ALPHA),
                         tuple(0, null),
-                        tuple(100, BOOSTER),
-                        tuple(Integer.MAX_VALUE, ALPHA),
-                        tuple(34, ALPHA),
-                        tuple(21, PFIZER),
-                        tuple(67, ALPHA),
-                        tuple(34, MODERNA),
+                        tuple(100, basicConfig.loads.BOOSTER),
+                        tuple(Integer.MAX_VALUE, basicConfig.loads.ALPHA),
+                        tuple(34, basicConfig.loads.ALPHA),
+                        tuple(21, basicConfig.loads.PFIZER),
+                        tuple(67, basicConfig.loads.ALPHA),
+                        tuple(34, basicConfig.loads.MODERNA),
                         tuple(-15, null),
-                        tuple(478, DELTA)
+                        tuple(478, basicConfig.loads.DELTA)
                 );
     }
 
@@ -105,7 +102,7 @@ public class ImmunizationIT {
         var item = mapper.create();
         mapper.load(null, item, index);
         item.getEvents().remove(0);
-        item.getEvents().add(event(99, BOOSTER));
+        item.getEvents().add(event(99, basicConfig.loads.BOOSTER));
         var modified = mapper.isModified(item, index);
         mapper.save(item, index);
 
@@ -116,29 +113,29 @@ public class ImmunizationIT {
         assertThat(result.getEvents().stream())
                 .extracting(ImmunizationEvent::getDay, ImmunizationEvent::getLoad)
                 .containsExactly(
-                        tuple(34, MODERNA),
-                        tuple(99, BOOSTER));
+                        tuple(34, basicConfig.loads.MODERNA),
+                        tuple(99, basicConfig.loads.BOOSTER));
         assertThat(modified).isTrue();
     }
 
     private List<Immunization> exampleData() {
         return List.of(
                 immunization(
-                        event(0, ALPHA),
-                        event(4, ASTRA),
-                        event(0, ALPHA),
+                        event(0, basicConfig.loads.ALPHA),
+                        event(4, basicConfig.loads.ASTRA),
+                        event(0, basicConfig.loads.ALPHA),
                         event(0, null),
-                        event(100, BOOSTER),
-                        event(Integer.MAX_VALUE, ALPHA)),
+                        event(100, basicConfig.loads.BOOSTER),
+                        event(Integer.MAX_VALUE, basicConfig.loads.ALPHA)),
                 immunization(
-                        event(34, ALPHA),
-                        event(21, PFIZER)),
+                        event(34, basicConfig.loads.ALPHA),
+                        event(21, basicConfig.loads.PFIZER)),
                 immunization(
-                        event(67, ALPHA),
-                        event(34, MODERNA)),
+                        event(67, basicConfig.loads.ALPHA),
+                        event(34, basicConfig.loads.MODERNA)),
                 immunization(
                         event(-15, null),
-                        event(478, DELTA)));
+                        event(478, basicConfig.loads.DELTA)));
     }
 
     private Immunization immunization(ImmunizationEvent... events) {

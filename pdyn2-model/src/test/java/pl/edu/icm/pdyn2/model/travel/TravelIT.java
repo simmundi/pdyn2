@@ -49,7 +49,7 @@ public class TravelIT {
 
     @BeforeEach
     void before() {
-        mapper = Mappers.create(Travel.class);
+        mapper = new Mappers().create(Travel.class);
         mapper.configureAndAttach(store);
     }
 

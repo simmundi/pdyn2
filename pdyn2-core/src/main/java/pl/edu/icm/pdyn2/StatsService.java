@@ -19,9 +19,12 @@
 package pl.edu.icm.pdyn2;
 
 import net.snowyhollows.bento.annotation.WithFactory;
+import net.snowyhollows.bento.soft.SoftEnum;
+import net.snowyhollows.bento.soft.SoftEnumMap;
 import pl.edu.icm.em.common.DebugTextFile;
 import pl.edu.icm.em.common.DebugTextFileService;
 import pl.edu.icm.pdyn2.model.progression.Stage;
+import pl.edu.icm.pdyn2.model.progression.Stages;
 
 import java.io.PrintStream;
 import java.util.EnumMap;
@@ -39,17 +42,21 @@ import static java.util.stream.Stream.concat;
  * Central place to store the essential statistical aggregates.
  */
 public class StatsService {
-    private final EnumMap<Stage, AtomicInteger> statsAll = new EnumMap<>(Stage.class);
-    private final EnumMap<Stage, AtomicInteger> statsDailyNew = new EnumMap<>(Stage.class);
+    private final SoftEnumMap<Stage, AtomicInteger> statsAll;
+    private final SoftEnumMap<Stage, AtomicInteger> statsDailyNew;
+    private final Stages stages;
     private final Map<String, AtomicInteger> additionalStatistics = new HashMap<>();
     private final DebugTextFileService debugFileService;
     private DebugTextFile debugTextFile;
 
 
     @WithFactory
-    public StatsService(DebugTextFileService debugFileService) {
+    public StatsService(DebugTextFileService debugFileService, Stages stages) {
         this.debugFileService = debugFileService;
-        for (Stage stage : Stage.values()) {
+        statsAll = new SoftEnumMap<>(stages);
+        statsDailyNew = new SoftEnumMap<>(stages);
+        this.stages = stages;
+        for (Stage stage : stages.values()) {
             statsAll.put(stage, new AtomicInteger(0));
             statsDailyNew.put(stage, new AtomicInteger(0));
         }
@@ -84,10 +91,10 @@ public class StatsService {
         checkState(debugTextFile == null, "Output file has already been created");
             debugTextFile = debugFileService.createTextFile(simulationStatsOutputFilename);
         var d1_header = concat(
-                Stream.of(Stage.values()).map(Enum::name),
+                stages.values().stream().map(Stage::name),
                 additionalStatistics.keySet().stream().map(String::toUpperCase)
         ).collect(joining(",d1_", "d1_", ","));
-        var headerContinued = Stream.of(Stage.values()).map(Enum::name)
+        var headerContinued = stages.values().stream().map(Stage::name)
                 .collect(joining(",", "", ""));
         debugTextFile.println(d1_header + headerContinued);
         debugTextFile.flush();
@@ -97,11 +104,11 @@ public class StatsService {
         checkNotNull(debugFileService, "Output file has not been created");
         var line = concat(
                 concat(
-                        Stream.of(Stage.values()).map(stage -> String.valueOf(statsDailyNew.get(stage))),
+                        stages.values().stream().map(stage -> String.valueOf(statsDailyNew.get(stage))),
                         additionalStatistics.values().stream().map(String::valueOf)
                 ),
-                Stream.of(Stage.values()).map(stage -> String.valueOf(statsAll.get(stage)))
-        ).collect(joining(",", "", ""));
+                stages.values().stream().map(stage -> String.valueOf(statsAll.get(stage))
+        )).collect(joining(",", "", ""));
         debugTextFile.println(line);
         debugTextFile.flush();
     }

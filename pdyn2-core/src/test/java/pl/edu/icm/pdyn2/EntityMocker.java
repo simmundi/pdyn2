@@ -32,10 +32,12 @@ import pl.edu.icm.pdyn2.model.travel.Travel;
 import pl.edu.icm.trurl.ecs.Entity;
 import pl.edu.icm.trurl.ecs.MapperSet;
 import pl.edu.icm.trurl.ecs.Session;
+import pl.edu.icm.trurl.ecs.mapper.Mappers;
 import pl.edu.icm.trurl.ecs.util.DynamicComponentAccessor;
 import pl.edu.icm.trurl.store.Store;
 import pl.edu.icm.trurl.store.array.ArrayStore;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -47,9 +49,11 @@ public class EntityMocker {
     private final Map<Integer, Entity> entities = new HashMap<>();
     private final Store store = new ArrayStore(1);
     private final AtomicInteger idSequence = new AtomicInteger();
+    private final BasicConfig basicConfig;
 
-    public EntityMocker(Session session) {
+    public EntityMocker(BasicConfig basicConfig, Session session) {
         this(session,
+                basicConfig,
                 Person.class,
                 Location.class,
                 HealthStatus.class,
@@ -63,10 +67,11 @@ public class EntityMocker {
                 ImmunizationSources.class);
     }
 
-    public EntityMocker(Session session, Class<?>... componentClasses) {
-        this.mapperSet = new MapperSet(new DynamicComponentAccessor(componentClasses));
+    public EntityMocker(Session session, BasicConfig basicConfig, Class<?>... componentClasses) {
+        this.mapperSet = new MapperSet(new DynamicComponentAccessor(Arrays.asList(componentClasses)), new Mappers(basicConfig.bento));
         mapperSet.streamMappers().forEach(m -> m.configureAndAttach(store));
         this.session = session;
+        this.basicConfig = basicConfig;
     }
 
     public Entity id(int id) {

@@ -21,10 +21,10 @@ package pl.edu.icm.pdyn2.immunization;
 import net.snowyhollows.bento.annotation.WithFactory;
 import net.snowyhollows.bento.config.WorkDir;
 import pl.edu.icm.pdyn2.model.immunization.Load;
+import pl.edu.icm.pdyn2.model.immunization.Loads;
 import pl.edu.icm.trurl.util.Status;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Scanner;
 
 public class ImmunizationFromCsvProvider {
+    private final Loads loads;
 
     private final List<List<double[]>> sFunction = new ArrayList<>(3);
     private final List<List<double[]>> crossImmunity = new ArrayList<>(4);
@@ -50,6 +51,7 @@ public class ImmunizationFromCsvProvider {
 
     @WithFactory
     public ImmunizationFromCsvProvider(WorkDir fileToStreamService,
+                                       Loads loads,
                                        String sFunctionLatentnyObjawowyFilename,
                                        String sFunctionHospitalizowanyBezOiomFilename,
                                        String sFunctionHospitalizowanyPrzedOiomFilename,
@@ -57,6 +59,7 @@ public class ImmunizationFromCsvProvider {
                                        String crossImmunityObjawowyFilename,
                                        String crossImmunityHospitalizowanyBezOiomFilename,
                                        String crossImmunityHospitalizowanyPrzedOiomFilename) {
+        this.loads = loads;
         this.sFunctionLatentnyObjawowyFilename = sFunctionLatentnyObjawowyFilename;
         this.sFunctionHospitalizowanyBezOiomFilename = sFunctionHospitalizowanyBezOiomFilename;
         this.sFunctionHospitalizowanyPrzedOiomFilename = sFunctionHospitalizowanyPrzedOiomFilename;
@@ -113,7 +116,7 @@ public class ImmunizationFromCsvProvider {
             cFunctionCols = elements.size();
             if (getLabels) {
                 for (int i = 1; i < cFunctionCols; i++) {
-                    diseaseLabelsList.add(Load.valueOf(elements.get(i)));
+                    diseaseLabelsList.add(loads.getByName(elements.get(i)));
                 }
             }
             if (checkDiseaseLabels) {
@@ -122,8 +125,8 @@ public class ImmunizationFromCsvProvider {
                     throw new IllegalArgumentException("Column labels: " + elements + " differ in length from previously loaded: " + diseaseLabelsList);
                 }
                 for (int i = 1; i < cFunctionCols; i++) {
-                    if (!diseaseLabelsList.get(i - 1).equals(Load.valueOf(elements.get(i)))) {
-                        throw new IllegalArgumentException("Column label: " + Load.valueOf(elements.get(i)) + " is different from previously loaded: " + diseaseLabelsList.get(cFunctionRow - 1));
+                    if (!diseaseLabelsList.get(i - 1).equals(loads.getByName(elements.get(i)))) {
+                        throw new IllegalArgumentException("Column label: " + loads.getByName(elements.get(i)) + " is different from previously loaded: " + diseaseLabelsList.get(cFunctionRow - 1));
                     }
                 }
             }
@@ -134,12 +137,9 @@ public class ImmunizationFromCsvProvider {
             String[] elements = data.split(",");
 
             if (getLabels) {
-                immunityLabelsList.add(cFunctionRow - 1, Load.valueOf(elements[0]));
-            } else if (!immunityLabelsList.get(cFunctionRow - 1).equals(Load.valueOf(elements[0]))) {
-                throw new IllegalArgumentException("Row label: " + Load.valueOf(elements[0]) + " is different from previously loaded: " + immunityLabelsList.get(cFunctionRow - 1));
-            }
-
-            {
+                immunityLabelsList.add(cFunctionRow - 1, loads.getByName(elements[0]));
+            } else if (!immunityLabelsList.get(cFunctionRow - 1).equals(loads.getByName(elements[0]))) {
+                throw new IllegalArgumentException("Row label: " + loads.getByName(elements[0]) + " is different from previously loaded: " + immunityLabelsList.get(cFunctionRow - 1));
             }
 
             for (int i = 1; i < cFunctionCols; i++) {

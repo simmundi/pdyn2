@@ -24,6 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import pl.edu.icm.pdyn2.BasicConfig;
 import pl.edu.icm.pdyn2.index.AreaClusteredSelectors;
 import pl.edu.icm.pdyn2.model.progression.HealthStatus;
 import pl.edu.icm.pdyn2.model.progression.HealthStatusMapper;
@@ -37,7 +38,7 @@ import pl.edu.icm.trurl.ecs.selector.Chunk;
 import pl.edu.icm.trurl.ecs.util.RangeSelector;
 import pl.edu.icm.trurl.ecs.util.Selectors;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doAnswer;
@@ -45,6 +46,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class EligibleForTestsSelectorIT {
+    BasicConfig basicConfig = new BasicConfig();
 
     @Mock
     Engine engine;
@@ -67,7 +69,7 @@ class EligibleForTestsSelectorIT {
     SimulationTimer simulationTimer;
 
     final int DAYS = 10;
-    final int STAGES = Stage.values().length;
+    final int STAGES = basicConfig.stages.values().size();
     final int COUNT = STAGES * DAYS;
 
     EligibleForTestsSelector selector;
@@ -78,11 +80,11 @@ class EligibleForTestsSelectorIT {
         doAnswer(args -> {
             args.getArgument(0, EngineCreationListener.class).onEngineCreated(engine);
             return null;
-        }).when(engineConfiguration).addEngineCreationListeners(any());
+        }).when(engineConfiguration).addEngineCreationListener(any());
         selectors = new Selectors(engine);
         when(engine.getMapperSet()).thenReturn(mapperSet);
         when(mapperSet.classToMapper(HealthStatus.class)).thenReturn(healthStatusMapper);
-        selector = new EligibleForTestsSelector(engineConfiguration, simulationTimer, selectors, areaClusteredSelectors);
+        selector = new EligibleForTestsSelector(engineConfiguration, simulationTimer, selectors, areaClusteredSelectors, basicConfig.stages);
     }
 
     @Test
@@ -110,7 +112,7 @@ class EligibleForTestsSelectorIT {
 
     private Stage stageFromId(int id) {
         int ordinal = id / DAYS;
-        return Stage.values()[ordinal];
+        return basicConfig.stages.values().get(ordinal);
     }
 
     private int dayFromId(int id) {

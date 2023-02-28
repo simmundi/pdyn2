@@ -37,7 +37,7 @@ class MedicalHistoryIT {
 
     @BeforeEach
     void before() {
-        mapper = Mappers.create(MedicalHistory.class);
+        mapper = new Mappers().create(MedicalHistory.class);
         mapper.configureStore(store);
         mapper.attachStore(store);
     }

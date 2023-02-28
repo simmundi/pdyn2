@@ -26,13 +26,12 @@ import pl.edu.icm.pdyn2.model.context.ContextInfectivityClass;
 import pl.edu.icm.pdyn2.model.immunization.*;
 import pl.edu.icm.pdyn2.model.progression.HealthStatus;
 import pl.edu.icm.pdyn2.model.progression.Stage;
+import pl.edu.icm.pdyn2.model.progression.Stages;
 import pl.edu.icm.pdyn2.model.travel.Travel;
 import pl.edu.icm.pdyn2.time.SimulationTimer;
 import pl.edu.icm.trurl.ecs.Entity;
 import pl.edu.icm.trurl.sampleSpace.EnumSampleSpace;
 
-import static pl.edu.icm.pdyn2.model.progression.Stage.LATENT;
-import static pl.edu.icm.pdyn2.model.progression.Stage.HEALTHY;
 
 /**
  * <p>
@@ -59,10 +58,12 @@ import static pl.edu.icm.pdyn2.model.progression.Stage.HEALTHY;
 public class AgentStateService {
 
     private final SimulationTimer simulationTimer;
+    private final Stages stages;
 
     @WithFactory
-    public AgentStateService(SimulationTimer simulationTimer) {
+    public AgentStateService(SimulationTimer simulationTimer, Stages stages) {
         this.simulationTimer = simulationTimer;
+        this.stages = stages;
     }
 
     public void activate(Entity agentEntity) {
@@ -106,7 +107,7 @@ public class AgentStateService {
         HealthStatus healthStatus = getHealthStatusWhenNotSick(agentEntity);
         healthStatus.setDiseaseLoad(load);
         healthStatus.resetDiseaseHistory();
-        healthStatus.transitionTo(Stage.LATENT, simulationTimer.getDaysPassed() - dayInState);
+        healthStatus.transitionTo(stages.LATENT, simulationTimer.getDaysPassed() - dayInState);
     }
 
     /**
@@ -127,28 +128,22 @@ public class AgentStateService {
         HealthStatus healthStatus = getHealthStatus(agentEntity);
         healthStatus.transitionTo(targetStage, simulationTimer.getDaysPassed() - dayInState);
 
-        switch (targetStage) {
-            case DECEASED:
-                agentEntity.getOrCreate(Behaviour.class).transitionTo(BehaviourType.DEAD, simulationTimer.getDaysPassed());
-                // thru
-            case HEALTHY:
-                Behaviour behaviour = agentEntity.getOrCreate(Behaviour.class);
-                if (behaviour.getType() == BehaviourType.SELF_ISOLATION
-                        || behaviour.getType() == BehaviourType.HOSPITALIZED) {
-                    behaviour.transitionTo(BehaviourType.ROUTINE, simulationTimer.getDaysPassed());
-                }
-                addImmunizationEvent(agentEntity, createEventFromHealth(healthStatus));
-                break;
-            case HOSPITALIZED_NO_ICU:
-                // thru
-            case HOSPITALIZED_PRE_ICU:
-                // thru
-            case HOSPITALIZED_ICU:
-                agentEntity.getOrCreate(Behaviour.class)
-                        .transitionTo(BehaviourType.HOSPITALIZED, simulationTimer.getDaysPassed());
-                break;
-            default:
-                break;
+        if (targetStage == stages.DECEASED) {
+            agentEntity.getOrCreate(Behaviour.class).transitionTo(BehaviourType.DEAD, simulationTimer.getDaysPassed());
+        }
+
+        if (!targetStage.sick) { // no longer sick, (probably deceased or healthy)
+            Behaviour behaviour = agentEntity.getOrCreate(Behaviour.class);
+            if (behaviour.getType() == BehaviourType.SELF_ISOLATION
+                    || behaviour.getType() == BehaviourType.HOSPITALIZED) { // but still traveling, if was before
+                behaviour.transitionTo(BehaviourType.ROUTINE, simulationTimer.getDaysPassed());
+            }
+            addImmunizationEvent(agentEntity, createEventFromHealth(healthStatus));
+        }
+
+        if (targetStage.hospitalized) {
+            agentEntity.getOrCreate(Behaviour.class)
+                    .transitionTo(BehaviourType.HOSPITALIZED, simulationTimer.getDaysPassed());
         }
 
     }
@@ -221,7 +216,7 @@ public class AgentStateService {
     public void changeLoad(Entity agentEntity, Load targetLoad) {
         var health = getHealthStatus(agentEntity);
         Preconditions.checkArgument(targetLoad.classification.equals(LoadClassification.VIRUS), "Variant can be changed only to another virus load");
-        Preconditions.checkArgument(health.getStage().equals(LATENT), "Only latent agents can have their load changed");
+        Preconditions.checkArgument(health.getStage().equals(stages.LATENT), "Only latent agents can have their load changed");
 
         health.setDiseaseLoad(targetLoad);
     }
@@ -245,7 +240,7 @@ public class AgentStateService {
 
     private HealthStatus getHealthStatusWhenNotSick(Entity agentEntity) {
         HealthStatus healthStatus = agentEntity.get(HealthStatus.class);
-        Preconditions.checkArgument(healthStatus.getStage() == HEALTHY,
+        Preconditions.checkArgument(healthStatus.getStage() == stages.HEALTHY,
                 "Agent to infect must be alive and healthy - tried to infect %s agent.",
                 healthStatus.getStage());
         return healthStatus;

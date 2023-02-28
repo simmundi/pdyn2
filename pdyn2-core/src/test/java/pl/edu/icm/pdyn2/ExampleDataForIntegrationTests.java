@@ -89,6 +89,7 @@ public class ExampleDataForIntegrationTests {
     public KilometerGridCell cellB;
     public KilometerGridCell cellC;
     public Bento config;
+    private final BasicConfig basicConfig;
     public AgentStateService agentStateService;
     public AgentImpactService agentImpactService;
     public ContextsService contextsService;
@@ -99,9 +100,11 @@ public class ExampleDataForIntegrationTests {
     public List<Entity> allAgents;
     public final WorkDir workDir = Mockito.mock(WorkDir.class);
 
-    public ExampleDataForIntegrationTests(boolean sharedSession) {
-        config = Bento.createRoot();
+    public ExampleDataForIntegrationTests(BasicConfig basicConfig, boolean sharedSession) {
+        config = basicConfig.bento;
+        this.basicConfig = basicConfig;
         config.register("contextService", "behaviourBased");
+        config.register("trurl.engine.sharedSession", sharedSession);
         config.register("contextImpactService", "basic");
         config.register("gridRows", rows);
         config.register("gridColumns", cols);
@@ -118,8 +121,6 @@ public class ExampleDataForIntegrationTests {
         selectors = config.get(SelectorsFactory.IT);
 
         EngineConfiguration engineConfig = config.get(EngineConfigurationFactory.IT);
-        engineConfig.setSharedSession(sharedSession);
-        engineConfig.setStoreFactory(new ArrayStoreFactory());
         engineConfig.addComponentClasses(
                 Person.class,
                 Location.class,
@@ -150,32 +151,32 @@ public class ExampleDataForIntegrationTests {
         areaIndex.appendStreetIdsFromKilometerGridCell(cellA, (idx, id) -> streetsA.add(session.getEntity(id)));
         areaIndex.appendStreetIdsFromKilometerGridCell(cellB, (idx, id) -> streetsB.add(session.getEntity(id)));
         areaIndex.appendStreetIdsFromKilometerGridCell(cellC, (idx, id) -> streetsC.add(session.getEntity(id)));
-        householdContext1 = session.createEntity(context(ContextType.HOUSEHOLD), location(cellA));
-        householdContext2 = session.createEntity(context(ContextType.HOUSEHOLD), location(cellA));
-        householdContext3 = session.createEntity(context(ContextType.HOUSEHOLD), location(cellC));
-        school1 = session.createEntity(context(ContextType.SCHOOL));
-        school2 = session.createEntity(context(ContextType.SCHOOL));
-        workplace = session.createEntity(context(ContextType.WORKPLACE));
+        householdContext1 = session.createEntity(context(basicConfig.contextTypes.HOUSEHOLD), location(cellA));
+        householdContext2 = session.createEntity(context(basicConfig.contextTypes.HOUSEHOLD), location(cellA));
+        householdContext3 = session.createEntity(context(basicConfig.contextTypes.HOUSEHOLD), location(cellC));
+        school1 = session.createEntity(context(basicConfig.contextTypes.SCHOOL));
+        school2 = session.createEntity(context(basicConfig.contextTypes.SCHOOL));
+        workplace = session.createEntity(context(basicConfig.contextTypes.WORKPLACE));
         agent1 = session.createEntity(person(18, Person.Sex.M),
-                inhabitant(householdContext1, school1), health(Load.WILD, Stage.HEALTHY), behaviour(BehaviourType.ROUTINE));
+                inhabitant(householdContext1, school1), health(basicConfig.loads.WILD, basicConfig.stages.HEALTHY), behaviour(BehaviourType.ROUTINE));
         agent2 = session.createEntity(person(18, Person.Sex.M),
-                inhabitant(householdContext1, school1), health(Load.WILD, Stage.HEALTHY), behaviour(BehaviourType.ROUTINE));
+                inhabitant(householdContext1, school1), health(basicConfig.loads.WILD, basicConfig.stages.HEALTHY), behaviour(BehaviourType.ROUTINE));
         agent3 = session.createEntity(person(18, Person.Sex.M),
-                inhabitant(householdContext1, school1), health(Load.WILD, Stage.HEALTHY), behaviour(BehaviourType.ROUTINE));
+                inhabitant(householdContext1, school1), health(basicConfig.loads.WILD, basicConfig.stages.HEALTHY), behaviour(BehaviourType.ROUTINE));
         agent4 = session.createEntity(person(18, Person.Sex.M),
-                inhabitant(householdContext2, school1), health(Load.WILD, Stage.HEALTHY), behaviour(BehaviourType.ROUTINE));
+                inhabitant(householdContext2, school1), health(basicConfig.loads.WILD, basicConfig.stages.HEALTHY), behaviour(BehaviourType.ROUTINE));
         agent5 = session.createEntity(person(18, Person.Sex.M),
-                inhabitant(householdContext2, school1), health(Load.WILD, Stage.HEALTHY), behaviour(BehaviourType.ROUTINE));
+                inhabitant(householdContext2, school1), health(basicConfig.loads.WILD, basicConfig.stages.HEALTHY), behaviour(BehaviourType.ROUTINE));
         agent6 = session.createEntity(person(18, Person.Sex.M),
-                inhabitant(householdContext2, school2), health(Load.WILD, Stage.HEALTHY), behaviour(BehaviourType.ROUTINE));
+                inhabitant(householdContext2, school2), health(basicConfig.loads.WILD, basicConfig.stages.HEALTHY), behaviour(BehaviourType.ROUTINE));
         agent7 = session.createEntity(person(18, Person.Sex.M),
-                inhabitant(householdContext3, school2), health(Load.WILD, Stage.HEALTHY), behaviour(BehaviourType.ROUTINE));
+                inhabitant(householdContext3, school2), health(basicConfig.loads.WILD, basicConfig.stages.HEALTHY), behaviour(BehaviourType.ROUTINE));
         agent8 = session.createEntity(person(18, Person.Sex.M),
-                inhabitant(householdContext3, school2), health(Load.WILD, Stage.HEALTHY), behaviour(BehaviourType.ROUTINE));
+                inhabitant(householdContext3, school2), health(basicConfig.loads.WILD, basicConfig.stages.HEALTHY), behaviour(BehaviourType.ROUTINE));
         agent9 = session.createEntity(person(18, Person.Sex.M),
-                inhabitant(householdContext3, school2), health(Load.WILD, Stage.HEALTHY), behaviour(BehaviourType.ROUTINE));
+                inhabitant(householdContext3, school2), health(basicConfig.loads.WILD, basicConfig.stages.HEALTHY), behaviour(BehaviourType.ROUTINE));
         agentA = session.createEntity(person(18, Person.Sex.M),
-                inhabitant(householdContext3, workplace, school2), health(Load.WILD, Stage.HEALTHY), behaviour(BehaviourType.ROUTINE));
+                inhabitant(householdContext3, workplace, school2), health(basicConfig.loads.WILD, basicConfig.stages.HEALTHY), behaviour(BehaviourType.ROUTINE));
         allAgents = List.of(agent1, agent2, agent3, agent4, agent5, agent6, agent7, agent8, agent9, agentA);
         householdContext1.add(household(List.of(agent1, agent2, agent3)));
         householdContext2.add(household(List.of(agent4, agent5, agent6)));
@@ -185,7 +186,7 @@ public class ExampleDataForIntegrationTests {
     public void createStreets(Session session) {
         for (int j = 0; j < rows; j++) {
             for (int i = 0; i < cols; i++) {
-                for (ContextType streetContext : ContextType.streetContexts()) {
+                for (ContextType streetContext : basicConfig.contextTypes.streetContexts()) {
                     session.createEntity(
                             context(streetContext),
                             area(KilometerGridCell.fromLegacyPdynCoordinates(i, j))

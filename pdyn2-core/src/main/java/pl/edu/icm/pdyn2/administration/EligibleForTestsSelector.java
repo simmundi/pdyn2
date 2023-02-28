@@ -23,8 +23,8 @@ import pl.edu.icm.pdyn2.index.AreaClusteredSelectors;
 import pl.edu.icm.pdyn2.model.progression.HealthStatus;
 import pl.edu.icm.pdyn2.model.progression.HealthStatusMapper;
 import pl.edu.icm.pdyn2.model.progression.Stage;
+import pl.edu.icm.pdyn2.model.progression.Stages;
 import pl.edu.icm.pdyn2.time.SimulationTimer;
-import pl.edu.icm.trurl.ecs.Engine;
 import pl.edu.icm.trurl.ecs.EngineConfiguration;
 import pl.edu.icm.trurl.ecs.selector.Chunk;
 import pl.edu.icm.trurl.ecs.selector.Selector;
@@ -41,16 +41,19 @@ public class EligibleForTestsSelector implements Selector {
     private final SimulationTimer simulationTimer;
     private final Selectors selectors;
     private final AreaClusteredSelectors areaClusteredSelectors;
+    private final Stages stages;
 
     @WithFactory
     public EligibleForTestsSelector(EngineConfiguration engineConfiguration,
                                     SimulationTimer simulationTimer,
                                     Selectors selectors,
-                                    AreaClusteredSelectors areaClusteredSelectors) {
+                                    AreaClusteredSelectors areaClusteredSelectors,
+                                    Stages stages) {
         this.simulationTimer = simulationTimer;
         this.selectors = selectors;
         this.areaClusteredSelectors = areaClusteredSelectors;
-        engineConfiguration.addEngineCreationListeners(engine -> {
+        this.stages = stages;
+        engineConfiguration.addEngineCreationListener(engine -> {
             healthStatusMapper = (HealthStatusMapper) engine.getMapperSet().classToMapper(HealthStatus.class);
         });
     }
@@ -72,7 +75,7 @@ public class EligibleForTestsSelector implements Selector {
                     int day = healthStatusMapper.getDayOfLastChange(id);
                     if (day == today) {
                         Stage stage = healthStatusMapper.getStage(id);
-                        return stage == Stage.INFECTIOUS_ASYMPTOMATIC || stage == Stage.INFECTIOUS_SYMPTOMATIC;
+                        return stage == stages.INFECTIOUS_ASYMPTOMATIC || stage == stages.INFECTIOUS_SYMPTOMATIC;
                     }
                     return false;
                 }));
