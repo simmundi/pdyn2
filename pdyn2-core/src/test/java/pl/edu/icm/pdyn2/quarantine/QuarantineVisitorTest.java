@@ -26,18 +26,17 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.edu.icm.pdyn2.*;
-import pl.edu.icm.pdyn2.model.behaviour.BehaviourType;
+import pl.edu.icm.pdyn2.simulation.StatsService;
 import pl.edu.icm.pdyn2.time.SimulationTimer;
 import pl.edu.icm.trurl.ecs.Entity;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static pl.edu.icm.pdyn2.ComponentCreator.behaviour;
 import static pl.edu.icm.pdyn2.model.behaviour.BehaviourType.QUARANTINE;
 
 @ExtendWith(MockitoExtension.class)
-class QuarantineServiceTest {
+class QuarantineVisitorTest {
 
     @Mock
     StatsService statsService;
@@ -52,7 +51,7 @@ class QuarantineServiceTest {
     QuarantineConfig quarantineConfig;
 
     @InjectMocks
-    QuarantineService quarantineService;
+    QuarantineVisitor quarantineVisitor;
 
     private final BasicConfig basicConfig = new BasicConfig();
     private final EntityMocker entityMocker = new EntityMocker(basicConfig, null);
@@ -67,8 +66,8 @@ class QuarantineServiceTest {
         Mockito.when(simulationTimer.getDaysPassed()).thenReturn(12);
 
         // execute
-        quarantineService.maybeEndQuarantine(justStarted);
-        quarantineService.maybeEndQuarantine(shouldEnd);
+        quarantineVisitor.maybeEndQuarantine(justStarted);
+        quarantineVisitor.maybeEndQuarantine(shouldEnd);
 
         // assert
         Mockito.verify(agentStateService, never()).endQuarantine(justStarted);

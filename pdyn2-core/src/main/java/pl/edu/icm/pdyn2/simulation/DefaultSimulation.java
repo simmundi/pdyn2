@@ -19,14 +19,18 @@
 package pl.edu.icm.pdyn2.simulation;
 
 import net.snowyhollows.bento.annotation.WithFactory;
-import pl.edu.icm.pdyn2.administration.TestingSystemBuilder;
-import pl.edu.icm.pdyn2.behaviour.BehaviourDrivenLogicBuilder;
-import pl.edu.icm.pdyn2.impact.ImpactSystemBuilder;
-import pl.edu.icm.pdyn2.progression.DiseaseProgressionSystemBuilder;
-import pl.edu.icm.pdyn2.transmission.TransmissionSystemBuilder;
-import pl.edu.icm.pdyn2.vaccination.VaccinationFromCsvSystemBuilder;
-import pl.edu.icm.pdyn2.variantsowing.VariantSowingFromCsvSystemBuilder;
+import pl.edu.icm.board.util.RandomForChunkProvider;
+import pl.edu.icm.board.util.RandomProvider;
+import pl.edu.icm.pdyn2.administrative.AgentStartsGettingSymptomsVisitor;
+import pl.edu.icm.pdyn2.impact.AgentImpactVisitor;
+import pl.edu.icm.pdyn2.index.AreaClusteredSelectors;
+import pl.edu.icm.pdyn2.progression.DiseaseProgressionVisitor;
+import pl.edu.icm.pdyn2.quarantine.QuarantineVisitor;
+import pl.edu.icm.pdyn2.transmission.TransmissionVisitor;
+import pl.edu.icm.pdyn2.travel.TravelVisitor;
 import pl.edu.icm.trurl.ecs.EntitySystem;
+import pl.edu.icm.trurl.ecs.util.IteratingSystemBuilder;
+import pl.edu.icm.trurl.ecs.util.Visit;
 
 import static pl.edu.icm.trurl.ecs.util.Systems.sequence;
 import static pl.edu.icm.trurl.ecs.util.Systems.withStatusMessage;
@@ -39,48 +43,57 @@ import static pl.edu.icm.trurl.ecs.util.Systems.withStatusMessage;
  * Does not include ticking the simulation clock or gathering statistics.
  */
 public class DefaultSimulation {
-    private final TransmissionSystemBuilder transmissionSystemBuilder;
-    private final DiseaseProgressionSystemBuilder diseaseProgressionSystemBuilder;
-    private final BehaviourDrivenLogicBuilder behaviourDrivenLogicBuilder;
-    private final TestingSystemBuilder testingSystemBuilder;
-    private final ImpactSystemBuilder impactSystemBuilder;
-    private final VariantSowingFromCsvSystemBuilder variantSowingSystemBuilder;
-    private final VaccinationFromCsvSystemBuilder vaccinationSystemBuilder;
+    private final TransmissionVisitor transmissionVisitor;
+    private final DiseaseProgressionVisitor diseaseProgressionVisitor;
+    private final TravelVisitor travelVisitor;
+    private final QuarantineVisitor quarantineVisitor;
+    private final AgentStartsGettingSymptomsVisitor startsFeelingSickVisitor;
+    private final AgentImpactVisitor agentImpactVisitor;
+    private final AreaClusteredSelectors areaClusteredSelectors;
+    private final RandomForChunkProvider randomForChunkProvider;
 
     @WithFactory
-    public DefaultSimulation(TransmissionSystemBuilder transmissionSystemBuilder,
-                             DiseaseProgressionSystemBuilder diseaseProgressionSystemBuilder,
-                             BehaviourDrivenLogicBuilder behaviourDrivenLogicBuilder,
-                             TestingSystemBuilder testingSystemBuilder,
-                             ImpactSystemBuilder impactSystemBuilder, VariantSowingFromCsvSystemBuilder variantSowingSystemBuilder, VaccinationFromCsvSystemBuilder vaccinationSystemBuilder) {
-        this.transmissionSystemBuilder = transmissionSystemBuilder;
-        this.diseaseProgressionSystemBuilder = diseaseProgressionSystemBuilder;
-        this.behaviourDrivenLogicBuilder = behaviourDrivenLogicBuilder;
-        this.testingSystemBuilder = testingSystemBuilder;
-        this.impactSystemBuilder = impactSystemBuilder;
-        this.variantSowingSystemBuilder = variantSowingSystemBuilder;
-        this.vaccinationSystemBuilder = vaccinationSystemBuilder;
+    public DefaultSimulation(TransmissionVisitor transmissionVisitor,
+                             DiseaseProgressionVisitor diseaseProgressionVisitor,
+                             TravelVisitor travelVisitor,
+                             QuarantineVisitor quarantineVisitor,
+                             AgentStartsGettingSymptomsVisitor startsFeelingSickVisitor,
+                             AgentImpactVisitor agentImpactVisitor,
+                             AreaClusteredSelectors areaClusteredSelectors,
+                             RandomProvider randomProvider) {
+
+        this.transmissionVisitor = transmissionVisitor;
+        this.diseaseProgressionVisitor = diseaseProgressionVisitor;
+        this.travelVisitor = travelVisitor;
+        this.quarantineVisitor = quarantineVisitor;
+        this.startsFeelingSickVisitor = startsFeelingSickVisitor;
+        this.agentImpactVisitor = agentImpactVisitor;
+        this.areaClusteredSelectors = areaClusteredSelectors;
+        this.randomForChunkProvider = randomProvider.getRandomForChunkProvider(DefaultSimulation.class);
     }
 
     public EntitySystem defaultSimulationDay() {
-        var variantSowingSystem = variantSowingSystemBuilder.buildVariantSowingSystem();
-        var vaccinationSystem = vaccinationSystemBuilder.buildVaccinationSystem();
-        var progressionSystem = diseaseProgressionSystemBuilder.buildProgressionSystem();
-        var transmissionSystem = transmissionSystemBuilder.buildTransmissionSystem();
-        var behaviourSystem = behaviourDrivenLogicBuilder.buildTravelSystem();
-        var testingSystem = testingSystemBuilder.buildTestingSystem();
-        var impactSystem = impactSystemBuilder.buildImpactSystem();
+
+        var allAgents =  areaClusteredSelectors.personSelector();
+
+        var impactSystem = IteratingSystemBuilder.iteratingOverInParallel(allAgents)
+                .persistingAll()
+                .withoutContext()
+                .perform(Visit.of(agentImpactVisitor::updateImpact))
+                .build();
+
+        var stateChangeSystem = IteratingSystemBuilder.iteratingOverInParallel(allAgents)
+                .persistingAll()
+                .withContext(randomForChunkProvider)
+                .perform(Visit.of(transmissionVisitor::visit))
+                .andPerform(Visit.of(diseaseProgressionVisitor::visit))
+                .andPerform(Visit.of(travelVisitor::visit))
+                .andPerform(Visit.of(quarantineVisitor::maybeEndQuarantine))
+                .andPerform(Visit.of(startsFeelingSickVisitor::visit))
+                .build();
+
         return sequence(
-                (unused) -> {
-                    System.out.println();
-                    System.out.println("Calculating another day:");
-                },
-                variantSowingSystem,
-                vaccinationSystem,
-                withStatusMessage(impactSystem, "Impact"),
-                withStatusMessage(transmissionSystem, "Transmission"),
-                withStatusMessage(progressionSystem, "Progression"),
-                withStatusMessage(behaviourSystem, "Travel and quarantine"),
-                withStatusMessage(testingSystem, "Testing"));
+                withStatusMessage(impactSystem, "Calculates impact on contexts"),
+                withStatusMessage(stateChangeSystem, "Changes agents' state"));
     }
 }

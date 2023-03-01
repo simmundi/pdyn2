@@ -31,7 +31,7 @@ import pl.edu.icm.pdyn2.*;
 import pl.edu.icm.pdyn2.index.CommuneClusteredSelectors;
 import pl.edu.icm.pdyn2.model.immunization.Immunization;
 import pl.edu.icm.pdyn2.model.immunization.ImmunizationEvent;
-import pl.edu.icm.pdyn2.model.immunization.Load;
+import pl.edu.icm.pdyn2.simulation.StatsService;
 import pl.edu.icm.pdyn2.time.SimulationTimer;
 import pl.edu.icm.trurl.ecs.Entity;
 import pl.edu.icm.trurl.ecs.selector.Chunk;

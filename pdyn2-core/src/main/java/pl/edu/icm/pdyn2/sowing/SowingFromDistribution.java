@@ -32,20 +32,16 @@ import pl.edu.icm.board.model.Location;
 import pl.edu.icm.board.model.Person;
 import pl.edu.icm.board.util.RandomProvider;
 import pl.edu.icm.pdyn2.AgentStateService;
-import pl.edu.icm.pdyn2.StatsService;
-import pl.edu.icm.pdyn2.administration.TestingService;
+import pl.edu.icm.pdyn2.simulation.StatsService;
+import pl.edu.icm.pdyn2.administrative.TestingService;
 import pl.edu.icm.pdyn2.model.context.ContextInfectivityClass;
-import pl.edu.icm.pdyn2.model.immunization.ImmunizationSources;
-import pl.edu.icm.pdyn2.model.immunization.Load;
 import pl.edu.icm.pdyn2.model.immunization.Loads;
-import pl.edu.icm.pdyn2.model.progression.Stage;
 import pl.edu.icm.pdyn2.model.progression.Stages;
 import pl.edu.icm.pdyn2.progression.DiseaseStageTransitionsService;
 import pl.edu.icm.trurl.bin.BinPool;
 import pl.edu.icm.trurl.ecs.Entity;
 import pl.edu.icm.trurl.ecs.util.ArraySelector;
 import pl.edu.icm.trurl.ecs.util.EntityIterator;
-import pl.edu.icm.trurl.ecs.util.Selectors;
 import pl.edu.icm.trurl.sampleSpace.EnumSampleSpace;
 import pl.edu.icm.trurl.util.Status;
 
@@ -195,7 +191,7 @@ public class SowingFromDistribution implements SowingService {
                                     new EnumSampleSpace<>(ContextInfectivityClass.class));
                             status.tick();
                             if (stage >= durationLatentny) {
-                                testingService.maybeTestAgentOnDay(member, stage - durationLatentny);
+                                testingService.maybeTestAgentOnDay(random.nextFloat(), member, stage - durationLatentny);
                                 if (symptomatic) {
                                     agentStateService.progressToDiseaseStage(member,
                                             stages.INFECTIOUS_SYMPTOMATIC,

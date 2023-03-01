@@ -78,7 +78,7 @@ public class TransmissionService {
      */
     public boolean consideredForInfection(Entity agent) {
         HealthStatus healthStatus = agent.get(HealthStatus.class);
-        return healthStatus.getStage() == stages.HEALTHY;
+        return healthStatus != null && healthStatus.getStage() == stages.HEALTHY;
     }
 
 

@@ -16,15 +16,13 @@
  *
  */
 
-package pl.edu.icm.pdyn2.administration;
+package pl.edu.icm.pdyn2.administrative;
 
 import com.google.common.base.Preconditions;
 import net.snowyhollows.bento.annotation.WithFactory;
-import org.apache.commons.math3.random.RandomGenerator;
 import pl.edu.icm.board.model.Household;
-import pl.edu.icm.board.util.RandomProvider;
 import pl.edu.icm.pdyn2.AgentStateService;
-import pl.edu.icm.pdyn2.StatsService;
+import pl.edu.icm.pdyn2.simulation.StatsService;
 import pl.edu.icm.pdyn2.model.administration.MedicalHistory;
 import pl.edu.icm.pdyn2.model.administration.Record;
 import pl.edu.icm.pdyn2.model.administration.RecordType;
@@ -35,32 +33,29 @@ import pl.edu.icm.trurl.ecs.Entity;
 
 public final class TestingService {
     private final SimulationTimer simulationTimer;
-    private final RandomGenerator randomGenerator;
     private final StatsService statsService;
     private final AgentStateService agentStateService;
     private final TestingConfig testingConfig;
 
     @WithFactory
     public TestingService(SimulationTimer simulationTimer,
-                          RandomProvider randomProvider,
                           StatsService statsService,
                           AgentStateService agentStateService, TestingConfig testingConfig) {
         this.simulationTimer = simulationTimer;
-        this.randomGenerator = randomProvider.getRandomGenerator(TestingService.class);
         this.statsService = statsService;
         this.agentStateService = agentStateService;
         this.testingConfig = testingConfig;
     }
 
-    public void maybeTestAgent(Entity agentEntity) {
-        maybeTestAgentOnDay(agentEntity, 0);
+    public void maybeTestAgent(float random, Entity agentEntity) {
+        maybeTestAgentOnDay(random, agentEntity, 0);
     }
 
-    public void maybeTestAgentOnDay(Entity agentEntity, int daysFromTest) {
+    public void maybeTestAgentOnDay(float random, Entity agentEntity, int daysFromTest) {
         Preconditions.checkArgument(daysFromTest >= 0, "Cannot test agent at a future date. daysFromTest should be >= 0: %s", daysFromTest);
         float baseProbabilityOfTest = testingConfig.getBaseProbabilityOfTest();
 
-        if (baseProbabilityOfTest > 0 && randomGenerator.nextFloat() < baseProbabilityOfTest) {
+        if (baseProbabilityOfTest > 0 && random < baseProbabilityOfTest) {
             testAgent(agentEntity, simulationTimer.getDaysPassed() - daysFromTest);
         }
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 ICM Epidemiological Model Team at Interdisciplinary Centre for Mathematical and Computational Modelling, University of Warsaw.
+ * Copyright (c) 2022-2023 ICM Epidemiological Model Team at Interdisciplinary Centre for Mathematical and Computational Modelling, University of Warsaw.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,9 @@
  *
  */
 
-package pl.edu.icm.pdyn2;
+package pl.edu.icm.pdyn2.simulation;
 
 import net.snowyhollows.bento.annotation.WithFactory;
-import net.snowyhollows.bento.soft.SoftEnum;
 import net.snowyhollows.bento.soft.SoftEnumMap;
 import pl.edu.icm.em.common.DebugTextFile;
 import pl.edu.icm.em.common.DebugTextFileService;
@@ -27,11 +26,9 @@ import pl.edu.icm.pdyn2.model.progression.Stage;
 import pl.edu.icm.pdyn2.model.progression.Stages;
 
 import java.io.PrintStream;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;

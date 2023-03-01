@@ -25,6 +25,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.edu.icm.em.common.DebugTextFileService;
+import pl.edu.icm.pdyn2.simulation.StatsService;
 import tech.tablesaw.api.Table;
 
 import java.io.IOException;

@@ -20,6 +20,9 @@ package pl.edu.icm.pdyn2.isolation;
 
 import net.snowyhollows.bento.annotation.WithFactory;
 
+/**
+ * Holder for the self-isolation configuration.
+ */
 public class IsolationConfig {
     final float baseProbabilityOfSelfIsolation;
     float selfIsolationWeight;

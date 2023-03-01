@@ -16,7 +16,7 @@
  *
  */
 
-package pl.edu.icm.pdyn2.behaviour;
+package pl.edu.icm.pdyn2.travel;
 
 import net.snowyhollows.bento.annotation.WithFactory;
 import org.apache.commons.math3.random.RandomGenerator;
@@ -27,22 +27,26 @@ import pl.edu.icm.pdyn2.model.behaviour.Behaviour;
 import pl.edu.icm.trurl.ecs.Entity;
 import pl.edu.icm.trurl.ecs.selector.RandomAccessSelector;
 
-public class TravelService {
+public class TravelVisitor {
     private final AreaClusteredSelectors areaClusteredSelectors;
     private final AgentStateService agentStateService;
     private final TravelConfig travelConfig;
     private RandomAccessSelector households;
 
     @WithFactory
-    public TravelService(AreaClusteredSelectors areaClusteredSelectors, AgentStateService agentStateService,
+    public TravelVisitor(AreaClusteredSelectors areaClusteredSelectors, AgentStateService agentStateService,
                          TravelConfig travelConfig) {
         this.areaClusteredSelectors = areaClusteredSelectors;
         this.agentStateService = agentStateService;
         this.travelConfig = travelConfig;
+        this.households = households;
     }
 
-    public void processTravelLogic(Entity e, Behaviour behaviour, RandomGenerator randomGenerator) {
-
+    public void visit(RandomGenerator randomGenerator, Entity e) {
+        Behaviour behaviour = e.get(Behaviour.class);
+        if (behaviour == null) {
+            return;
+        }
         switch (behaviour.getType()) {
             case ROUTINE:
                 if (randomGenerator.nextFloat() < travelConfig.getProbabilityOfTravel()) {

@@ -26,7 +26,10 @@ import pl.edu.icm.pdyn2.model.immunization.Load;
 import pl.edu.icm.pdyn2.model.progression.Stages;
 import pl.edu.icm.pdyn2.time.SimulationTimer;
 
-public class LoadDiseaseStageTransitionsReader {
+/**
+ * Service for reading LoadDiseaseStageTransitions for the given load.
+ */
+class LoadDiseaseStageTransitionsReader {
     private final ImmunizationService immunizationService;
     private final SimulationTimer simulationTimer;
     private final WorkDir workDir;

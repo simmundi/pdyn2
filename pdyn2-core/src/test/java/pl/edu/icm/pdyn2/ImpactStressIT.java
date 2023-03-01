@@ -87,7 +87,7 @@ public class ImpactStressIT {
         // execute
         // calculate initial count of agents
         processAgentsSingleFile(entity -> {
-            data.agentImpactService.updateImpact(entity);
+            data.agentImpactVisitor.updateImpact(entity);
         });
         Context context = getContextFromEntityId(0);
         float initialAgentCount = context.getAgentCount();
@@ -109,7 +109,7 @@ public class ImpactStressIT {
             processAgents(entity -> {
                 // multiple threads continually update just two households.
                 // This is the piece we are actually testing.
-                data.agentImpactService.updateImpact(entity);
+                data.agentImpactVisitor.updateImpact(entity);
             });
 
             // count agents: hospitalized, at home and in resort.
@@ -142,7 +142,7 @@ public class ImpactStressIT {
         // all agents recover and return to routing
         processAgents(entity -> {
             cleanAgent(entity);
-            data.agentImpactService.updateImpact(entity);
+            data.agentImpactVisitor.updateImpact(entity);
         });
 
         // assert

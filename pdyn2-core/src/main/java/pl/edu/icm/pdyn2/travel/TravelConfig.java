@@ -16,7 +16,7 @@
  *
  */
 
-package pl.edu.icm.pdyn2.behaviour;
+package pl.edu.icm.pdyn2.travel;
 
 import net.snowyhollows.bento.annotation.WithFactory;
 

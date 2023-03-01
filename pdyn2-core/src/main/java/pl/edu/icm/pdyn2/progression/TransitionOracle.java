@@ -21,9 +21,12 @@ package pl.edu.icm.pdyn2.progression;
 import net.snowyhollows.bento.annotation.WithFactory;
 import pl.edu.icm.pdyn2.model.progression.Stage;
 import pl.edu.icm.pdyn2.model.progression.Stages;
-import pl.edu.icm.trurl.sampleSpace.EnumSampleSpace;
 import pl.edu.icm.trurl.sampleSpace.SoftEnumSampleSpace;
 
+/**
+ * Helper for LoadDiseaseStageTransitions, holds information about a single stage/age/load combination
+ * (i.e. possible transitions to other states and the duration)
+ */
 class TransitionOracle {
     private Stage stage;
     private final SoftEnumSampleSpace<Stage> outcomes;

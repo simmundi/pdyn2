@@ -41,7 +41,7 @@ import pl.edu.icm.board.util.RandomForChunkProvider;
 import pl.edu.icm.board.util.RandomProvider;
 import pl.edu.icm.pdyn2.AgentStateService;
 import pl.edu.icm.pdyn2.BasicConfig;
-import pl.edu.icm.pdyn2.StatsService;
+import pl.edu.icm.pdyn2.simulation.StatsService;
 import pl.edu.icm.pdyn2.context.BehaviourBasedContextsService;
 import pl.edu.icm.pdyn2.context.ContextsService;
 import pl.edu.icm.pdyn2.immunization.ImmunizationService;
@@ -56,7 +56,9 @@ import pl.edu.icm.trurl.csv.CsvWriter;
 import pl.edu.icm.trurl.ecs.EngineConfiguration;
 import pl.edu.icm.trurl.ecs.EngineConfigurationFactory;
 import pl.edu.icm.trurl.ecs.EntitySystem;
+import pl.edu.icm.trurl.ecs.util.IteratingSystemBuilder;
 import pl.edu.icm.trurl.ecs.util.Selectors;
+import pl.edu.icm.trurl.ecs.util.Visit;
 import pl.edu.icm.trurl.store.tablesaw.TablesawStore;
 import pl.edu.icm.trurl.store.tablesaw.TablesawStoreFactory;
 
@@ -71,7 +73,7 @@ import static org.mockito.Mockito.when;
 class TransmissionSystemIT {
     private BasicConfig basicConfig = new BasicConfig();
 
-    private TransmissionSystemBuilder transmissionSystemBuilder;
+    private TransmissionVisitor transmissionVisitor;
 
     private EngineIo board;
 
@@ -141,20 +143,23 @@ class TransmissionSystemIT {
                 Immunization.class
         );
         areaClusteredSelectors = new AreaClusteredSelectors(engineConfig, 10, 10);
-        board.load(TransmissionSystemBuilder.class.getResourceAsStream("/transmissionTest.csv"));
-        when(randomProvider.getRandomGenerator(TransmissionSystemBuilder.class)).thenReturn(randomGenerator);
-        when(randomProvider.getRandomForChunkProvider(TransmissionSystemBuilder.class)).thenReturn(randomForChunkProvider);
+        board.load(TransmissionVisitor.class.getResourceAsStream("/transmissionTest.csv"));
+        when(randomProvider.getRandomGenerator(TransmissionVisitor.class)).thenReturn(randomGenerator);
+        when(randomProvider.getRandomForChunkProvider(TransmissionVisitor.class)).thenReturn(randomForChunkProvider);
         contextsService = new BehaviourBasedContextsService(areaIndex);
         transmissionService = new TransmissionService(contextsService, relativeAlphaConfig, transmissionConfig, simulationTimer, basicConfig.loads, basicConfig.stages, immunizationService);
-        transmissionSystemBuilder = new TransmissionSystemBuilder(
+        transmissionVisitor = new TransmissionVisitor(
                 transmissionService,
                 agentStateService,
-                areaClusteredSelectors,
-                selectors,
                 statsService,
-                randomProvider, basicConfig.loads, basicConfig.stages);
+                basicConfig.loads,
+                basicConfig.stages);
 
-        transmissionSystem = transmissionSystemBuilder.buildTransmissionSystem();
+        transmissionSystem = IteratingSystemBuilder.iteratingOver(areaClusteredSelectors.personSelector())
+                .persistingAll()
+                .withContext(randomForChunkProvider)
+                .perform(Visit.of(transmissionVisitor::visit))
+                .build();
 
         when(immunizationService.getImmunizationCoefficient(any(), any(), any(), anyInt())).thenReturn(0.5f);
         when(transmissionConfig.getAlpha()).thenReturn(1.0f);

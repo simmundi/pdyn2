@@ -1,3 +1,5 @@
 rootProject.name = 'pdyn2'
 include 'pdyn2-core',
-        'pdyn2-model'
+        'pdyn2-model',
+        'pdyn2-example-experiment'
+

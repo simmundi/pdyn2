@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 ICM Epidemiological Model Team at Interdisciplinary Centre for Mathematical and Computational Modelling, University of Warsaw.
+ * Copyright (c) 2022-2023 ICM Epidemiological Model Team at Interdisciplinary Centre for Mathematical and Computational Modelling, University of Warsaw.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,17 @@
  *
  */
 
-package pl.edu.icm.pdyn2;
+package pl.edu.icm.pdyn2.simulation;
 
 import net.snowyhollows.bento.annotation.WithFactory;
-import pl.edu.icm.pdyn2.administration.TestingConfig;
+import pl.edu.icm.pdyn2.administrative.TestingConfig;
 import pl.edu.icm.pdyn2.isolation.IsolationConfig;
 import pl.edu.icm.pdyn2.transmission.TransmissionConfig;
 
+/**
+ * A helper object that aggregates three different configuration holders, simplifying
+ * access, change and debugging.
+ */
 public class EpidemicConfig {
     private final TransmissionConfig transmissionConfig;
     private final TestingConfig testingConfig;

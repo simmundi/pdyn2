@@ -20,7 +20,7 @@ package pl.edu.icm.pdyn2.impact;
 
 import net.snowyhollows.bento.annotation.WithFactory;
 import pl.edu.icm.board.model.Person;
-import pl.edu.icm.pdyn2.StatsService;
+import pl.edu.icm.pdyn2.simulation.StatsService;
 import pl.edu.icm.pdyn2.model.progression.Stages;
 import pl.edu.icm.pdyn2.transmission.ContextImpactService;
 import pl.edu.icm.pdyn2.context.ContextsService;
@@ -36,7 +36,7 @@ import pl.edu.icm.trurl.ecs.Entity;
  * If agents impact has changed from the last time it was checked,
  * it is replaced (by withdrawing the old impact and applying the new)
  */
-public class AgentImpactService {
+public class AgentImpactVisitor {
     private final ContextsService contextsService;
     private final ContextImpactService contextImpactService;
     private final StatsService statsService;
@@ -46,7 +46,7 @@ public class AgentImpactService {
     private final int ADD = 1;
 
     @WithFactory
-    public AgentImpactService(ContextsService contextsService,
+    public AgentImpactVisitor(ContextsService contextsService,
                               ContextImpactService contextImpactService,
                               StatsService statsService,
                               StageImpactConfig stageImpactConfig,
@@ -59,9 +59,14 @@ public class AgentImpactService {
     }
 
     public void updateImpact(Entity agentEntity) {
+        Behaviour behaviour = agentEntity.get(Behaviour.class);
+
+        if (behaviour == null) {
+            return;
+        }
+
         Impact impact = agentEntity.getOrCreate(Impact.class);
         HealthStatus disease = agentEntity.get(HealthStatus.class);
-        Behaviour behaviour = agentEntity.get(Behaviour.class);
 
         if (impact.isDifferentFrom(behaviour, disease)) {
             Person person = agentEntity.get(Person.class);

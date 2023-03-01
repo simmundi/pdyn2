@@ -32,12 +32,12 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class AgentImpactServiceIT {
+public class AgentImpactVisitorIT {
     private final static Offset<Float> VERY_CLOSE = Offset.offset(0.000001f);
     BasicConfig basicConfig = new BasicConfig();
 
     ExampleDataForIntegrationTests data = new ExampleDataForIntegrationTests(basicConfig, false);
-    AgentImpactService agentImpactService = data.agentImpactService;
+    AgentImpactVisitor agentImpactVisitor = data.agentImpactVisitor;
     AgentStateService agentStateService = data.agentStateService;
 
     @Test
@@ -45,7 +45,7 @@ public class AgentImpactServiceIT {
     void countAgents() {
         // execute
         for (Entity agent : data.allAgents) {
-            agentImpactService.updateImpact(agent);
+            agentImpactVisitor.updateImpact(agent);
         }
 
         // assert
@@ -80,7 +80,7 @@ public class AgentImpactServiceIT {
         // execute
 
         for (Entity agent : data.allAgents) {
-            agentImpactService.updateImpact(agent);
+            agentImpactVisitor.updateImpact(agent);
         }
 
         // assert

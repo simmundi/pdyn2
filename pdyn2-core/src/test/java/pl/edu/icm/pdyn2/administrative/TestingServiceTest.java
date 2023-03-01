@@ -16,7 +16,7 @@
  *
  */
 
-package pl.edu.icm.pdyn2.administration;
+package pl.edu.icm.pdyn2.administrative;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -28,6 +28,7 @@ import pl.edu.icm.board.model.Household;
 import pl.edu.icm.pdyn2.*;
 import pl.edu.icm.pdyn2.model.administration.MedicalHistory;
 import pl.edu.icm.pdyn2.model.progression.HealthStatus;
+import pl.edu.icm.pdyn2.simulation.StatsService;
 import pl.edu.icm.pdyn2.time.SimulationTimer;
 import pl.edu.icm.trurl.ecs.Entity;
 
@@ -52,7 +53,6 @@ class TestingServiceTest {
     @Mock
     SimulationTimer simulationTimer;
 
-    MockRandomProvider mockRandomProvider = new MockRandomProvider();
 
     TestingService testingService;
 
@@ -60,11 +60,11 @@ class TestingServiceTest {
 
     @BeforeEach
     void before() {
-        testingService = new TestingService(simulationTimer, mockRandomProvider, statsService, agentStateService, testingConfig);
+        testingService = new TestingService(simulationTimer, statsService, agentStateService, testingConfig);
     }
 
     @Test
-    @DisplayName("Should correctly test all agents when random mocked to 0.0")
+    @DisplayName("Should correctly test all agents when random equals 0.0")
     void maybeTestAgent() {
         // given
         HealthStatus healthStatus = ComponentCreator.health(basicConfig.loads.WILD, basicConfig.stages.INFECTIOUS_SYMPTOMATIC);
@@ -75,9 +75,9 @@ class TestingServiceTest {
         Entity healthyAgent = entityMocker.entity(healthy);
 
         // execute
-        testingService.maybeTestAgent(sickAgent);
-        testingService.maybeTestAgent(healthyAgent);
-        testingService.maybeTestAgent(recoveredAgent);
+        testingService.maybeTestAgent(0, sickAgent);
+        testingService.maybeTestAgent(0, healthyAgent);
+        testingService.maybeTestAgent(0, recoveredAgent);
 
         // assert
         verify(statsService, times(1)).tickTestedPositive();
@@ -98,7 +98,7 @@ class TestingServiceTest {
         household.get(Household.class).getMembers().add(healthySpouse);
 
         // execute
-        testingService.maybeTestAgent(sickAgent);
+        testingService.maybeTestAgent(0, sickAgent);
 
         // assert
         verify(statsService, times(2)).tickQuarantined();
@@ -107,15 +107,14 @@ class TestingServiceTest {
     }
 
     @Test
-    @DisplayName("Shouldn't test an agent when random mocked to more than base probability")
+    @DisplayName("Shouldn't test an agent when random is more than the base probability")
     void maybeTestAgent__none() {
         // given
-        when(mockRandomProvider.getRandomGenerator().nextFloat()).thenReturn(BASE_PROBABILITY_OF_TEST + 0.001f);
         HealthStatus healthStatus = ComponentCreator.health(basicConfig.loads.WILD, basicConfig.stages.INFECTIOUS_SYMPTOMATIC);
         Entity sickAgent = entityMocker.entity(healthStatus);
 
         // execute
-        testingService.maybeTestAgent(sickAgent);
+        testingService.maybeTestAgent(BASE_PROBABILITY_OF_TEST + 0.001f, sickAgent);
 
         // assert
         verify(statsService, never()).tickTestedPositive();

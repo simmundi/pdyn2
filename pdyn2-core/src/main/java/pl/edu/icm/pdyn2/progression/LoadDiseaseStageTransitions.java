@@ -30,9 +30,7 @@ import pl.edu.icm.pdyn2.model.progression.Stage;
 import pl.edu.icm.pdyn2.model.progression.Stages;
 import pl.edu.icm.pdyn2.time.SimulationTimer;
 import pl.edu.icm.trurl.ecs.Entity;
-import pl.edu.icm.trurl.sampleSpace.EnumSampleSpace;
 import pl.edu.icm.trurl.sampleSpace.SoftEnumSampleSpace;
-import pl.edu.icm.trurl.util.EnumTable;
 import pl.edu.icm.trurl.util.SoftEnumTable;
 
 import java.io.File;
@@ -42,6 +40,10 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Scanner;
 
+/**
+ * A helper class for use by the DiseaseStageTransitionService.
+ * Contains a parser for the state-time-transition tables.
+ */
 public class LoadDiseaseStageTransitions {
     private final Load load;
     private final SoftEnumTable<AgeRange, Stage, TransitionOracle> stateTimeTransitions;

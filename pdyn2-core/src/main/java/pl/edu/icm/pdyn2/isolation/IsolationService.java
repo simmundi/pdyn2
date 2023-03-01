@@ -19,42 +19,41 @@
 package pl.edu.icm.pdyn2.isolation;
 
 import net.snowyhollows.bento.annotation.WithFactory;
-import org.apache.commons.math3.random.RandomGenerator;
-import pl.edu.icm.board.util.RandomProvider;
 import pl.edu.icm.pdyn2.AgentStateService;
-import pl.edu.icm.pdyn2.StatsService;
-import pl.edu.icm.pdyn2.model.progression.HealthStatus;
-import pl.edu.icm.pdyn2.model.progression.Stage;
+import pl.edu.icm.pdyn2.simulation.StatsService;
 import pl.edu.icm.pdyn2.model.progression.Stages;
 import pl.edu.icm.trurl.ecs.Entity;
 
+/**
+ * This service attempts to make an agent self-isolate, taking into account any additional configuration.
+ * The service does not attempt to verify if there's a reason for the agent to self-isolate, the reasons
+ * for self-isolation are up to the caller, as is the ending of the isolation (currently it only ends
+ * when agent becomes healthy).
+ */
 public final class IsolationService {
-    private final RandomGenerator randomGenerator;
     private final StatsService statsService;
     private final AgentStateService agentStateService;
     private final IsolationConfig isolationConfig;
     private final Stages stages;
 
     @WithFactory
-    public IsolationService(RandomProvider randomProvider,
-                            StatsService statsService,
+    public IsolationService(StatsService statsService,
                             AgentStateService agentStateService,
                             IsolationConfig isolationConfig,
                             Stages stages) {
-        this.randomGenerator = randomProvider.getRandomGenerator(IsolationService.class);
         this.statsService = statsService;
         this.agentStateService = agentStateService;
         this.isolationConfig = isolationConfig;
         this.stages = stages;
     }
 
-    public void maybeIsolateAgent(Entity agentEntity) {
+    public void maybeIsolateAgent(float random, Entity agentEntity) {
         float baseProbabilityOfSelfIsolation = isolationConfig.getBaseProbabilityOfSelfIsolation();
         float selfIsolationWeight = isolationConfig.getSelfIsolationWeight();
 
-        if (baseProbabilityOfSelfIsolation > 0 && agentEntity.get(HealthStatus.class).getStage() == stages.INFECTIOUS_SYMPTOMATIC) {
-            if (randomGenerator.nextFloat() < baseProbabilityOfSelfIsolation * selfIsolationWeight) {
-                // recklessly stays at home
+        if (baseProbabilityOfSelfIsolation > 0) {
+            if (random < baseProbabilityOfSelfIsolation * selfIsolationWeight) {
+                // selflessly stays at home
             } else {
                 if (agentStateService.beginIsolation(agentEntity)) {
                     statsService.tickIsolated();

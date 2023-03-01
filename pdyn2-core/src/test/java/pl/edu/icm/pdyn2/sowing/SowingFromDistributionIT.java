@@ -31,10 +31,10 @@ import pl.edu.icm.board.geography.commune.CommuneManager;
 import pl.edu.icm.board.geography.commune.PopulationService;
 import pl.edu.icm.board.util.RandomProvider;
 import pl.edu.icm.pdyn2.*;
-import pl.edu.icm.pdyn2.administration.TestingService;
+import pl.edu.icm.pdyn2.administrative.TestingService;
 import pl.edu.icm.pdyn2.model.progression.HealthStatus;
-import pl.edu.icm.pdyn2.model.progression.Stage;
 import pl.edu.icm.pdyn2.progression.DiseaseStageTransitionsService;
+import pl.edu.icm.pdyn2.simulation.StatsService;
 
 import java.io.File;
 import java.io.FileNotFoundException;

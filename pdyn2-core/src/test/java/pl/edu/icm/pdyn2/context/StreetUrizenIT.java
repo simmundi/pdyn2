@@ -29,6 +29,7 @@ import pl.edu.icm.board.model.Area;
 import pl.edu.icm.board.model.Location;
 import pl.edu.icm.pdyn2.BasicConfig;
 import pl.edu.icm.pdyn2.model.context.Context;
+import pl.edu.icm.pdyn2.setup.StreetUrizen;
 import pl.edu.icm.trurl.ecs.EngineConfiguration;
 import pl.edu.icm.trurl.ecs.EngineConfigurationFactory;
 import pl.edu.icm.trurl.ecs.Session;

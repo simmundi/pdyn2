@@ -19,7 +19,6 @@
 package pl.edu.icm.pdyn2;
 
 import net.snowyhollows.bento.Bento;
-import net.snowyhollows.bento.config.Configurer;
 import net.snowyhollows.bento.config.WorkDir;
 import net.snowyhollows.bento.config.WorkDirFactory;
 import org.mockito.Mockito;
@@ -29,8 +28,8 @@ import pl.edu.icm.board.model.Location;
 import pl.edu.icm.board.model.Person;
 import pl.edu.icm.pdyn2.context.ContextsService;
 import pl.edu.icm.pdyn2.context.ContextsServiceFactory;
-import pl.edu.icm.pdyn2.impact.AgentImpactService;
-import pl.edu.icm.pdyn2.impact.AgentImpactServiceFactory;
+import pl.edu.icm.pdyn2.impact.AgentImpactVisitor;
+import pl.edu.icm.pdyn2.impact.AgentImpactVisitorFactory;
 import pl.edu.icm.pdyn2.model.administration.MedicalHistory;
 import pl.edu.icm.pdyn2.model.behaviour.Behaviour;
 import pl.edu.icm.pdyn2.model.context.Context;
@@ -46,14 +45,12 @@ import pl.edu.icm.trurl.ecs.EngineConfiguration;
 import pl.edu.icm.trurl.ecs.EngineConfigurationFactory;
 import pl.edu.icm.trurl.ecs.util.Selectors;
 import pl.edu.icm.trurl.ecs.util.SelectorsFactory;
-import pl.edu.icm.trurl.store.array.ArrayStoreFactory;
-import pl.edu.icm.trurl.store.tablesaw.TablesawStoreFactory;
 
 public class EmptyDataForIntegrationTests {
     public Selectors selectors;
     public Bento config;
     public AgentStateService agentStateService;
-    public AgentImpactService agentImpactService;
+    public AgentImpactVisitor agentImpactVisitor;
     public ContextsService contextsService;
     public SimulationTimer simulationTimer;
     public Engine engine;
@@ -75,7 +72,7 @@ public class EmptyDataForIntegrationTests {
 
         agentStateService = config.get(AgentStateServiceFactory.IT);
         contextsService = config.get(ContextsServiceFactory.IT);
-        agentImpactService = config.get(AgentImpactServiceFactory.IT);
+        agentImpactVisitor = config.get(AgentImpactVisitorFactory.IT);
         simulationTimer = config.get(SimulationTimerFactory.IT);
         selectors = config.get(SelectorsFactory.IT);
 

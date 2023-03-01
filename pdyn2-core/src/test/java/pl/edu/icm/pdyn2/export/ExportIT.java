@@ -27,13 +27,13 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.edu.icm.board.EngineIo;
-import pl.edu.icm.board.util.RandomProvider;
 import pl.edu.icm.pdyn2.*;
-import pl.edu.icm.pdyn2.administration.TestingConfig;
-import pl.edu.icm.pdyn2.administration.TestingService;
+import pl.edu.icm.pdyn2.administrative.TestingConfig;
+import pl.edu.icm.pdyn2.administrative.TestingService;
 import pl.edu.icm.pdyn2.model.context.ContextInfectivityClass;
 import pl.edu.icm.pdyn2.model.immunization.ImmunizationEvent;
 import pl.edu.icm.pdyn2.progression.DiseaseStageTransitionsService;
+import pl.edu.icm.pdyn2.simulation.StatsService;
 import pl.edu.icm.trurl.sampleSpace.EnumSampleSpace;
 
 import java.io.ByteArrayOutputStream;
@@ -47,7 +47,6 @@ import static org.mockito.Mockito.when;
 public class ExportIT {
     private final BasicConfig basicConfig = new BasicConfig();
     private final ExampleDataForIntegrationTests data = new ExampleDataForIntegrationTests(basicConfig, false);
-    private final RandomProvider randomProvider = new MockRandomProvider();
     private final AgentStateService agentStateService = data.agentStateService;
     @Mock
     private DiseaseStageTransitionsService transitionsService;
@@ -96,7 +95,6 @@ public class ExportIT {
 
         TestingService testingService = new TestingService(
                 data.simulationTimer,
-                randomProvider,
                 statsService,
                 agentStateService, new TestingConfig(1.0f));
         var sowingSource = new EnumSampleSpace<>(ContextInfectivityClass.class);
@@ -130,7 +128,7 @@ public class ExportIT {
         agentStateService.infect(data.agent7, basicConfig.loads.OMICRON);
         agentStateService.addSourcesDistribution(data.agent7, universitySource);
         advance(7);
-        testingService.maybeTestAgent(data.agent7);
+        testingService.maybeTestAgent(0, data.agent7);
         agentStateService.progressToDiseaseStage(data.agent7, basicConfig.stages.INFECTIOUS_SYMPTOMATIC);
         advance(6);
         agentStateService.progressToDiseaseStage(data.agent7, basicConfig.stages.HOSPITALIZED_PRE_ICU);

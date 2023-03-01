@@ -20,20 +20,24 @@ package pl.edu.icm.pdyn2.quarantine;
 
 import net.snowyhollows.bento.annotation.WithFactory;
 import pl.edu.icm.pdyn2.AgentStateService;
-import pl.edu.icm.pdyn2.StatsService;
+import pl.edu.icm.pdyn2.simulation.StatsService;
 import pl.edu.icm.pdyn2.model.behaviour.Behaviour;
 import pl.edu.icm.pdyn2.model.behaviour.BehaviourType;
 import pl.edu.icm.pdyn2.time.SimulationTimer;
 import pl.edu.icm.trurl.ecs.Entity;
 
-public final class QuarantineService {
+/**
+ * Visitor for ending the quarantine, based on its duration.
+ * Agents are quarantined in the testing visitor (after being positively tested).
+ */
+public final class QuarantineVisitor {
     private final StatsService statsService;
     private final AgentStateService agentStateService;
     private final QuarantineConfig quarantineConfig;
     private final SimulationTimer simulationTimer;
 
     @WithFactory
-    public QuarantineService(StatsService statsService,
+    public QuarantineVisitor(StatsService statsService,
                              AgentStateService agentStateService,
                              QuarantineConfig quarantineConfig,
                              SimulationTimer simulationTimer) {
@@ -44,8 +48,8 @@ public final class QuarantineService {
     }
 
     public void maybeEndQuarantine(Entity agentEntity) {
-        Behaviour behaviour = agentEntity.getOrCreate(Behaviour.class);
-        if (behaviour.getType() != BehaviourType.QUARANTINE) {
+        Behaviour behaviour = agentEntity.get(Behaviour.class);
+        if (behaviour == null || behaviour.getType() != BehaviourType.QUARANTINE) {
             return;
         }
         int howLong = simulationTimer.getDaysPassed() - behaviour.getDayOfLastChange();

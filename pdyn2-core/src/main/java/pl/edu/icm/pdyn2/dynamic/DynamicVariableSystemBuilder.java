@@ -19,7 +19,7 @@
 package pl.edu.icm.pdyn2.dynamic;
 
 import net.snowyhollows.bento.annotation.WithFactory;
-import pl.edu.icm.pdyn2.EpidemicConfig;
+import pl.edu.icm.pdyn2.simulation.EpidemicConfig;
 import pl.edu.icm.pdyn2.time.SimulationTimer;
 import pl.edu.icm.trurl.ecs.EntitySystem;
 

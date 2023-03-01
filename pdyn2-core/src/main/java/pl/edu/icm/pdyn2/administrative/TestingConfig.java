@@ -16,7 +16,7 @@
  *
  */
 
-package pl.edu.icm.pdyn2.administration;
+package pl.edu.icm.pdyn2.administrative;
 
 import net.snowyhollows.bento.annotation.WithFactory;
 

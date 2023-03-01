@@ -28,7 +28,7 @@ import pl.edu.icm.board.model.Person;
 import pl.edu.icm.pdyn2.BasicConfig;
 import pl.edu.icm.pdyn2.ComponentCreator;
 import pl.edu.icm.pdyn2.EntityMocker;
-import pl.edu.icm.pdyn2.StatsService;
+import pl.edu.icm.pdyn2.simulation.StatsService;
 import pl.edu.icm.pdyn2.context.ContextsService;
 import pl.edu.icm.pdyn2.model.behaviour.BehaviourType;
 import pl.edu.icm.pdyn2.model.context.Context;
@@ -46,7 +46,7 @@ import static org.mockito.Mockito.when;
 import static pl.edu.icm.pdyn2.ComponentCreator.*;
 
 @ExtendWith(MockitoExtension.class)
-class AgentImpactServiceTest {
+class AgentImpactVisitorTest {
     BasicConfig basicConfig = new BasicConfig();
     @Mock
     ContextsService contextsService;
@@ -57,7 +57,7 @@ class AgentImpactServiceTest {
     @Mock
     StageImpactConfig stageImpactConfig;
     @InjectMocks
-    AgentImpactService agentImpactService;
+    AgentImpactVisitor agentImpactVisitor;
 
     private EntityMocker entityMocker = new EntityMocker(basicConfig, null);
 
@@ -72,7 +72,7 @@ class AgentImpactServiceTest {
                 person(34, Person.Sex.M));
 
         // execute
-        agentImpactService.updateImpact(entity);
+        agentImpactVisitor.updateImpact(entity);
 
         // assert
         verifyNoInteractions(statsService);
@@ -98,7 +98,7 @@ class AgentImpactServiceTest {
                 Stream.of(uni, street), Stream.of(uni, street));
 
         // execute
-        agentImpactService.updateImpact(entity);
+        agentImpactVisitor.updateImpact(entity);
 
         // assert
         assertThat(uni.getContaminations()).hasSize(1);

@@ -22,7 +22,7 @@ import net.snowyhollows.bento.annotation.WithFactory;
 import org.apache.commons.math3.random.RandomAdaptor;
 import pl.edu.icm.board.util.RandomProvider;
 import pl.edu.icm.pdyn2.AgentStateService;
-import pl.edu.icm.pdyn2.StatsService;
+import pl.edu.icm.pdyn2.simulation.StatsService;
 import pl.edu.icm.pdyn2.index.CommuneClusteredSelectors;
 import pl.edu.icm.pdyn2.model.immunization.ImmunizationEvent;
 import pl.edu.icm.trurl.ecs.Entity;

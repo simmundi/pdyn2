@@ -16,20 +16,19 @@
  *
  */
 
-package pl.edu.icm.pdyn2.behaviour;
+package pl.edu.icm.pdyn2.travel;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.edu.icm.board.model.Person;
 import pl.edu.icm.pdyn2.AgentStateService;
 import pl.edu.icm.pdyn2.MockRandomProvider;
-import pl.edu.icm.pdyn2.behaviour.TravelConfig;
-import pl.edu.icm.pdyn2.behaviour.TravelService;
 import pl.edu.icm.pdyn2.index.AreaClusteredSelectors;
 import pl.edu.icm.pdyn2.model.behaviour.Behaviour;
 import pl.edu.icm.pdyn2.model.behaviour.BehaviourType;
@@ -64,7 +63,7 @@ class TravelServiceTest {
     TravelConfig travelConfig = new TravelConfig(0.5f, 1);
 
     @InjectMocks
-    TravelService travelService;
+    TravelVisitor travelVisitor;
 
     @Test
     @DisplayName("Should not do anything when behaviour is neither Routine or Travel")
@@ -72,18 +71,24 @@ class TravelServiceTest {
         // given
         Behaviour quarantine = new Behaviour();
         quarantine.transitionTo(BehaviourType.QUARANTINE, 0);
-        Behaviour dormant = new Behaviour();
-        dormant.transitionTo(BehaviourType.DORMANT, 0);
+        Behaviour selfIsolating = new Behaviour();
+        selfIsolating.transitionTo(BehaviourType.SELF_ISOLATION, 0);
         Behaviour dead = new Behaviour();
         dead.transitionTo(BehaviourType.DEAD, 0);
 
+        Entity quarantiedAgent = Mockito.mock(Entity.class);
+        Entity isolatingAgent = Mockito.mock(Entity.class);
+        Entity deadAgent = Mockito.mock(Entity.class);
+        Mockito.when(quarantiedAgent.get(Behaviour.class)).thenReturn(quarantine);
+        Mockito.when(isolatingAgent.get(Behaviour.class)).thenReturn(selfIsolating);
+        Mockito.when(deadAgent.get(Behaviour.class)).thenReturn(dead);
+
         // execute
-        travelService.processTravelLogic(agent, quarantine, randomProvider.getRandomGenerator());
-        travelService.processTravelLogic(agent, dormant, randomProvider.getRandomGenerator());
-        travelService.processTravelLogic(agent, dead, randomProvider.getRandomGenerator());
+        travelVisitor.visit(randomProvider.getRandomGenerator(), quarantiedAgent);
+        travelVisitor.visit(randomProvider.getRandomGenerator(), isolatingAgent);
+        travelVisitor.visit(randomProvider.getRandomGenerator(), deadAgent);
 
         // assert
-        verifyNoInteractions(agent);
         verifyNoInteractions(agentStateService);
         verifyNoInteractions(randomProvider.getRandomGenerator());
         verifyNoInteractions(householdIndex);
@@ -97,6 +102,7 @@ class TravelServiceTest {
         behaviour.transitionTo(BehaviourType.ROUTINE, 0);
         when(areaClusteredSelectors.householdSelector()).thenReturn(householdIndex);
         when(randomProvider.getRandomGenerator().nextFloat()).thenReturn(0f).thenReturn(0.9f);
+        when(agent.get(Behaviour.class)).thenReturn(behaviour);
         when(agent.get(Person.class)).thenReturn(person);
         when(person.getAge()).thenReturn(20);
         when(householdIndex.getInt(0.9f)).thenReturn(TARGET_ID);
@@ -104,7 +110,7 @@ class TravelServiceTest {
         when(session.getEntity(TARGET_ID)).thenReturn(targetHousehold);
 
         // execute
-        travelService.processTravelLogic(agent, behaviour, randomProvider.getRandomGenerator());
+        travelVisitor.visit(randomProvider.getRandomGenerator(), agent);
 
         // assert
         verify(agentStateService).beginTravel(agent, targetHousehold);
@@ -117,9 +123,10 @@ class TravelServiceTest {
         Behaviour behaviour = new Behaviour();
         behaviour.transitionTo(BehaviourType.PRIVATE_TRAVEL, 0);
         when(randomProvider.getRandomGenerator().nextFloat()).thenReturn(0f);
+        when(agent.get(Behaviour.class)).thenReturn(behaviour);
 
         // execute
-        travelService.processTravelLogic(agent, behaviour, randomProvider.getRandomGenerator());
+        travelVisitor.visit(randomProvider.getRandomGenerator(), agent);
 
         // assert
         verify(agentStateService).endTravel(agent);

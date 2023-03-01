@@ -25,8 +25,11 @@ import pl.edu.icm.pdyn2.model.immunization.Loads;
 import pl.edu.icm.pdyn2.model.progression.Stage;
 import pl.edu.icm.trurl.ecs.Entity;
 
-import java.util.EnumMap;
-
+/**
+ * A stateless service that provides a distribution of outcomes and duration of any given stage of disease,
+ * taking into account age and sex of a person.
+ *
+ */
 public class DiseaseStageTransitionsService {
     private final SoftEnumMap<Load, LoadDiseaseStageTransitions> loadSpecificTransitions;
     private final Loads loads;

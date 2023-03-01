@@ -19,15 +19,15 @@
 package pl.edu.icm.pdyn2.context;
 
 import net.snowyhollows.bento.annotation.ImplementationSwitch;
-import pl.edu.icm.pdyn2.immunization.ImmunizationStrategyFromPdyn1;
-import pl.edu.icm.pdyn2.immunization.ImmunizationStrategyFromPdyn1Rewritten;
-import pl.edu.icm.pdyn2.immunization.SimpleImmunizationStrategy;
 import pl.edu.icm.pdyn2.model.context.Context;
 import pl.edu.icm.pdyn2.model.impact.Impact;
 import pl.edu.icm.trurl.ecs.Entity;
 
 import java.util.stream.Stream;
 
+/**
+ * Implementation should return list of context that the agents currently interacts with.
+ */
 @ImplementationSwitch(
         configKey = "contextService",
         cases = {

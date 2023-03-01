@@ -36,11 +36,8 @@ import java.util.List;
 import java.util.stream.Stream;
 
 /**
- * The service encapsulates logic for returning all the contexts that an agent is active in.
- * <p>
  * The main factor for establishing the contexts is the agent's Behaviour (or rather - its type),
- * but the information might come from different components, like Travel and Inhabitant; some of
- * the logic might be purely programmatic (e.g. households automatically pulling in their streets)
+ * but the information might come from different components, like Travel and Inhabitant.
  */
 public class BehaviourBasedContextsService implements ContextsService {
 

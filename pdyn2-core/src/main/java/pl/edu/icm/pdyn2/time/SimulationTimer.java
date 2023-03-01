@@ -30,8 +30,7 @@ import java.time.LocalDateTime;
 /**
  * Keeps track of the simulation time.
  *
- * Provides any piece of logic with the current date,
- * allows some main loop to advance the time by one day.
+ * Allows some main loop to advance the time by one day.
  */
 public class SimulationTimer implements EntitySystem {
     private final LocalDateTime simulationStartDate;
