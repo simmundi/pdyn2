@@ -19,16 +19,19 @@
 package pl.edu.icm.pdyn2.variantsowing;
 
 import net.snowyhollows.bento.config.WorkDir;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.edu.icm.board.model.Household;
 import pl.edu.icm.board.util.RandomProvider;
-import pl.edu.icm.pdyn2.*;
-import pl.edu.icm.pdyn2.index.CommuneClusteredSelectors;
+import pl.edu.icm.pdyn2.AgentStateService;
+import pl.edu.icm.pdyn2.BasicConfig;
+import pl.edu.icm.pdyn2.ExampleDataForIntegrationTests;
+import pl.edu.icm.pdyn2.MockRandomProvider;
+import pl.edu.icm.pdyn2.index.AreaClusteredSelectors;
 import pl.edu.icm.pdyn2.model.progression.HealthStatus;
 import pl.edu.icm.pdyn2.simulation.StatsService;
 import pl.edu.icm.pdyn2.time.SimulationTimer;
@@ -50,40 +53,39 @@ public class VariantSowingIT {
     private final ExampleDataForIntegrationTests data = new ExampleDataForIntegrationTests(basicConfig, true);
     private final AgentStateService agentStateService = data.agentStateService;
     private final SimulationTimer simulationTimer = data.simulationTimer;
+    private final RandomProvider randomProvider = new MockRandomProvider();
     @Mock
     private WorkDir workDir;
-
-    private RandomProvider randomProvider = new MockRandomProvider();
     @Mock
     private StatsService statsService;
     @Mock
-    private CommuneClusteredSelectors communeClusteredSelectors;
+    private AreaClusteredSelectors areaClusteredSelectors;
 
     @BeforeEach
     public void before() {
         when(workDir.openForReading(new File("/variantSowingTest.csv")))
                 .thenReturn(VariantSowingIT.class.getResourceAsStream("/variantSowingTest.csv"));
-        when(communeClusteredSelectors.personInTerytSelector(List.of("24")))
+        when(areaClusteredSelectors.peopleByTerytPrefixSelector(List.of("24")))
                 .thenReturn(() -> Stream.of(new Chunk(ChunkInfo.of(0, 10, "240102"),
-                data.householdContext1.get(Household.class).getMembers().stream().mapToInt(Entity::getId)
-        )));
-        when(communeClusteredSelectors.personInTerytSelector(List.of("012345")))
+                        data.householdContext1.get(Household.class).getMembers().stream().mapToInt(Entity::getId)
+                )));
+        when(areaClusteredSelectors.peopleByTerytPrefixSelector(List.of("012345")))
                 .thenReturn(() -> Stream.of(new Chunk(ChunkInfo.of(0, 10, "012345"),
-                data.householdContext2.get(Household.class).getMembers().stream().mapToInt(Entity::getId)
-        )));
-        when(communeClusteredSelectors.personInTerytSelector(List.of("10")))
+                        data.householdContext2.get(Household.class).getMembers().stream().mapToInt(Entity::getId)
+                )));
+        when(areaClusteredSelectors.peopleByTerytPrefixSelector(List.of("10")))
                 .thenReturn(() -> Stream.of(new Chunk(ChunkInfo.of(0, 10, "100102"),
-                data.householdContext3.get(Household.class).getMembers().stream().mapToInt(Entity::getId)
-        )));
+                        data.householdContext3.get(Household.class).getMembers().stream().mapToInt(Entity::getId)
+                )));
     }
 
     @Test
     @DisplayName("Should change load according to the given data")
-    public void test(){
+    public void test() {
         var loader = new VariantSowingFromCsvLoader("/variantSowingTest.csv", workDir, basicConfig.loads);
         var variantSowingService = new VariantSowingService(agentStateService,
                 randomProvider,
-                communeClusteredSelectors,
+                areaClusteredSelectors,
                 data.selectors,
                 statsService);
         var variantSowingSystemBuilder = new VariantSowingFromCsvSystemBuilder(loader,

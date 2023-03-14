@@ -22,9 +22,9 @@ import net.snowyhollows.bento.annotation.WithFactory;
 import org.apache.commons.math3.random.RandomAdaptor;
 import pl.edu.icm.board.util.RandomProvider;
 import pl.edu.icm.pdyn2.AgentStateService;
-import pl.edu.icm.pdyn2.simulation.StatsService;
-import pl.edu.icm.pdyn2.index.CommuneClusteredSelectors;
+import pl.edu.icm.pdyn2.index.AreaClusteredSelectors;
 import pl.edu.icm.pdyn2.model.immunization.ImmunizationEvent;
+import pl.edu.icm.pdyn2.simulation.StatsService;
 import pl.edu.icm.trurl.ecs.Entity;
 import pl.edu.icm.trurl.ecs.Session;
 import pl.edu.icm.trurl.ecs.selector.Chunk;
@@ -41,18 +41,23 @@ import static java.lang.Math.min;
 public class VaccinationService {
     private final AgentStateService agentStateService;
     private final Random random;
-    private final CommuneClusteredSelectors communeClusteredSelectors;
+    private final AreaClusteredSelectors areaClusteredSelectors;
     private final Selectors selectors;
     private final StatsService statsService;
 
     @WithFactory
-    public VaccinationService(AgentStateService agentStateService, RandomProvider randomProvider, CommuneClusteredSelectors communeClusteredSelectors, Selectors selectors, StatsService statsService) {
+    public VaccinationService(AgentStateService agentStateService,
+                              RandomProvider randomProvider,
+                              AreaClusteredSelectors areaClusteredSelectors,
+                              Selectors selectors,
+                              StatsService statsService) {
         this.agentStateService = agentStateService;
         this.random = RandomAdaptor.createAdaptor(randomProvider.getRandomGenerator(VaccinationService.class));
-        this.communeClusteredSelectors = communeClusteredSelectors;
+        this.areaClusteredSelectors = areaClusteredSelectors;
         this.selectors = selectors;
         this.statsService = statsService;
     }
+
     public <M, K, L, W> void vaccinate(Session session,
                                        ImmunizationEvent vaccinationEvent,
                                        int count,
@@ -63,7 +68,7 @@ public class VaccinationService {
                                        Class<L> lClass, Predicate<L> lPredicate, boolean lAcceptIfAbsent,
                                        Class<W> wClass, Predicate<W> wPredicate, boolean wAcceptIfAbsent) {
 
-        List<Entity> eligibleAgents = selectors.filtered(communeClusteredSelectors.personInTerytSelector(teryts),
+        List<Entity> eligibleAgents = selectors.filtered(areaClusteredSelectors.peopleByTerytPrefixSelector(teryts),
                         mClass, mPredicate, mAcceptIfAbsent,
                         kClass, kPredicate, kAcceptIfAbsent,
                         lClass, lPredicate, lAcceptIfAbsent,

@@ -22,9 +22,9 @@ import net.snowyhollows.bento.annotation.WithFactory;
 import org.apache.commons.math3.random.RandomAdaptor;
 import pl.edu.icm.board.util.RandomProvider;
 import pl.edu.icm.pdyn2.AgentStateService;
-import pl.edu.icm.pdyn2.simulation.StatsService;
-import pl.edu.icm.pdyn2.index.CommuneClusteredSelectors;
+import pl.edu.icm.pdyn2.index.AreaClusteredSelectors;
 import pl.edu.icm.pdyn2.model.immunization.Load;
+import pl.edu.icm.pdyn2.simulation.StatsService;
 import pl.edu.icm.trurl.ecs.Entity;
 import pl.edu.icm.trurl.ecs.Session;
 import pl.edu.icm.trurl.ecs.selector.Chunk;
@@ -34,10 +34,6 @@ import pl.edu.icm.trurl.util.Status;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Random;
 import java.util.stream.IntStream;
 
 import static java.lang.Math.min;
@@ -45,7 +41,7 @@ import static java.lang.Math.min;
 public class VariantSowingService {
     private final AgentStateService agentStateService;
     private final Random random;
-    private final CommuneClusteredSelectors communeClusteredSelectors;
+    private final AreaClusteredSelectors areaClusteredSelectors;
 
     private final Selectors selectors;
     private final StatsService statsService;
@@ -53,10 +49,12 @@ public class VariantSowingService {
     @WithFactory
     public VariantSowingService(AgentStateService agentStateService,
                                 RandomProvider randomProvider,
-                                CommuneClusteredSelectors communeClusteredSelectors, Selectors selectors, StatsService statsService) {
+                                AreaClusteredSelectors areaClusteredSelectors,
+                                Selectors selectors,
+                                StatsService statsService) {
         this.agentStateService = agentStateService;
         this.random = RandomAdaptor.createAdaptor(randomProvider.getRandomGenerator(VariantSowingService.class));
-        this.communeClusteredSelectors = communeClusteredSelectors;
+        this.areaClusteredSelectors = areaClusteredSelectors;
         this.selectors = selectors;
         this.statsService = statsService;
     }
@@ -65,7 +63,7 @@ public class VariantSowingService {
                                   Class<M> mClass, Predicate<M> mPredicate, boolean mAcceptIfAbsent,
                                   Class<K> kClass, Predicate<K> kPredicate, boolean kAcceptIfAbsent) {
         var eligibleAgents = selectors.filtered(
-                        communeClusteredSelectors.personInTerytSelector(teryts),
+                        areaClusteredSelectors.peopleByTerytPrefixSelector(teryts),
                         mClass,
                         mPredicate,
                         mAcceptIfAbsent,

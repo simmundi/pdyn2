@@ -28,20 +28,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.edu.icm.board.EngineIo;
 import pl.edu.icm.board.geography.GeographicalServices;
-import pl.edu.icm.board.model.AdministrationUnit;
-import pl.edu.icm.board.model.Area;
-import pl.edu.icm.board.model.Attendee;
-import pl.edu.icm.board.model.EducationalInstitution;
-import pl.edu.icm.board.model.Household;
-import pl.edu.icm.board.model.Location;
-import pl.edu.icm.board.model.Named;
-import pl.edu.icm.board.model.Person;
-import pl.edu.icm.board.model.Workplace;
+import pl.edu.icm.board.geography.commune.CommuneManager;
+import pl.edu.icm.board.model.*;
 import pl.edu.icm.board.util.RandomForChunkProvider;
 import pl.edu.icm.board.util.RandomProvider;
 import pl.edu.icm.pdyn2.AgentStateService;
 import pl.edu.icm.pdyn2.BasicConfig;
-import pl.edu.icm.pdyn2.simulation.StatsService;
 import pl.edu.icm.pdyn2.context.BehaviourBasedContextsService;
 import pl.edu.icm.pdyn2.context.ContextsService;
 import pl.edu.icm.pdyn2.immunization.ImmunizationService;
@@ -51,11 +43,13 @@ import pl.edu.icm.pdyn2.model.context.Context;
 import pl.edu.icm.pdyn2.model.context.Inhabitant;
 import pl.edu.icm.pdyn2.model.immunization.Immunization;
 import pl.edu.icm.pdyn2.model.progression.HealthStatus;
+import pl.edu.icm.pdyn2.simulation.StatsService;
 import pl.edu.icm.pdyn2.time.SimulationTimer;
 import pl.edu.icm.trurl.csv.CsvWriter;
 import pl.edu.icm.trurl.ecs.EngineConfiguration;
 import pl.edu.icm.trurl.ecs.EngineConfigurationFactory;
 import pl.edu.icm.trurl.ecs.EntitySystem;
+import pl.edu.icm.trurl.ecs.query.SelectorFromQueryService;
 import pl.edu.icm.trurl.ecs.util.IteratingSystemBuilder;
 import pl.edu.icm.trurl.ecs.util.Selectors;
 import pl.edu.icm.trurl.ecs.util.Visit;
@@ -64,7 +58,7 @@ import pl.edu.icm.trurl.store.tablesaw.TablesawStoreFactory;
 
 import java.io.IOException;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
@@ -121,6 +115,10 @@ class TransmissionSystemIT {
     private AreaClusteredSelectors areaClusteredSelectors;
 
     private EntitySystem transmissionSystem;
+    @Mock
+    private SelectorFromQueryService selectorFromQueryService;
+    @Mock
+    private CommuneManager communeManager;
 
     @BeforeEach
     void before() throws IOException {
@@ -142,7 +140,7 @@ class TransmissionSystemIT {
                 Context.class,
                 Immunization.class
         );
-        areaClusteredSelectors = new AreaClusteredSelectors(engineConfig, 10, 10);
+        areaClusteredSelectors = new AreaClusteredSelectors(engineConfig, selectorFromQueryService, communeManager);
         board.load(TransmissionVisitor.class.getResourceAsStream("/transmissionTest.csv"));
         when(randomProvider.getRandomGenerator(TransmissionVisitor.class)).thenReturn(randomGenerator);
         when(randomProvider.getRandomForChunkProvider(TransmissionVisitor.class)).thenReturn(randomForChunkProvider);
@@ -172,7 +170,7 @@ class TransmissionSystemIT {
     @Disabled
     void test() throws IOException {
         board.getEngine().execute(transmissionSystem);
-        var table = ((TablesawStore)board.getEngine().getStore()).asTable("entities");
+        var table = ((TablesawStore) board.getEngine().getStore()).asTable("entities");
 
         assertThat(table.where(table.stringColumn("health.stage").isEqualTo("OBJAWOWY"))
                 .rowCount()).isEqualTo(1);

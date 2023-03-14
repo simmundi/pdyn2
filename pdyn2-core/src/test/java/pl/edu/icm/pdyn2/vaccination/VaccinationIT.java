@@ -27,8 +27,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.edu.icm.board.model.Household;
 import pl.edu.icm.board.util.RandomProvider;
-import pl.edu.icm.pdyn2.*;
-import pl.edu.icm.pdyn2.index.CommuneClusteredSelectors;
+import pl.edu.icm.pdyn2.AgentStateService;
+import pl.edu.icm.pdyn2.BasicConfig;
+import pl.edu.icm.pdyn2.ExampleDataForIntegrationTests;
+import pl.edu.icm.pdyn2.MockRandomProvider;
+import pl.edu.icm.pdyn2.index.AreaClusteredSelectors;
 import pl.edu.icm.pdyn2.model.immunization.Immunization;
 import pl.edu.icm.pdyn2.model.immunization.ImmunizationEvent;
 import pl.edu.icm.pdyn2.simulation.StatsService;
@@ -51,28 +54,27 @@ public class VaccinationIT {
     private final ExampleDataForIntegrationTests data = new ExampleDataForIntegrationTests(basicConfig, true);
     private final AgentStateService agentStateService = data.agentStateService;
     private final SimulationTimer simulationTimer = data.simulationTimer;
+    private final RandomProvider randomProvider = new MockRandomProvider();
     @Mock
     private WorkDir workDir;
-
-    private final RandomProvider randomProvider = new MockRandomProvider();
     @Mock
     private StatsService statsService;
     @Mock
-    private CommuneClusteredSelectors communeClusteredSelectors;
+    private AreaClusteredSelectors areaClusteredSelectors;
 
     @BeforeEach
     public void before() {
         when(workDir.openForReading(new File("/vaccinationTest.csv")))
                 .thenReturn(VaccinationIT.class.getResourceAsStream("/vaccinationTest.csv"));
-        when(communeClusteredSelectors.personInTerytSelector(List.of("2401")))
+        when(areaClusteredSelectors.peopleByTerytPrefixSelector(List.of("2401")))
                 .thenReturn(() -> Stream.of(new Chunk(ChunkInfo.of(0, 10, "240102"),
                         data.householdContext1.get(Household.class).getMembers().stream().mapToInt(Entity::getId)
                 )));
-        when(communeClusteredSelectors.personInTerytSelector(List.of("0123")))
+        when(areaClusteredSelectors.peopleByTerytPrefixSelector(List.of("0123")))
                 .thenReturn(() -> Stream.of(new Chunk(ChunkInfo.of(0, 10, "012345"),
                         data.householdContext2.get(Household.class).getMembers().stream().mapToInt(Entity::getId)
                 )));
-        when(communeClusteredSelectors.personInTerytSelector(List.of("1001")))
+        when(areaClusteredSelectors.peopleByTerytPrefixSelector(List.of("1001")))
                 .thenReturn(() -> Stream.of(new Chunk(ChunkInfo.of(0, 10, "100102"),
                         data.householdContext3.get(Household.class).getMembers().stream().mapToInt(Entity::getId)
                 )));
@@ -84,7 +86,7 @@ public class VaccinationIT {
         var loader = new VaccinationFromCsvLoader("/vaccinationTest.csv", workDir, basicConfig.loads);
         var vaccinationService = new VaccinationService(agentStateService,
                 randomProvider,
-                communeClusteredSelectors,
+                areaClusteredSelectors,
                 data.selectors,
                 statsService);
         var vaccinationSystemBuilder = new VaccinationFromCsvSystemBuilder(loader,

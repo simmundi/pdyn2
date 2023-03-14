@@ -18,101 +18,128 @@
 
 package pl.edu.icm.pdyn2.index;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
 import net.snowyhollows.bento.annotation.WithFactory;
 import pl.edu.icm.board.geography.KilometerGridCell;
-import pl.edu.icm.board.model.Household;
-import pl.edu.icm.board.model.HouseholdMapper;
-import pl.edu.icm.board.model.Location;
-import pl.edu.icm.board.model.Person;
+import pl.edu.icm.board.geography.commune.CommuneManager;
+import pl.edu.icm.board.model.*;
 import pl.edu.icm.trurl.ecs.EngineConfiguration;
-import pl.edu.icm.trurl.ecs.mapper.Mapper;
+import pl.edu.icm.trurl.ecs.query.SelectorFromQueryService;
+import pl.edu.icm.trurl.ecs.selector.Chunk;
 import pl.edu.icm.trurl.ecs.selector.RandomAccessSelector;
 import pl.edu.icm.trurl.ecs.selector.Selector;
-import pl.edu.icm.trurl.ecs.util.ManuallyChunkedArraySelector;
-import pl.edu.icm.trurl.store.attribute.EntityListAttribute;
 import pl.edu.icm.trurl.util.Status;
 
-public class AreaClusteredSelectors {
+import java.util.Collection;
+import java.util.Map;
+import java.util.stream.Stream;
 
-    private final EngineConfiguration engineConfiguration;
+public class AreaClusteredSelectors {
     private final int targetChunkSize = 25_000;
-    private final int gridColumns;
-    private final int gridRows;
     private final int chunkWidth = 6;
     private final int chunkHeight = 6;
-    private ManuallyChunkedArraySelector personSelector;
-    private ManuallyChunkedArraySelector householdSelector;
-
+    private final EngineConfiguration engineConfiguration;
+    private final SelectorFromQueryService selectorFromQueryService;
+    private final CommuneManager communeManager;
+    private RandomAccessSelector personInGridSelector;
+    private RandomAccessSelector householdInGridSelector;
+    private RandomAccessSelector personInCommuneSelector;
     @WithFactory
-    public AreaClusteredSelectors(EngineConfiguration engineConfiguration, int gridColumns, int gridRows) {
+    public AreaClusteredSelectors(EngineConfiguration engineConfiguration,
+                                  SelectorFromQueryService selectorFromQueryService,
+                                  CommuneManager communeManager) {
         this.engineConfiguration = engineConfiguration;
-        this.gridColumns = gridColumns;
-        this.gridRows = gridRows;
+        this.selectorFromQueryService = selectorFromQueryService;
+        this.communeManager = communeManager;
         engineConfiguration.addComponentClasses(Person.class, Household.class, Location.class);
     }
 
     public synchronized RandomAccessSelector householdSelector() {
-        if (householdSelector == null) {
+        if (householdInGridSelector == null) {
             createSelectors();
         }
-        return householdSelector;
+        return householdInGridSelector;
     }
 
     public synchronized Selector personSelector() {
-        if (personSelector == null) {
+        if (personInGridSelector == null) {
             createSelectors();
         }
-        return personSelector;
+        return personInGridSelector;
+    }
+
+    public synchronized Selector peopleByTerytPrefixSelector(Collection<String> prefixes) {
+        if (personInCommuneSelector == null) {
+            createSelectors();
+        }
+        return new Selector() {
+            @Override
+            public Stream<Chunk> chunks() {
+                return personInCommuneSelector.chunks()
+                        .filter(chunk -> prefixes.stream()
+                                .anyMatch(t -> chunk.getChunkInfo().getLabel().startsWith(t))
+                        );
+            }
+
+            @Override
+            public int estimatedChunkSize() {
+                return targetChunkSize;
+            }
+        };
     }
 
     private void createSelectors() {
         HouseholdMapper householdMapper = (HouseholdMapper) engineConfiguration.getEngine().getMapperSet().classToMapper(Household.class);
-        Mapper<Location> locationMapper = engineConfiguration.getEngine().getMapperSet().classToMapper(Location.class);
-        EntityListAttribute members = engineConfiguration.getEngine().getStore().get("members");
+        LocationMapper locationMapper = (LocationMapper) engineConfiguration.getEngine().getMapperSet().classToMapper(Location.class);
 
-        Multimap<KilometerGridCell, Integer> multimap = HashMultimap.create(13_000_000, 100);
+        Status status = Status.of("Building area clustered selectors", 1_000_000);
+        Map<SelectorType, Integer> tagClassifiersWithInitialSizes = Map.of(
+                SelectorType.HOUSEHOLD_IN_GRID, 512,
+                SelectorType.PERSON_IN_GRID, 4094,
+                SelectorType.PERSON_IN_COMMUNE, 16384
+        );
 
-        {
-            Status status = Status.of("locating households", 1000_000);
-            for (int id = 0; id < engineConfiguration.getEngine().getCount(); id++) {
-                if (!householdMapper.isPresent(id)) {
-                    continue;
-                }
-                status.tick();
-                multimap.put(KilometerGridCell.fromLocation(locationMapper.createAndLoad(id)),
-                        id);
-            }
-            status.done();
-        }
+        var builtSelectors = selectorFromQueryService.fixedMultipleSelectorsFromRawQueryInParallel(
+                tagClassifiersWithInitialSizes,
+                (id, result, label) -> {
+                    if (householdMapper.isPresent(id)) {
+                        int locationE = locationMapper.getE(id);
+                        int locationN = locationMapper.getN(id);
+                        var kgc = KilometerGridCell.fromPl1992ENMeters(locationE, locationN);
+                        var gridTag = getGridTagForLocation(kgc);
+                        var communeTag = getCommuneTagForLocation(kgc);
+                        result.add(id, gridTag, SelectorType.HOUSEHOLD_IN_GRID);
 
-        personSelector = new ManuallyChunkedArraySelector(39_000_000, multimap.keySet().size());
-        householdSelector = new ManuallyChunkedArraySelector(15_000_000, multimap.keySet().size());
-        {
-            Status status = Status.of("indexing households and people", 1000_000);
-
-            for (int col = 0; col < gridColumns; col += chunkWidth) {
-                for (int row = 0; row < gridRows; row += chunkHeight) {
-                    for (int e = 0; e < chunkWidth; e++) {
-                        for (int n = 0; n < chunkHeight; n++) {
-                            KilometerGridCell kilometerGridCell = KilometerGridCell.fromLegacyPdynCoordinates(col + e, row + n);
-                            for (Integer id : multimap.get(kilometerGridCell)) {
-                                householdSelector.add(id);
-                                members.loadIds(id, (index, value) -> personSelector.add(value));
-                                status.tick();
-                            }
-                        }
+                        householdMapper.getMembers(id, (index, value) -> {
+                            result.add(value, gridTag, SelectorType.PERSON_IN_GRID);
+                            result.add(value, communeTag, SelectorType.PERSON_IN_COMMUNE);
+                        });
+                        status.tick();
                     }
-                    if (householdSelector.getRunningSize() >= targetChunkSize) {
-                        householdSelector.endChunk();
-                    }
-                    if (personSelector.getRunningSize() >= targetChunkSize) {
-                        personSelector.endChunk();
-                    }
-                }
-            }
-            status.done();
-        }
+                });
+
+        householdInGridSelector = builtSelectors.get(SelectorType.HOUSEHOLD_IN_GRID);
+        personInGridSelector = builtSelectors.get(SelectorType.PERSON_IN_GRID);
+        personInCommuneSelector = builtSelectors.get(SelectorType.PERSON_IN_COMMUNE);
+        status.done();
+    }
+
+    private String getCommuneTagForLocation(KilometerGridCell kgc) {
+        return communeManager.communeAt(kgc).getTeryt();
+    }
+
+    private String getGridTagForLocation(KilometerGridCell kgc) {
+        var col = kgc.getLegacyPdynCol();
+        var row = kgc.getLegacyPdynRow();
+        return "(" +
+                (col / chunkWidth) * chunkWidth + "-" + (col / chunkWidth + 1) * chunkWidth +
+                "," +
+                (row / chunkHeight) * chunkHeight + "-" + (row / chunkHeight + 1) * chunkHeight +
+                ")";
+    }
+
+    private enum SelectorType {
+        PERSON_IN_GRID,
+        HOUSEHOLD_IN_GRID,
+        PERSON_IN_COMMUNE
     }
 }
