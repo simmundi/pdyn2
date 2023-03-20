@@ -31,10 +31,15 @@ import java.util.function.Consumer;
 public class AgentIdMappingLoader {
 
     private ExportedIdMapper mapper;
+    private final OrcStoreService orcStoreService;
 
     @WithFactory
     public AgentIdMappingLoader() {
+        this(new OrcStoreService());
+    }
 
+    public AgentIdMappingLoader(OrcStoreService orcStoreService) {
+        this.orcStoreService = orcStoreService;
     }
 
     private void load(String filename) throws IOException {
@@ -46,7 +51,6 @@ public class AgentIdMappingLoader {
 
         var store = new ArrayStore(1024);
         mapper.configureAndAttach(store);
-        var orcStoreService = new OrcStoreService();
         orcStoreService.read(store, filename);
         mapper.attachStore(store);
         status.done();

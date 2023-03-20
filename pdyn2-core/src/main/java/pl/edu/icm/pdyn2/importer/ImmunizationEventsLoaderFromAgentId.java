@@ -54,10 +54,9 @@ public class ImmunizationEventsLoaderFromAgentId {
         csvParserSettings.setLineSeparatorDetectionEnabled(true);
         csvParserSettings.setHeaderExtractionEnabled(true);
         CsvParser csvParser = new CsvParser(csvParserSettings);
-
         var stream = workDir.openForReading(new File(filename));
         stream.mark(Integer.MAX_VALUE);
-        capacity = checkCapacity(csvParser, stream);
+        capacity = checkCapacity(stream);
         stream.reset();
         AtomicInteger counter = new AtomicInteger(0);
         var store = new ArrayStore(capacity);
@@ -78,7 +77,6 @@ public class ImmunizationEventsLoaderFromAgentId {
     }
 
     public void forEach(String filename, Consumer<ImportedImmunizationEvent> consumer) {
-
         try {
             load(filename);
         } catch (IOException exception) {
@@ -89,7 +87,7 @@ public class ImmunizationEventsLoaderFromAgentId {
         }
     }
 
-    private int checkCapacity(CsvParser csvParser, InputStream stream) throws IOException {
+    private int checkCapacity(InputStream stream) {
         int lines = 0;
         var scanner = new Scanner(stream);
         while (scanner.hasNextLine()) {

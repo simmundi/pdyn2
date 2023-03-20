@@ -32,8 +32,9 @@ import pl.edu.icm.pdyn2.model.progression.Stage;
 import pl.edu.icm.pdyn2.model.progression.Stages;
 import pl.edu.icm.pdyn2.progression.DiseaseStageTransitionsService;
 import pl.edu.icm.pdyn2.time.SimulationTimer;
-import pl.edu.icm.trurl.ecs.util.EntityIterator;
+import pl.edu.icm.trurl.ecs.util.IteratingSystemBuilder;
 import pl.edu.icm.trurl.ecs.util.Selectors;
+import pl.edu.icm.trurl.ecs.util.Visit;
 import pl.edu.icm.trurl.sampleSpace.EnumSampleSpace;
 import pl.edu.icm.trurl.util.Status;
 
@@ -90,25 +91,24 @@ public class ImmunizationEventsImporterFromAgentId {
             immunizationMap.computeIfAbsent(importedEvent.getId(), k -> new ArrayList<>()).add(event);
         });
         var status = Status.of("applying immunization history to agents", loader.getCapacity() / 10 + 1);
-
-        board.getEngine().execute(EntityIterator
-                .select(selectors.allWithComponents(Household.class))
-                .forEach(Household.class, (householdEntity, household) -> {
-                    var members = household.getMembers();
+        board.getEngine().execute(IteratingSystemBuilder.iteratingOver(
+                        selectors.allWithComponents(Household.class))
+                .persistingAll()
+                .withoutContext()
+                .perform(Visit.of((entity -> {
+                    var members = entity.get(Household.class).getMembers();
                     members.forEach(memberEntity -> {
                         var pdyn2Id = memberEntity.getId();
-                        var pdyn1Id = idsMap.getOrDefault(pdyn2Id, -1);
+                        var pdyn1Id = Optional.ofNullable(idsMap.get(pdyn2Id))
+                                .orElseThrow(() -> new IllegalStateException("Could not find id mapping for pdyn2Id=" + pdyn2Id));
 
-                        if (pdyn1Id == -1) {
-                            throw new IllegalStateException("Could not find id mapping for pdyn2Id=" + pdyn2Id);
-                        }
                         if (immunizationMap.containsKey(pdyn1Id)) {
                             var age = memberEntity.get(Person.class).getAge();
                             for (ImmunizationEvent event : immunizationMap.get(pdyn1Id)) {
                                 event.setDay(
                                         endDayFromDiseaseHistory(event.getLoad(), event.getDiseaseHistory(), age, event.getDay()));
                                 agentStateService.addImmunizationEvent(memberEntity, event);
-                                if(event.getLoad().classification == LoadClassification.VIRUS) {
+                                if (event.getLoad().classification == LoadClassification.VIRUS) {
                                     agentStateService.addSourcesDistribution(memberEntity,
                                             new EnumSampleSpace<>(ContextInfectivityClass.class));
                                 }
@@ -116,7 +116,7 @@ public class ImmunizationEventsImporterFromAgentId {
                             }
                         }
                     });
-                }));
+                }))).build());
         status.done();
     }
 

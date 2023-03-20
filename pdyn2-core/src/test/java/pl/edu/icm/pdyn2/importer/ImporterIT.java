@@ -20,7 +20,6 @@ package pl.edu.icm.pdyn2.importer;
 
 import net.snowyhollows.bento.config.WorkDir;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -30,14 +29,18 @@ import pl.edu.icm.pdyn2.AgentStateService;
 import pl.edu.icm.pdyn2.BasicConfig;
 import pl.edu.icm.pdyn2.ExampleDataForIntegrationTests;
 import pl.edu.icm.pdyn2.model.immunization.Immunization;
-import pl.edu.icm.pdyn2.model.immunization.Load;
-import pl.edu.icm.pdyn2.model.progression.Stage;
 import pl.edu.icm.pdyn2.progression.DiseaseStageTransitionsService;
+import pl.edu.icm.trurl.csv.CsvReader;
+import pl.edu.icm.trurl.io.orc.OrcStoreService;
+import pl.edu.icm.trurl.store.Store;
 
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -51,11 +54,18 @@ public class ImporterIT {
     private EngineIo board;
     @Mock
     private WorkDir workDir;
+    @Mock
+    private OrcStoreService orcStoreService;
 
     ImmunizationEventsImporterFromAgentId importer;
 
     @BeforeEach
-    public void before() throws FileNotFoundException {
+    public void before() throws IOException {
+        doAnswer((params) -> {
+            Store store = params.getArgument(0);
+            (new CsvReader()).load(ImporterIT.class.getResourceAsStream("/importerTest.orc.csv"), store);
+            return null;
+        }).when(orcStoreService).read(any(), anyString());
         when(workDir.openForReading(new File("/importerTest.csv"))).thenReturn(ImporterIT.class
                 .getResourceAsStream("/importerTest.csv"));
         when(board.getEngine()).thenReturn(data.session.getEngine());
@@ -77,10 +87,9 @@ public class ImporterIT {
     }
 
     @Test
-    @Disabled
     public void test() {
         var loader = new ImmunizationEventsLoaderFromAgentId(workDir);
-        var idMappingLoader = new AgentIdMappingLoader();
+        var idMappingLoader = new AgentIdMappingLoader(orcStoreService);
         importer = new ImmunizationEventsImporterFromAgentId(loader,
                 idMappingLoader,
                 board,
@@ -91,8 +100,7 @@ public class ImporterIT {
                 basicConfig.loads,
                 basicConfig.stages);
         data.session.close();
-        var orcFilename = String.valueOf(ImporterIT.class.getResource("/importerTest.orc"));
-        importer.importEvents("/importerTest.csv", orcFilename, 1000);
+        importer.importEvents("/importerTest.csv", "mocked_look_at_before()", 1000);
         data.session.close();
 
         assertThat(data.allAgents.get(1).get(Immunization.class).getEvents().get(0).getDay()).isEqualTo(-997);
