@@ -25,9 +25,9 @@ It _will_, however, take some liberties with your home directory
 and it _will_ consume some resources (a daemon process called `gradle` will linger on,
 to speed up future builds. It can be safely killed.)
 
-To run gradle, use the script `gradlew` (there's a `gradlew.bat` version which works on Windows as well`).
+To run Gradle, use the script `gradlew` (there's a `gradlew.bat` version which works on Windows as well`).
 
-To clean:
+To clean: 
 
 ```
 ./gradlew clean
