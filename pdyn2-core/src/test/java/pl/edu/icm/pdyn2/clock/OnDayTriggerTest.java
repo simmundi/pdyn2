@@ -16,34 +16,42 @@
  *
  */
 
-package pl.edu.icm.pdyn2.immunization;
+package pl.edu.icm.pdyn2.clock;
 
+import it.unimi.dsi.fastutil.ints.Int2IntArrayMap;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import pl.edu.icm.pdyn2.BasicConfig;
-import pl.edu.icm.pdyn2.immunization.strategy.SimpleImmunizationStrategy;
-import pl.edu.icm.pdyn2.model.immunization.Immunization;
+import pl.edu.icm.trurl.ecs.SessionFactory;
+import pl.edu.icm.trurl.ecs.EntitySystem;
+import pl.edu.icm.trurl.ecs.util.Systems;
+
+import java.util.Map;
+import java.util.stream.IntStream;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @ExtendWith(MockitoExtension.class)
-class SimpleImmunizationStrategyTest {
-    final BasicConfig basicConfig = new BasicConfig();
+class OnDayTriggerTest {
+    SimulationClock simulationClock = new SimulationClock("");
     @Mock
-    Immunization immunization;
+    SessionFactory sessionFactory;
 
     @Test
-    void getImmunizationCoefficient() {
+    void onDay() {
         //given
-        var simpleImmunizationStrategy = new SimpleImmunizationStrategy(0.3f);
+        var onday = new OnDayTrigger(simulationClock);
+        final Map<Integer, Integer> day = new Int2IntArrayMap();
         //execute
-        var coef = simpleImmunizationStrategy.getImmunizationCoefficient(immunization,
-                ImmunizationStage.LATENT,
-                basicConfig.loads.WILD,
-                0);
+        EntitySystem sequence = Systems.sequence(
+                onday.onDay(0, (s) -> day.put(0, simulationClock.getDaysPassed())),
+                onday.onDay(3, (s) -> day.put(3, simulationClock.getDaysPassed())),
+                onday.onDay(5, (s) -> day.put(5, simulationClock.getDaysPassed())),
+                simulationClock
+        );
+        IntStream.range(0, 6).forEach(x -> sequence.execute(sessionFactory));
         //assert
-        assertThat(coef).isEqualTo(0.3f);
+        day.forEach((x,y) -> assertThat(x).isEqualTo(y));
     }
 }

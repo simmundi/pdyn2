@@ -19,21 +19,18 @@
 package pl.edu.icm.pdyn2.progression;
 
 import net.snowyhollows.bento.annotation.ImplementationSwitch;
+import pl.edu.icm.em.common.math.pdf.SoftEnumDiscretePDF;
 import pl.edu.icm.pdyn2.model.immunization.Load;
 import pl.edu.icm.pdyn2.model.progression.Stage;
 import pl.edu.icm.trurl.ecs.Entity;
+import pl.edu.icm.trurl.sampleSpace.SoftEnumSampleSpace;
 
 @ImplementationSwitch(
-        configKey = "diseaseStageTransitionService",
+        configKey = "outcomeModifier",
         cases = {
-                @ImplementationSwitch.When(name="basic", implementation = DiseaseStageTransitionsServiceImpl.class, useByDefault = true),
+                @ImplementationSwitch.When(name="immunityAffectsHospitalization", implementation = ImmunityEffectsOutcomeModifier.class, useByDefault = true),
         }
 )
-public interface DiseaseStageTransitionsService {
-    int durationOf(Load load, Stage stage, int age);
-
-    Stage outcomeOf(Stage stage,
-                    Entity person,
-                    Load load,
-                    double random);
+public interface OutcomeModifier {
+    void modifyOutcomes(SoftEnumDiscretePDF<Stage> sampleSpace, Load load, Entity person);
 }

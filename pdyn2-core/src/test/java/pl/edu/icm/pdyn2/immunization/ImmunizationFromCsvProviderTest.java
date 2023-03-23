@@ -25,7 +25,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.edu.icm.pdyn2.BasicConfig;
-import pl.edu.icm.pdyn2.model.immunization.Load;
+import pl.edu.icm.pdyn2.immunization.strategy.ImmunizationFromCsvProvider;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -64,12 +64,12 @@ class ImmunizationFromCsvProviderTest {
     @Test
     void test() throws IOException {
         immunizationFromCsvProvider.load();
-        assertEquals(immunizationFromCsvProvider.getSFunction(basicConfig.loads.ALPHA, ImmunizationStage.HOSPITALIZOWANY_PRZED_OIOM, 10), 0.1);
-        assertEquals(immunizationFromCsvProvider.getSFunction(basicConfig.loads.PFIZER, ImmunizationStage.OBJAWOWY, 6), 0.39);
-        assertEquals(immunizationFromCsvProvider.getSFunction(basicConfig.loads.DELTA, ImmunizationStage.LATENTNY, 0), 0.88);
-        assertEquals(immunizationFromCsvProvider.getCrossImmunity(basicConfig.loads.PFIZER, basicConfig.loads.ALPHA, ImmunizationStage.LATENTNY), 0.999);
-        assertEquals(immunizationFromCsvProvider.getCrossImmunity(basicConfig.loads.ALPHA, basicConfig.loads.DELTA, ImmunizationStage.HOSPITALIZOWANY_PRZED_OIOM), 0.977);
-        assertEquals(immunizationFromCsvProvider.getCrossImmunity(basicConfig.loads.WILD, basicConfig.loads.WILD, ImmunizationStage.HOSPITALIZOWANY_BEZ_OIOM), 0.99999);
-        assertEquals(immunizationFromCsvProvider.getCrossImmunity(basicConfig.loads.DELTA, basicConfig.loads.ALPHA, ImmunizationStage.OBJAWOWY), 0.8);
+        assertEquals(immunizationFromCsvProvider.getSFunction(basicConfig.ALPHA, ImmunizationStage.HOSPITALIZED_PRE_ICU, 10), 0.1);
+        assertEquals(immunizationFromCsvProvider.getSFunction(basicConfig.PFIZER, ImmunizationStage.SYMPTOMATIC, 6), 0.39);
+        assertEquals(immunizationFromCsvProvider.getSFunction(basicConfig.DELTA, ImmunizationStage.LATENT, 0), 0.88);
+        assertEquals(immunizationFromCsvProvider.getCrossImmunity(basicConfig.PFIZER, basicConfig.ALPHA, ImmunizationStage.LATENT), 0.999);
+        assertEquals(immunizationFromCsvProvider.getCrossImmunity(basicConfig.ALPHA, basicConfig.DELTA, ImmunizationStage.HOSPITALIZED_PRE_ICU), 0.977);
+        assertEquals(immunizationFromCsvProvider.getCrossImmunity(basicConfig.loads.WILD, basicConfig.loads.WILD, ImmunizationStage.ASYMPTOMATIC), 0.99999);
+        assertEquals(immunizationFromCsvProvider.getCrossImmunity(basicConfig.DELTA, basicConfig.ALPHA, ImmunizationStage.SYMPTOMATIC), 0.8);
     }
 }

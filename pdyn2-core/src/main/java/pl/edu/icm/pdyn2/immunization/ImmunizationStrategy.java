@@ -20,6 +20,9 @@ package pl.edu.icm.pdyn2.immunization;
 
 import net.snowyhollows.bento.annotation.ImplementationSwitch;
 import net.snowyhollows.bento.annotation.ImplementationSwitch.When;
+import pl.edu.icm.pdyn2.immunization.strategy.ImmunizationStrategyFromPdyn1;
+import pl.edu.icm.pdyn2.immunization.strategy.ImmunizationStrategyFromPdyn1Rewritten;
+import pl.edu.icm.pdyn2.immunization.strategy.SimpleImmunizationStrategy;
 import pl.edu.icm.pdyn2.model.immunization.Immunization;
 import pl.edu.icm.pdyn2.model.immunization.Load;
 

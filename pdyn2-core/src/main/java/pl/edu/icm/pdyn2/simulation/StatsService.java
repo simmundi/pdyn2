@@ -73,7 +73,20 @@ public class StatsService {
      */
     public void debugOutputStats(PrintStream out) {
         for (Stage stage : statsAll.keySet()) {
-            out.println(" - " + stage + ": " + statsAll.get(stage).get() + ", delta: " + statsDailyNew.get(stage).get());
+            out.println(" - " + stage.name() + ": " + statsAll.get(stage).get() + ", delta: " + statsDailyNew.get(stage).get());
+        }
+        out.println(" - tested positive: " + additionalStatistics.get("testedPositive").get());
+        out.println(" - isolated: " + additionalStatistics.get("isolated").get());
+        out.println(" - quarantined: " + additionalStatistics.get("quarantined").get());
+        out.println(" - unquarantined: " + additionalStatistics.get("unquarantined").get());
+        out.println(" - changed impact: " + additionalStatistics.get("changedImpact").get());
+        out.println(" - changed variant: " + additionalStatistics.get("changedVariant").get());
+        out.println(" - vaccinated: " + additionalStatistics.get("vaccinated").get());
+    }
+
+    public void debugOutputStats(DebugTextFile out) {
+        for (Stage stage : statsAll.keySet()) {
+            out.println(" - " + stage.name() + ": " + statsAll.get(stage).get() + ", delta: " + statsDailyNew.get(stage).get());
         }
         out.println(" - tested positive: " + additionalStatistics.get("testedPositive").get());
         out.println(" - isolated: " + additionalStatistics.get("isolated").get());

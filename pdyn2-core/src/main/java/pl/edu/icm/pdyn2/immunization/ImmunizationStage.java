@@ -20,10 +20,10 @@ package pl.edu.icm.pdyn2.immunization;
 
 public enum ImmunizationStage {
 
-    LATENTNY(0),
-    OBJAWOWY(1),
-    HOSPITALIZOWANY_BEZ_OIOM(2),
-    HOSPITALIZOWANY_PRZED_OIOM(3);
+    LATENT(0),
+    SYMPTOMATIC(1),
+    ASYMPTOMATIC(2),
+    HOSPITALIZED_PRE_ICU(3);
 
     public final int id;
 

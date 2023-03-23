@@ -18,12 +18,12 @@
 
 package pl.edu.icm.pdyn2.model.context;
 
-public enum ContextInfectivityClass {
-    HOUSEHOLD,
-    WORKPLACE,
-    KINDERGARTEN,
-    SCHOOL,
-    UNIVERSITY,
-    BIG_UNIVERSITY,
-    STREET
+import net.snowyhollows.bento.annotation.WithFactory;
+import pl.edu.icm.trurl.util.AbstractSoftEnum;
+
+public class ContextInfectivityClass extends AbstractSoftEnum {
+    @WithFactory
+    public ContextInfectivityClass(String name, int ordinal) {
+        super(name, ordinal);
+    }
 }

@@ -66,9 +66,9 @@ class AgentImpactVisitorTest {
     void updateImpact__no_change() {
         // given
         Entity entity = entityMocker.entity(
-                impact(BehaviourType.ROUTINE, basicConfig.loads.WILD, basicConfig.stages.INFECTIOUS_ASYMPTOMATIC),
+                impact(BehaviourType.ROUTINE, basicConfig.loads.WILD, basicConfig.INFECTIOUS_ASYMPTOMATIC),
                 behaviour(BehaviourType.ROUTINE),
-                health(basicConfig.loads.WILD, basicConfig.stages.INFECTIOUS_ASYMPTOMATIC),
+                health(basicConfig.loads.WILD, basicConfig.INFECTIOUS_ASYMPTOMATIC),
                 person(34, Person.Sex.M));
 
         // execute
@@ -83,7 +83,7 @@ class AgentImpactVisitorTest {
     void updateImpact() {
         // given
         Entity entity = entityMocker.entity(
-                impact(BehaviourType.ROUTINE, basicConfig.loads.WILD, basicConfig.stages.INFECTIOUS_ASYMPTOMATIC),
+                impact(BehaviourType.ROUTINE, basicConfig.loads.WILD, basicConfig.INFECTIOUS_ASYMPTOMATIC),
                 behaviour(BehaviourType.ROUTINE),
                 health(basicConfig.loads.WILD, basicConfig.stages.INFECTIOUS_SYMPTOMATIC),
                 person(34, Person.Sex.M));
@@ -92,7 +92,7 @@ class AgentImpactVisitorTest {
 
         when(contextImpactService.calculateInfluenceFractionFor(entity.get(Person.class), uni)).thenReturn(1f);
         when(contextImpactService.calculateInfluenceFractionFor(entity.get(Person.class), street)).thenReturn(0.5f);
-        when(stageImpactConfig.getInfluenceOf(basicConfig.stages.INFECTIOUS_ASYMPTOMATIC)).thenReturn(0.1f);
+        when(stageImpactConfig.getInfluenceOf(basicConfig.INFECTIOUS_ASYMPTOMATIC)).thenReturn(0.1f);
         when(stageImpactConfig.getInfluenceOf(basicConfig.stages.INFECTIOUS_SYMPTOMATIC)).thenReturn(1f);
         when(contextsService.findActiveContextsForAgent(entity, entity.get(Impact.class))).thenReturn(
                 Stream.of(uni, street), Stream.of(uni, street));

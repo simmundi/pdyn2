@@ -26,6 +26,7 @@ import pl.edu.icm.board.model.Area;
 import pl.edu.icm.board.model.Household;
 import pl.edu.icm.board.model.Location;
 import pl.edu.icm.board.model.Person;
+import pl.edu.icm.pdyn2.clock.SimulationClockFactory;
 import pl.edu.icm.pdyn2.context.ContextsService;
 import pl.edu.icm.pdyn2.context.ContextsServiceFactory;
 import pl.edu.icm.pdyn2.impact.AgentImpactVisitor;
@@ -38,8 +39,7 @@ import pl.edu.icm.pdyn2.model.immunization.Immunization;
 import pl.edu.icm.pdyn2.model.impact.Impact;
 import pl.edu.icm.pdyn2.model.progression.HealthStatus;
 import pl.edu.icm.pdyn2.model.travel.Travel;
-import pl.edu.icm.pdyn2.time.SimulationTimer;
-import pl.edu.icm.pdyn2.time.SimulationTimerFactory;
+import pl.edu.icm.pdyn2.clock.SimulationClock;;
 import pl.edu.icm.trurl.ecs.Engine;
 import pl.edu.icm.trurl.ecs.EngineConfiguration;
 import pl.edu.icm.trurl.ecs.EngineConfigurationFactory;
@@ -52,7 +52,7 @@ public class EmptyDataForIntegrationTests {
     public AgentStateService agentStateService;
     public AgentImpactVisitor agentImpactVisitor;
     public ContextsService contextsService;
-    public SimulationTimer simulationTimer;
+    public SimulationClock simulationClock;
     public Engine engine;
     public final int cols = 100;
     public final int rows = 100;
@@ -68,12 +68,13 @@ public class EmptyDataForIntegrationTests {
         config.register("simulationStartDate", "1977-04-01");
         config.register("asymptomaticInfluenceShare", 0.1);
         config.register("symptomaticInfluenceShare", 1.0);
+        config.register("stages.initialStage", "LATENT");
         config.register(WorkDirFactory.IT, workDir);
 
         agentStateService = config.get(AgentStateServiceFactory.IT);
         contextsService = config.get(ContextsServiceFactory.IT);
         agentImpactVisitor = config.get(AgentImpactVisitorFactory.IT);
-        simulationTimer = config.get(SimulationTimerFactory.IT);
+        simulationClock = config.get(SimulationClockFactory.IT);
         selectors = config.get(SelectorsFactory.IT);
 
         EngineConfiguration engineConfiguration = config.get(EngineConfigurationFactory.IT);

@@ -22,26 +22,26 @@ import com.google.common.base.Preconditions;
 import net.snowyhollows.bento.annotation.WithFactory;
 import pl.edu.icm.board.model.Household;
 import pl.edu.icm.pdyn2.AgentStateService;
+import pl.edu.icm.pdyn2.clock.SimulationClock;
 import pl.edu.icm.pdyn2.simulation.StatsService;
 import pl.edu.icm.pdyn2.model.administration.MedicalHistory;
 import pl.edu.icm.pdyn2.model.administration.Record;
 import pl.edu.icm.pdyn2.model.administration.RecordType;
 import pl.edu.icm.pdyn2.model.context.Inhabitant;
 import pl.edu.icm.pdyn2.model.progression.HealthStatus;
-import pl.edu.icm.pdyn2.time.SimulationTimer;
 import pl.edu.icm.trurl.ecs.Entity;
 
 public final class TestingService {
-    private final SimulationTimer simulationTimer;
+    private final SimulationClock simulationClock;
     private final StatsService statsService;
     private final AgentStateService agentStateService;
     private final TestingConfig testingConfig;
 
     @WithFactory
-    public TestingService(SimulationTimer simulationTimer,
+    public TestingService(SimulationClock simulationClock,
                           StatsService statsService,
                           AgentStateService agentStateService, TestingConfig testingConfig) {
-        this.simulationTimer = simulationTimer;
+        this.simulationClock = simulationClock;
         this.statsService = statsService;
         this.agentStateService = agentStateService;
         this.testingConfig = testingConfig;
@@ -56,7 +56,7 @@ public final class TestingService {
         float baseProbabilityOfTest = testingConfig.getBaseProbabilityOfTest();
 
         if (baseProbabilityOfTest > 0 && random < baseProbabilityOfTest) {
-            testAgent(agentEntity, simulationTimer.getDaysPassed() - daysFromTest);
+            testAgent(agentEntity, simulationClock.getDaysPassed() - daysFromTest);
         }
     }
 

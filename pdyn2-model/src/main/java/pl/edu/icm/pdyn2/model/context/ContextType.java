@@ -25,9 +25,9 @@ public class ContextType extends AbstractSoftEnum {
     private final ContextInfectivityClass infectivityClass;
 
     @WithFactory
-    public ContextType(String name, int ordinal, ContextInfectivityClass infectivityClass) {
+    public ContextType(String name, int ordinal, ContextInfectivityClasses contextInfectivityClasses, String infectivityClass) {
         super(name, ordinal);
-        this.infectivityClass = infectivityClass;
+        this.infectivityClass = contextInfectivityClasses.getByName(infectivityClass);
     }
 
     public ContextInfectivityClass getInfectivityClass() {

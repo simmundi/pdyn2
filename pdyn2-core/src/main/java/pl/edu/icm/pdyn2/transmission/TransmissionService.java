@@ -19,9 +19,11 @@
 package pl.edu.icm.pdyn2.transmission;
 
 import net.snowyhollows.bento.annotation.WithFactory;
+import pl.edu.icm.em.common.math.pdf.SoftEnumDiscretePDF;
+import pl.edu.icm.pdyn2.clock.SimulationClock;
 import pl.edu.icm.pdyn2.context.ContextsService;
-import pl.edu.icm.pdyn2.immunization.ImmunizationService;
 import pl.edu.icm.pdyn2.immunization.ImmunizationStage;
+import pl.edu.icm.pdyn2.immunization.ImmunizationStrategy;
 import pl.edu.icm.pdyn2.model.context.Contamination;
 import pl.edu.icm.pdyn2.model.context.Context;
 import pl.edu.icm.pdyn2.model.context.ContextInfectivityClass;
@@ -30,9 +32,7 @@ import pl.edu.icm.pdyn2.model.immunization.Load;
 import pl.edu.icm.pdyn2.model.immunization.Loads;
 import pl.edu.icm.pdyn2.model.progression.HealthStatus;
 import pl.edu.icm.pdyn2.model.progression.Stages;
-import pl.edu.icm.pdyn2.time.SimulationTimer;
 import pl.edu.icm.trurl.ecs.Entity;
-import pl.edu.icm.trurl.sampleSpace.EnumSampleSpace;
 import pl.edu.icm.trurl.sampleSpace.SoftEnumSampleSpace;
 
 /**
@@ -44,29 +44,29 @@ import pl.edu.icm.trurl.sampleSpace.SoftEnumSampleSpace;
 public class TransmissionService {
     private final TransmissionConfig transmissionConfig;
     private final ContextsService contextsService;
-    private final SimulationTimer simulationTimer;
+    private final SimulationClock simulationClock;
     private final Loads loads;
     private final Stages stages;
-    private final ImmunizationService immunizationService;
-    private final SoftEnumSampleSpace<Load> relativeAlpha;
+    private final ImmunizationStrategy immunizationStrategy;
+    private final SoftEnumDiscretePDF<Load> relativeAlpha;
 
     @WithFactory
     public TransmissionService(ContextsService contextsService,
                                RelativeAlphaConfig relativeAlphaConfig,
                                TransmissionConfig transmissionConfig,
-                               SimulationTimer simulationTimer,
+                               SimulationClock simulationClock,
                                Loads loads,
                                Stages stages,
-                               ImmunizationService immunizationService) {
-        this.relativeAlpha = new SoftEnumSampleSpace<>(loads);
+                               ImmunizationStrategy immunizationStrategy) {
+        this.relativeAlpha = new SoftEnumDiscretePDF<>(loads);
         this.contextsService = contextsService;
         this.transmissionConfig = transmissionConfig;
-        this.simulationTimer = simulationTimer;
+        this.simulationClock = simulationClock;
         this.loads = loads;
         this.stages = stages;
-        this.immunizationService = immunizationService;
+        this.immunizationStrategy = immunizationStrategy;
         for (Load currentLoad : loads.viruses()) {
-            relativeAlpha.changeOutcome(currentLoad, relativeAlphaConfig.getRelativeAlpha(currentLoad));
+            relativeAlpha.set(currentLoad, relativeAlphaConfig.getRelativeAlpha(currentLoad));
         }
     }
 
@@ -91,13 +91,13 @@ public class TransmissionService {
      * @param entity      the agent entity
      * @return
      */
-    public void gatherExposurePerLoadAndContextForAgent(SoftEnumSampleSpace<Load> infectivity,
-                                                        EnumSampleSpace<ContextInfectivityClass> infectionSourceSampleSpace,
+    public void gatherExposurePerLoadAndContextForAgent(SoftEnumDiscretePDF<Load> infectivity,
+                                                        SoftEnumDiscretePDF<ContextInfectivityClass> infectionSourcePDF,
                                                         Entity entity) {
         var contexts = contextsService.findActiveContextsForAgent(entity);
         contexts.forEach(context -> {
             addContextInfectivity(context, infectivity);
-            updateSources(context, infectionSourceSampleSpace);
+            updateSources(context, infectionSourcePDF);
         });
         infectivity.multiply(relativeAlpha);
     }
@@ -119,10 +119,10 @@ public class TransmissionService {
      * @param randomDouble    number between 0 to 1
      * @return
      */
-    public Load selectLoad(SoftEnumSampleSpace<Load> exposurePerLoad, double randomDouble) {
+    public Load selectLoad(SoftEnumDiscretePDF<Load> exposurePerLoad, double randomDouble) {
         // this should never choose "default", because for valid randomDouble (less than 1) the value
         // will always be below total.
-        return exposurePerLoad.sampleOrDefault(randomDouble * exposurePerLoad.sumOfProbabilities());
+        return exposurePerLoad.sampleUnnormalized(randomDouble * exposurePerLoad.total());
     }
 
     /**
@@ -136,32 +136,32 @@ public class TransmissionService {
      */
     public double adjustProbabilityWithImmunity(double probability, Load chosenLoad, Entity agent) {
         Immunization immunization = agent.get(Immunization.class);
-        double coefficient = immunization == null ? 1 : (1 - immunizationService.getImmunizationCoefficient(immunization,
-                ImmunizationStage.LATENTNY,
+        double coefficient = immunization == null ? 1 : (1 - immunizationStrategy.getImmunizationCoefficient(immunization,
+                ImmunizationStage.LATENT,
                 chosenLoad,
-                simulationTimer.getDaysPassed()));
+                simulationClock.getDaysPassed()));
         return probability * coefficient;
     }
 
-    private void addContextInfectivity(Context context, SoftEnumSampleSpace<Load> infectivity) {
+    private void addContextInfectivity(Context context, SoftEnumDiscretePDF<Load> infectivity) {
         var weight = transmissionConfig.getTotalWeightForContextType(context.getContextType());
         var agentCount = context.getAgentCount();
         for (Contamination contamination : context.getContaminations()) {
             var loadInContext = contamination.getLoad();
             var levelInContext = contamination.getLevel() * weight / agentCount;
-            infectivity.increaseOutcome(loadInContext, levelInContext);
+            infectivity.shift(loadInContext, levelInContext);
         }
     }
 
-    private void updateSources(Context context, EnumSampleSpace<ContextInfectivityClass> infectionSources) {
+    private void updateSources(Context context, SoftEnumDiscretePDF<ContextInfectivityClass> infectionSources) {
         var weight = transmissionConfig.getTotalWeightForContextType(context.getContextType());
         var agentCount = context.getAgentCount();
         for (Contamination contamination : context.getContaminations()) {
             var loadInContext = contamination.getLoad();
             var levelInContext = contamination.getLevel() * weight / agentCount;
             infectionSources
-                    .increaseOutcome(context.getContextType().getInfectivityClass(),
-                            levelInContext * relativeAlpha.getProbability(loadInContext));
+                    .shift(context.getContextType().getInfectivityClass(),
+                            levelInContext * relativeAlpha.get(loadInContext));
         }
     }
 }

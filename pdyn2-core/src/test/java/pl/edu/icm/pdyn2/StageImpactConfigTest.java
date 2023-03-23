@@ -38,7 +38,7 @@ class StageImpactConfigTest {
         for (var stage : basicConfig.stages.values()) {
             float value = 0f;
 
-            if (stage == basicConfig.stages.INFECTIOUS_ASYMPTOMATIC) {
+            if (stage == basicConfig.stages.getByName("INFECTIOUS_ASYMPTOMATIC")) {
                 value = 0.1f;
             }
             if (stage == basicConfig.stages.INFECTIOUS_SYMPTOMATIC) {

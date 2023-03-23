@@ -23,7 +23,7 @@ import pl.edu.icm.pdyn2.AgentStateService;
 import pl.edu.icm.pdyn2.simulation.StatsService;
 import pl.edu.icm.pdyn2.model.behaviour.Behaviour;
 import pl.edu.icm.pdyn2.model.behaviour.BehaviourType;
-import pl.edu.icm.pdyn2.time.SimulationTimer;
+import pl.edu.icm.pdyn2.clock.SimulationClock;
 import pl.edu.icm.trurl.ecs.Entity;
 
 /**
@@ -34,17 +34,17 @@ public final class QuarantineVisitor {
     private final StatsService statsService;
     private final AgentStateService agentStateService;
     private final QuarantineConfig quarantineConfig;
-    private final SimulationTimer simulationTimer;
+    private final SimulationClock simulationClock;
 
     @WithFactory
     public QuarantineVisitor(StatsService statsService,
                              AgentStateService agentStateService,
                              QuarantineConfig quarantineConfig,
-                             SimulationTimer simulationTimer) {
+                             SimulationClock simulationClock) {
         this.statsService = statsService;
         this.agentStateService = agentStateService;
         this.quarantineConfig = quarantineConfig;
-        this.simulationTimer = simulationTimer;
+        this.simulationClock = simulationClock;
     }
 
     public void maybeEndQuarantine(Entity agentEntity) {
@@ -52,7 +52,7 @@ public final class QuarantineVisitor {
         if (behaviour == null || behaviour.getType() != BehaviourType.QUARANTINE) {
             return;
         }
-        int howLong = simulationTimer.getDaysPassed() - behaviour.getDayOfLastChange();
+        int howLong = simulationClock.getDaysPassed() - behaviour.getDayOfLastChange();
         if (howLong > quarantineConfig.getQuarantineLengthDays()) {
             agentStateService.endQuarantine(agentEntity);
             statsService.tickUnquarantined();

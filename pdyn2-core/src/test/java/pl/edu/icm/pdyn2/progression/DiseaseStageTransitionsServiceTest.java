@@ -25,8 +25,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.edu.icm.pdyn2.BasicConfig;
-import pl.edu.icm.pdyn2.model.immunization.Load;
-import pl.edu.icm.pdyn2.model.progression.Stage;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -47,7 +45,7 @@ class DiseaseStageTransitionsServiceTest {
         when(reader.readFromFile(anyString(), any())).thenReturn(Mockito.mock(LoadDiseaseStageTransitions.class));
 
         // execute
-        new DiseaseStageTransitionsService("wild",
+        new DiseaseStageTransitionsServiceImpl("wild",
                 "alpha",
                 "delta",
                 "omicron",
@@ -57,10 +55,10 @@ class DiseaseStageTransitionsServiceTest {
 
         // assert
         verify(reader).readFromFile(endsWith("wild"), eq(basicConfig.loads.WILD));
-        verify(reader).readFromFile(endsWith("alpha"), eq(basicConfig.loads.ALPHA));
-        verify(reader).readFromFile(endsWith("delta"), eq(basicConfig.loads.DELTA));
-        verify(reader).readFromFile(endsWith("omicron"), eq(basicConfig.loads.OMICRON));
-        verify(reader).readFromFile(endsWith("ba2"), eq(basicConfig.loads.BA2));
+        verify(reader).readFromFile(endsWith("alpha"), eq(basicConfig.ALPHA));
+        verify(reader).readFromFile(endsWith("delta"), eq(basicConfig.DELTA));
+        verify(reader).readFromFile(endsWith("omicron"), eq(basicConfig.OMICRON));
+        verify(reader).readFromFile(endsWith("ba2"), eq(basicConfig.BA2));
     }
 
 
@@ -69,8 +67,8 @@ class DiseaseStageTransitionsServiceTest {
     void durationOf() {
         // given
         when(reader.readFromFile(any(), any())).thenReturn(mock(LoadDiseaseStageTransitions.class));
-        when(reader.readFromFile(any(), eq(basicConfig.loads.OMICRON))).thenReturn(transitions);
-        DiseaseStageTransitionsService service =  new DiseaseStageTransitionsService("wild",
+        when(reader.readFromFile(any(), eq(basicConfig.OMICRON))).thenReturn(transitions);
+        DiseaseStageTransitionsService service =  new DiseaseStageTransitionsServiceImpl("wild",
                 "alpha",
                 "delta",
                 "omicron",
@@ -79,7 +77,7 @@ class DiseaseStageTransitionsServiceTest {
                 reader);
 
         // execute
-        service.durationOf(basicConfig.loads.OMICRON, basicConfig.stages.HEALTHY, 23);
+        service.durationOf(basicConfig.OMICRON, basicConfig.stages.HEALTHY, 23);
 
         // assert
         verify(transitions).durationOf(basicConfig.stages.HEALTHY, 23);
@@ -91,7 +89,7 @@ class DiseaseStageTransitionsServiceTest {
         // given
         when(reader.readFromFile(any(), any())).thenReturn(mock(LoadDiseaseStageTransitions.class));
         when(reader.readFromFile(any(), eq(basicConfig.loads.WILD))).thenReturn(transitions);
-        DiseaseStageTransitionsService service =         new DiseaseStageTransitionsService("wild",
+        DiseaseStageTransitionsService service =         new DiseaseStageTransitionsServiceImpl("wild",
                 "alpha",
                 "delta",
                 "omicron",
@@ -100,9 +98,9 @@ class DiseaseStageTransitionsServiceTest {
                 reader);
 
         // execute
-        service.durationOf(basicConfig.loads.WILD, basicConfig.stages.INFECTIOUS_ASYMPTOMATIC, 11);
+        service.durationOf(basicConfig.loads.WILD, basicConfig.INFECTIOUS_ASYMPTOMATIC, 11);
 
         // assert
-        verify(transitions).durationOf(basicConfig.stages.INFECTIOUS_ASYMPTOMATIC, 11);
+        verify(transitions).durationOf(basicConfig.INFECTIOUS_ASYMPTOMATIC, 11);
     }
 }

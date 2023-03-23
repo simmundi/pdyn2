@@ -19,9 +19,9 @@
 package pl.edu.icm.pdyn2.progression;
 
 import net.snowyhollows.bento.annotation.WithFactory;
+import pl.edu.icm.em.common.math.pdf.SoftEnumDiscretePDF;
 import pl.edu.icm.pdyn2.model.progression.Stage;
 import pl.edu.icm.pdyn2.model.progression.Stages;
-import pl.edu.icm.trurl.sampleSpace.SoftEnumSampleSpace;
 
 /**
  * Helper for LoadDiseaseStageTransitions, holds information about a single stage/age/load combination
@@ -29,12 +29,12 @@ import pl.edu.icm.trurl.sampleSpace.SoftEnumSampleSpace;
  */
 class TransitionOracle {
     private Stage stage;
-    private final SoftEnumSampleSpace<Stage> outcomes;
+    private final SoftEnumDiscretePDF<Stage> outcomes;
     private int duration;
 
     @WithFactory
     public TransitionOracle(Stages stages) {
-        outcomes = new SoftEnumSampleSpace<>(stages);
+        outcomes = new SoftEnumDiscretePDF<>(stages);
     }
 
     public Stage getStage() {
@@ -53,11 +53,11 @@ class TransitionOracle {
         this.duration = duration;
     }
 
-    public void addProbableOutcome(float probability, Stage outcome) {
-        outcomes.changeOutcome(outcome, probability);
+    public void setProbableOutcome(float probability, Stage outcome) {
+        outcomes.set(outcome, probability);
     }
 
-    public SoftEnumSampleSpace<Stage> getOutcomes() {
+    public SoftEnumDiscretePDF<Stage> getOutcomes() {
         return outcomes;
     }
 }

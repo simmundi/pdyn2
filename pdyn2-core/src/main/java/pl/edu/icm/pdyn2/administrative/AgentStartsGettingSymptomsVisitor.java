@@ -23,29 +23,30 @@ import org.apache.commons.math3.random.RandomGenerator;
 import pl.edu.icm.pdyn2.isolation.IsolationService;
 import pl.edu.icm.pdyn2.model.progression.HealthStatus;
 import pl.edu.icm.pdyn2.model.progression.Stages;
-import pl.edu.icm.pdyn2.time.SimulationTimer;
+import pl.edu.icm.pdyn2.clock.SimulationClock;
 import pl.edu.icm.trurl.ecs.Entity;
 
 /**
- * Builds a System instance that uses EligibleForTestsSelector
- * to run testingService#maybeTestAgent
+ * Checks whether agent is in the first day of their symptoms and
+ * executes logic for self-isolation and performing an official test.
+ *
  */
 public class AgentStartsGettingSymptomsVisitor {
 
     private final TestingService testingService;
     private final IsolationService isolationService;
-    private final SimulationTimer simulationTimer;
+    private final SimulationClock simulationClock;
 
     private final Stages stages;
 
     @WithFactory
     public AgentStartsGettingSymptomsVisitor(TestingService testingService,
                                              IsolationService isolationService,
-                                             SimulationTimer simulationTimer,
+                                             SimulationClock simulationClock,
                                              Stages stages) {
         this.testingService = testingService;
         this.isolationService = isolationService;
-        this.simulationTimer = simulationTimer;
+        this.simulationClock = simulationClock;
         this.stages = stages;
     }
 
@@ -56,7 +57,7 @@ public class AgentStartsGettingSymptomsVisitor {
             return;
         }
 
-        if (healthStatus.getStage() != stages.INFECTIOUS_SYMPTOMATIC || healthStatus.getDayOfLastChange() != simulationTimer.getDaysPassed()) {
+        if (healthStatus.getStage() != stages.INFECTIOUS_SYMPTOMATIC || healthStatus.getDayOfLastChange() != simulationClock.getDaysPassed()) {
             return;
         }
 

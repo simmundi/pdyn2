@@ -34,17 +34,14 @@ public final class IsolationService {
     private final StatsService statsService;
     private final AgentStateService agentStateService;
     private final IsolationConfig isolationConfig;
-    private final Stages stages;
 
     @WithFactory
     public IsolationService(StatsService statsService,
                             AgentStateService agentStateService,
-                            IsolationConfig isolationConfig,
-                            Stages stages) {
+                            IsolationConfig isolationConfig) {
         this.statsService = statsService;
         this.agentStateService = agentStateService;
         this.isolationConfig = isolationConfig;
-        this.stages = stages;
     }
 
     public void maybeIsolateAgent(float random, Entity agentEntity) {
@@ -61,5 +58,4 @@ public final class IsolationService {
             }
         }
     }
-
 }

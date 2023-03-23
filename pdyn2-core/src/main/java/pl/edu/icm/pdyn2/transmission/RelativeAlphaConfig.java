@@ -46,25 +46,24 @@ public class RelativeAlphaConfig {
     }
 
     public float getRelativeAlpha(Load load) {
-        if (load == loads.ALPHA) {
+        if (load.name().equals("ALPHA")) {
             return alphaAlpha;
         }
-        if (load == loads.DELTA) {
+        if (load.name().equals("DELTA")) {
             return alphaDelta;
         }
-        if (load == loads.OMICRON) {
+        if (load.name().equals("OMICRON")) {
             return alphaOmicron;
         }
-        if (load == loads.BA2) {
+        if (load.name().equals("BA2")) {
             return alphaBA2;
         }
-        if (load == loads.BA45) {
+        if (load.name().equals("BA45")) {
             return alphaBA45;
         }
         if (load == loads.WILD) {
             return 1.0f;
         }
-        throw new IllegalArgumentException("Invalid load: " + load.name() +
-                " Relative alpha available for loads: ALPHA, DELTA, OMICRON, BA2, BA45, WILD");
+        throw new IllegalArgumentException("Invalid load: " + load.name());
     }
 }

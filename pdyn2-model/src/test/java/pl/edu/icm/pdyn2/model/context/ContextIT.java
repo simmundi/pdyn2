@@ -80,12 +80,12 @@ public class ContextIT {
                 .extracting(Contamination::getLevel, Contamination::getLoad)
                 .containsExactly(
                         tuple(136f, basicConfig.loads.WILD),
-                        tuple(45f, basicConfig.loads.ALPHA),
-                        tuple(89f, basicConfig.loads.DELTA),
-                        tuple(5f, basicConfig.loads.OMICRON),
-                        tuple(20000.23f, basicConfig.loads.OMICRON),
-                        tuple(10f, basicConfig.loads.DELTA),
-                        tuple(10f, basicConfig.loads.OMICRON));
+                        tuple(45f, basicConfig.ALPHA),
+                        tuple(89f, basicConfig.DELTA),
+                        tuple(5f, basicConfig.OMICRON),
+                        tuple(20000.23f, basicConfig.OMICRON),
+                        tuple(10f, basicConfig.DELTA),
+                        tuple(10f, basicConfig.OMICRON));
     }
 
     @Test
@@ -98,15 +98,15 @@ public class ContextIT {
 
         // execute
         Context context = mapper.createAndLoad(3);
-        context.changeContaminationLevel(basicConfig.loads.DELTA, 3.4f); // was 10f
+        context.changeContaminationLevel(basicConfig.DELTA, 3.4f); // was 10f
         context.changeContaminationLevel(basicConfig.loads.WILD, 15f);
         mapper.save(context, 3);
 
         // assert
         var result = mapper.createAndLoad(3);
         assertThat(result.getContaminationByLoad(basicConfig.loads.WILD).getLevel()).isEqualTo(15f);
-        assertThat(result.getContaminationByLoad(basicConfig.loads.DELTA).getLevel()).isEqualTo(13.4f);
-        assertThat(result.getContaminationByLoad(basicConfig.loads.OMICRON).getLevel()).isEqualTo(10f);
+        assertThat(result.getContaminationByLoad(basicConfig.DELTA).getLevel()).isEqualTo(13.4f);
+        assertThat(result.getContaminationByLoad(basicConfig.OMICRON).getLevel()).isEqualTo(10f);
         assertThat(result.getContaminations()).hasSize(3);
     }
 
@@ -118,24 +118,24 @@ public class ContextIT {
         Context contextB = exampleData().get(0);
 
         contextA.changeContaminationLevel(basicConfig.loads.WILD, 10f);
-        contextA.changeContaminationLevel(basicConfig.loads.ALPHA, 20f);
-        contextA.changeContaminationLevel(basicConfig.loads.DELTA, 30f);
-        contextA.changeContaminationLevel(basicConfig.loads.OMICRON, 40f);
+        contextA.changeContaminationLevel(basicConfig.ALPHA, 20f);
+        contextA.changeContaminationLevel(basicConfig.DELTA, 30f);
+        contextA.changeContaminationLevel(basicConfig.OMICRON, 40f);
         contextA.updateAgentCount(50);
 
         contextB.changeContaminationLevel(basicConfig.loads.WILD, 100f);
-        contextB.changeContaminationLevel(basicConfig.loads.ALPHA, 200f);
-        contextB.changeContaminationLevel(basicConfig.loads.BA2, 300f);
+        contextB.changeContaminationLevel(basicConfig.ALPHA, 200f);
+        contextB.changeContaminationLevel(basicConfig.BA2, 300f);
         contextB.updateAgentCount(-100);
 
         // execute
         Context resolved = contextA.resolve(contextB);
         assertThat(resolved.getAgentCount()).isEqualTo(100f + 50f - 100f);
         assertThat(resolved.getContaminationByLoad(basicConfig.loads.WILD).getLevel()).isEqualTo(136f + 10f + 100f);
-        assertThat(resolved.getContaminationByLoad(basicConfig.loads.ALPHA).getLevel()).isEqualTo(45f + 20f + 200f);
-        assertThat(resolved.getContaminationByLoad(basicConfig.loads.DELTA).getLevel()).isEqualTo(89f + 30f + 0f);
-        assertThat(resolved.getContaminationByLoad(basicConfig.loads.OMICRON).getLevel()).isEqualTo(5f + 40f + 0f);
-        assertThat(resolved.getContaminationByLoad(basicConfig.loads.BA2).getLevel()).isEqualTo(0f + 0f + 300f);
+        assertThat(resolved.getContaminationByLoad(basicConfig.ALPHA).getLevel()).isEqualTo(45f + 20f + 200f);
+        assertThat(resolved.getContaminationByLoad(basicConfig.DELTA).getLevel()).isEqualTo(89f + 30f + 0f);
+        assertThat(resolved.getContaminationByLoad(basicConfig.OMICRON).getLevel()).isEqualTo(5f + 40f + 0f);
+        assertThat(resolved.getContaminationByLoad(basicConfig.BA2).getLevel()).isEqualTo(0f + 0f + 300f);
     }
 
     @Test
@@ -148,15 +148,15 @@ public class ContextIT {
         context.changeContaminationLevel(basicConfig.loads.WILD, 23);
         context.changeContaminationLevel(basicConfig.loads.WILD, 230);
         context.changeContaminationLevel(basicConfig.loads.WILD, 2300);
-        context.changeContaminationLevel(basicConfig.loads.OMICRON, 100);
-        context.changeContaminationLevel(basicConfig.loads.BA2, 200);
-        context.changeContaminationLevel(basicConfig.loads.OMICRON, -100);
+        context.changeContaminationLevel(basicConfig.OMICRON, 100);
+        context.changeContaminationLevel(basicConfig.BA2, 200);
+        context.changeContaminationLevel(basicConfig.OMICRON, -100);
 
         // assert
         assertThat(context.getContaminations()).hasSize(3);
         assertThat(context.getContaminationByLoad(basicConfig.loads.WILD).getLevel()).isEqualTo(10 + 23 + 230 + 2300);
-        assertThat(context.getContaminationByLoad(basicConfig.loads.OMICRON).getLevel()).isZero();
-        assertThat(context.getContaminationByLoad(basicConfig.loads.BA2).getLevel()).isEqualTo(200);
+        assertThat(context.getContaminationByLoad(basicConfig.OMICRON).getLevel()).isZero();
+        assertThat(context.getContaminationByLoad(basicConfig.BA2).getLevel()).isEqualTo(200);
     }
 
     @Test
@@ -165,20 +165,20 @@ public class ContextIT {
         // given
         Context context = context(basicConfig.contextTypes.HOUSEHOLD, 10, contamination(10, basicConfig.loads.WILD));
 
-        context.changeContaminationLevel(basicConfig.loads.BA2, 10f);
-        context.changeContaminationLevel(basicConfig.loads.OMICRON, 20f);
-        context.changeContaminationLevel(basicConfig.loads.DELTA, 30f);
+        context.changeContaminationLevel(basicConfig.BA2, 10f);
+        context.changeContaminationLevel(basicConfig.OMICRON, 20f);
+        context.changeContaminationLevel(basicConfig.DELTA, 30f);
         context.updateAgentCount(50);
-        context.getContaminationByLoad(basicConfig.loads.OMICRON).setLevel(0f);
-        context.getContaminationByLoad(basicConfig.loads.ALPHA).setLevel(0f);
+        context.getContaminationByLoad(basicConfig.OMICRON).setLevel(0f);
+        context.getContaminationByLoad(basicConfig.ALPHA).setLevel(0f);
 
         // execute
         context.normalize();
 
         // execute
         assertThat(context.getContaminations()).extracting(Contamination::getLoad).containsExactly(basicConfig.loads.WILD,
-                basicConfig.loads.DELTA,
-                basicConfig.loads.BA2);
+                basicConfig.DELTA,
+                basicConfig.BA2);
         assertThat(context.getContaminations()).extracting(Contamination::getLevel).doesNotContain(0f);
     }
 
@@ -187,15 +187,15 @@ public class ContextIT {
         return List.of(
                 context(basicConfig.contextTypes.SCHOOL, 100,
                         contamination(136, basicConfig.loads.WILD),
-                        contamination(45, basicConfig.loads.ALPHA),
-                        contamination(89, basicConfig.loads.DELTA),
-                        contamination(5, basicConfig.loads.OMICRON)),
+                        contamination(45, basicConfig.ALPHA),
+                        contamination(89, basicConfig.DELTA),
+                        contamination(5, basicConfig.OMICRON)),
                 context(basicConfig.contextTypes.HOUSEHOLD, 5),
                 context(basicConfig.contextTypes.STREET_10, 50000,
-                        contamination(20000.23f, basicConfig.loads.OMICRON)),
+                        contamination(20000.23f, basicConfig.OMICRON)),
                 context(basicConfig.contextTypes.WORKPLACE, 20,
-                        contamination(10, basicConfig.loads.DELTA),
-                        contamination(10, basicConfig.loads.OMICRON)),
+                        contamination(10, basicConfig.DELTA),
+                        contamination(10, basicConfig.OMICRON)),
                 context(basicConfig.contextTypes.HOUSEHOLD, 3)
         );
     }

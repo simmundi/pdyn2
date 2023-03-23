@@ -18,16 +18,19 @@
 
 package pl.edu.icm.pdyn2.transmission;
 
+import net.snowyhollows.bento.annotation.ByName;
 import net.snowyhollows.bento.annotation.WithFactory;
 import org.apache.commons.math3.random.RandomGenerator;
+import pl.edu.icm.em.common.math.pdf.SoftEnumDiscretePDF;
 import pl.edu.icm.pdyn2.AgentStateService;
+import pl.edu.icm.pdyn2.model.context.ContextInfectivityClasses;
+import pl.edu.icm.pdyn2.model.progression.Stage;
 import pl.edu.icm.pdyn2.simulation.StatsService;
 import pl.edu.icm.pdyn2.model.context.ContextInfectivityClass;
 import pl.edu.icm.pdyn2.model.immunization.Load;
 import pl.edu.icm.pdyn2.model.immunization.Loads;
 import pl.edu.icm.pdyn2.model.progression.Stages;
 import pl.edu.icm.trurl.ecs.Entity;
-import pl.edu.icm.trurl.sampleSpace.EnumSampleSpace;
 import pl.edu.icm.trurl.sampleSpace.SoftEnumSampleSpace;
 
 public class TransmissionVisitor {
@@ -36,18 +39,24 @@ public class TransmissionVisitor {
     private final StatsService statsService;
     private final Loads loads;
     private final Stages stages;
+    private final ContextInfectivityClasses contextInfectivityClasses;
+    private final Stage initialStage;
 
     @WithFactory
     public TransmissionVisitor(TransmissionService transmissionService,
                                AgentStateService agentStateService,
                                StatsService statsService,
                                Loads loads,
-                               Stages stages) {
+                               Stages stages,
+                               ContextInfectivityClasses contextInfectivityClasses,
+                               @ByName("stages.initialStage") String initialStage) {
         this.transmissionService = transmissionService;
         this.agentStateService = agentStateService;
         this.statsService = statsService;
         this.loads = loads;
         this.stages = stages;
+        this.contextInfectivityClasses = contextInfectivityClasses;
+        this.initialStage = stages.getByName(initialStage);
     }
 
 
@@ -56,14 +65,14 @@ public class TransmissionVisitor {
             return;
         }
 
-        SoftEnumSampleSpace<Load> exposurePerLoad =
-                new SoftEnumSampleSpace<>(loads);
-        EnumSampleSpace<ContextInfectivityClass> exposurePerContext = new EnumSampleSpace<>(ContextInfectivityClass.class);
+        SoftEnumDiscretePDF<Load> exposurePerLoad =
+                new SoftEnumDiscretePDF<>(loads);
+        SoftEnumDiscretePDF<ContextInfectivityClass> exposurePerContext = new SoftEnumDiscretePDF<>(contextInfectivityClasses);
         transmissionService.gatherExposurePerLoadAndContextForAgent(
                 exposurePerLoad,
                 exposurePerContext,
                 agent);
-        float totalExposure = exposurePerLoad.sumOfProbabilities(); // TODO sumValues?
+        float totalExposure = exposurePerLoad.total();
 
         if (totalExposure > 0) {
             var probability = transmissionService.exposureToProbability(totalExposure);
@@ -73,7 +82,7 @@ public class TransmissionVisitor {
             if (adjustedProbability > 0 && random.nextDouble() <= adjustedProbability) {
                 agentStateService.infect(agent, chosenLoad);
                 agentStateService.addSourcesDistribution(agent, exposurePerContext);
-                statsService.tickStageChange(stages.LATENT);
+                statsService.tickStageChange(initialStage);
             }
         }
     }

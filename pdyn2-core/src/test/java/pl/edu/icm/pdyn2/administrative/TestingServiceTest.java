@@ -29,7 +29,7 @@ import pl.edu.icm.pdyn2.*;
 import pl.edu.icm.pdyn2.model.administration.MedicalHistory;
 import pl.edu.icm.pdyn2.model.progression.HealthStatus;
 import pl.edu.icm.pdyn2.simulation.StatsService;
-import pl.edu.icm.pdyn2.time.SimulationTimer;
+import pl.edu.icm.pdyn2.clock.SimulationClock;
 import pl.edu.icm.trurl.ecs.Entity;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -51,7 +51,7 @@ class TestingServiceTest {
     AgentStateService agentStateService;
 
     @Mock
-    SimulationTimer simulationTimer;
+    SimulationClock simulationClock;
 
 
     TestingService testingService;
@@ -60,7 +60,7 @@ class TestingServiceTest {
 
     @BeforeEach
     void before() {
-        testingService = new TestingService(simulationTimer, statsService, agentStateService, testingConfig);
+        testingService = new TestingService(simulationClock, statsService, agentStateService, testingConfig);
     }
 
     @Test

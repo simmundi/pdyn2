@@ -20,6 +20,7 @@ package pl.edu.icm.pdyn2.transmission;
 
 import net.snowyhollows.bento.annotation.WithFactory;
 import pl.edu.icm.pdyn2.model.context.ContextInfectivityClass;
+import pl.edu.icm.pdyn2.model.context.ContextInfectivityClasses;
 import pl.edu.icm.pdyn2.model.context.ContextType;
 
 public class TransmissionConfig {
@@ -40,6 +41,7 @@ public class TransmissionConfig {
     final float baseUniversityWeight;
     final float baseBigUniversityWeight;
     final float baseStreetWeight;
+    final ContextInfectivityClasses contextInfectivityClasses;
 
     @WithFactory
     public TransmissionConfig(float alpha,
@@ -49,7 +51,7 @@ public class TransmissionConfig {
                               float baseKindergartenWeight,
                               float baseUniversityWeight,
                               float baseBigUniversityWeight,
-                              float baseStreetWeight) {
+                              float baseStreetWeight, ContextInfectivityClasses contextInfectivityClasses) {
         this.alpha = alpha;
         this.baseHouseholdWeight = baseHouseholdWeight;
         this.baseWorkplaceWeight = baseWorkplaceWeight;
@@ -58,27 +60,27 @@ public class TransmissionConfig {
         this.baseUniversityWeight = baseUniversityWeight;
         this.baseBigUniversityWeight = baseBigUniversityWeight;
         this.baseStreetWeight = baseStreetWeight;
+        this.contextInfectivityClasses = contextInfectivityClasses;
     }
 
     public float getTotalWeightForContextType(ContextType type) {
         ContextInfectivityClass infectivityClass = type.getInfectivityClass();
-        switch (infectivityClass) {
-            case HOUSEHOLD:
-                return getHouseholdWeight() * baseHouseholdWeight;
-            case WORKPLACE:
-                return getWorkplaceWeight() * baseWorkplaceWeight;
-            case SCHOOL:
-                return getSchoolsWeight() * baseSchoolsWeight;
-            case UNIVERSITY:
-                return getUniversityWeight() * baseUniversityWeight;
-            case BIG_UNIVERSITY:
-                return getBigUniversityWeight() * baseBigUniversityWeight;
-            case STREET:
-                return getStreetWeight() * baseStreetWeight;
-            case KINDERGARTEN:
-                return getKindergartenWeight() * baseKindergartenWeight;
-            default:
-                throw new IllegalArgumentException("Unknown infectivity for context type: " + type);
+        if (infectivityClass == contextInfectivityClasses.HOUSEHOLD) {
+            return getHouseholdWeight() * baseHouseholdWeight;
+        } else if (infectivityClass == contextInfectivityClasses.WORKPLACE) {
+            return getWorkplaceWeight() * baseWorkplaceWeight;
+        } else if (infectivityClass == contextInfectivityClasses.SCHOOL) {
+            return getSchoolsWeight() * baseSchoolsWeight;
+        } else if (infectivityClass == contextInfectivityClasses.UNIVERSITY) {
+            return getUniversityWeight() * baseUniversityWeight;
+        } else if (infectivityClass == contextInfectivityClasses.BIG_UNIVERSITY) {
+            return getBigUniversityWeight() * baseBigUniversityWeight;
+        } else if (infectivityClass == contextInfectivityClasses.STREET) {
+            return getStreetWeight() * baseStreetWeight;
+        } else if (infectivityClass == contextInfectivityClasses.KINDERGARTEN) {
+            return getKindergartenWeight() * baseKindergartenWeight;
+        } else {
+            throw new IllegalArgumentException("Unknown infectivity for context type: " + type);
         }
     }
 
@@ -98,11 +100,17 @@ public class TransmissionConfig {
         return kindergartenWeight;
     }
 
-    public float getSchoolsWeight() { return schoolsWeight; }
+    public float getSchoolsWeight() {
+        return schoolsWeight;
+    }
 
-    public float getUniversityWeight() { return universityWeight; }
+    public float getUniversityWeight() {
+        return universityWeight;
+    }
 
-    public float getBigUniversityWeight() { return bigUniversityWeight; }
+    public float getBigUniversityWeight() {
+        return bigUniversityWeight;
+    }
 
     public float getStreetWeight() {
         return streetWeight;

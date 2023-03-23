@@ -28,13 +28,10 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.edu.icm.pdyn2.BasicConfig;
 import pl.edu.icm.pdyn2.model.AgeRanges;
-import pl.edu.icm.pdyn2.model.immunization.Load;
-import pl.edu.icm.pdyn2.model.progression.Stage;
 import pl.edu.icm.pdyn2.model.progression.Stages;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -63,6 +60,6 @@ class LoadDiseaseStageTransitionsReaderTest {
         LoadDiseaseStageTransitions transition = reader.readFromFile("stan_czas.txt", basicConfig.loads.WILD);
 
         // assert
-        assertThat(transition.durationOf(basicConfig.stages.LATENT, 7)).isPositive();
+        assertThat(transition.durationOf(basicConfig.LATENT, 7)).isPositive();
     }
 }

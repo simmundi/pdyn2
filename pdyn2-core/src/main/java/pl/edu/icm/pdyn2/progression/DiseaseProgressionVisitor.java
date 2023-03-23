@@ -22,10 +22,10 @@ import net.snowyhollows.bento.annotation.WithFactory;
 import org.apache.commons.math3.random.RandomGenerator;
 import pl.edu.icm.board.model.Person;
 import pl.edu.icm.pdyn2.AgentStateService;
+import pl.edu.icm.pdyn2.clock.SimulationClock;
 import pl.edu.icm.pdyn2.simulation.StatsService;
 import pl.edu.icm.pdyn2.model.progression.HealthStatus;
 import pl.edu.icm.pdyn2.model.progression.Stage;
-import pl.edu.icm.pdyn2.time.SimulationTimer;
 import pl.edu.icm.trurl.ecs.Entity;
 
 /**
@@ -38,17 +38,17 @@ import pl.edu.icm.trurl.ecs.Entity;
 public class DiseaseProgressionVisitor {
 
     private final DiseaseStageTransitionsService diseaseStageTransitionsService;
-    private final SimulationTimer simulationTimer;
+    private final SimulationClock simulationClock;
     private final AgentStateService agentStateService;
     private final StatsService statsService;
 
     @WithFactory
     public DiseaseProgressionVisitor(DiseaseStageTransitionsService diseaseStageTransitionsService,
-                                     SimulationTimer simulationTimer,
+                                     SimulationClock simulationClock,
                                      AgentStateService agentStateService,
                                      StatsService statsService) {
         this.diseaseStageTransitionsService = diseaseStageTransitionsService;
-        this.simulationTimer = simulationTimer;
+        this.simulationClock = simulationClock;
         this.agentStateService = agentStateService;
         this.statsService = statsService;
     }
@@ -64,7 +64,7 @@ public class DiseaseProgressionVisitor {
             return;
         }
 
-        int elapsed = health.getElapsedDays(simulationTimer.getDaysPassed());
+        int elapsed = health.getElapsedDays(simulationClock.getDaysPassed());
 
         int stageDuration = diseaseStageTransitionsService
                 .durationOf(health.getDiseaseLoad(), currentStage, person.getAge());

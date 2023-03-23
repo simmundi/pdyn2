@@ -51,8 +51,8 @@ class ImpactIT {
     public void save() {
         // given
         var health = new HealthStatus();
-        health.setDiseaseLoad(basicConfig.loads.BA2);
-        health.setStage(basicConfig.stages.INFECTIOUS_ASYMPTOMATIC);
+        health.setDiseaseLoad(basicConfig.BA2);
+        health.setStage(basicConfig.INFECTIOUS_ASYMPTOMATIC);
         var behavior = new Behaviour();
         behavior.transitionTo(BehaviourType.DORMANT, 2);
         var impact = new Impact();
@@ -73,8 +73,8 @@ class ImpactIT {
     public void isDifferentFrom() {
         // given
         var health = new HealthStatus();
-        health.setDiseaseLoad(basicConfig.loads.BA2);
-        health.setStage(basicConfig.stages.INFECTIOUS_ASYMPTOMATIC);
+        health.setDiseaseLoad(basicConfig.BA2);
+        health.setStage(basicConfig.INFECTIOUS_ASYMPTOMATIC);
         var behavior = new Behaviour();
         behavior.transitionTo(BehaviourType.ROUTINE, 2);
         var impact = new Impact();
@@ -93,8 +93,8 @@ class ImpactIT {
     public void isDifferentFrom__same() {
         // given
         var health = new HealthStatus();
-        health.setDiseaseLoad(basicConfig.loads.BA2);
-        health.setStage(basicConfig.stages.INFECTIOUS_ASYMPTOMATIC);
+        health.setDiseaseLoad(basicConfig.BA2);
+        health.setStage(basicConfig.INFECTIOUS_ASYMPTOMATIC);
         var behavior = new Behaviour();
         var impact = new Impact();
         // execute

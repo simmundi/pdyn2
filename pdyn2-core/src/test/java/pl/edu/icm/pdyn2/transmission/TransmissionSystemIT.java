@@ -34,9 +34,11 @@ import pl.edu.icm.board.util.RandomForChunkProvider;
 import pl.edu.icm.board.util.RandomProvider;
 import pl.edu.icm.pdyn2.AgentStateService;
 import pl.edu.icm.pdyn2.BasicConfig;
+import pl.edu.icm.pdyn2.immunization.ImmunizationStrategy;
+import pl.edu.icm.pdyn2.model.context.ContextInfectivityClasses;
+import pl.edu.icm.pdyn2.simulation.StatsService;
 import pl.edu.icm.pdyn2.context.BehaviourBasedContextsService;
 import pl.edu.icm.pdyn2.context.ContextsService;
-import pl.edu.icm.pdyn2.immunization.ImmunizationService;
 import pl.edu.icm.pdyn2.index.AreaClusteredSelectors;
 import pl.edu.icm.pdyn2.index.AreaIndex;
 import pl.edu.icm.pdyn2.model.context.Context;
@@ -44,7 +46,7 @@ import pl.edu.icm.pdyn2.model.context.Inhabitant;
 import pl.edu.icm.pdyn2.model.immunization.Immunization;
 import pl.edu.icm.pdyn2.model.progression.HealthStatus;
 import pl.edu.icm.pdyn2.simulation.StatsService;
-import pl.edu.icm.pdyn2.time.SimulationTimer;
+import pl.edu.icm.pdyn2.clock.SimulationClock;
 import pl.edu.icm.trurl.csv.CsvWriter;
 import pl.edu.icm.trurl.ecs.EngineConfiguration;
 import pl.edu.icm.trurl.ecs.EngineConfigurationFactory;
@@ -98,16 +100,19 @@ class TransmissionSystemIT {
     private RandomForChunkProvider randomForChunkProvider;
 
     @Mock
-    private SimulationTimer simulationTimer;
+    private SimulationClock simulationClock;
 
     @Mock
     StatsService statsService;
 
     @Mock
-    private ImmunizationService immunizationService;
+    private ImmunizationStrategy immunizationStrategy;
 
     @Mock
     private RelativeAlphaConfig relativeAlphaConfig;
+
+    @Mock
+    private ContextInfectivityClasses contextInfectivityClasses;
 
     private TransmissionService transmissionService;
 
@@ -145,13 +150,15 @@ class TransmissionSystemIT {
         when(randomProvider.getRandomGenerator(TransmissionVisitor.class)).thenReturn(randomGenerator);
         when(randomProvider.getRandomForChunkProvider(TransmissionVisitor.class)).thenReturn(randomForChunkProvider);
         contextsService = new BehaviourBasedContextsService(areaIndex);
-        transmissionService = new TransmissionService(contextsService, relativeAlphaConfig, transmissionConfig, simulationTimer, basicConfig.loads, basicConfig.stages, immunizationService);
+        transmissionService = new TransmissionService(contextsService, relativeAlphaConfig, transmissionConfig, simulationClock, basicConfig.loads, basicConfig.stages, immunizationStrategy);
         transmissionVisitor = new TransmissionVisitor(
                 transmissionService,
                 agentStateService,
                 statsService,
                 basicConfig.loads,
-                basicConfig.stages);
+                basicConfig.stages,
+                basicConfig.contextInfectivityClasses,
+                "LATENT");
 
         transmissionSystem = IteratingSystemBuilder.iteratingOver(areaClusteredSelectors.personSelector())
                 .persistingAll()
@@ -159,7 +166,7 @@ class TransmissionSystemIT {
                 .perform(Visit.of(transmissionVisitor::visit))
                 .build();
 
-        when(immunizationService.getImmunizationCoefficient(any(), any(), any(), anyInt())).thenReturn(0.5f);
+        when(immunizationStrategy.getImmunizationCoefficient(any(), any(), any(), anyInt())).thenReturn(0.5f);
         when(transmissionConfig.getAlpha()).thenReturn(1.0f);
         when(transmissionConfig.getTotalWeightForContextType(any())).thenReturn(1.0f);
         when(randomGenerator.nextDouble()).thenReturn(0.2);

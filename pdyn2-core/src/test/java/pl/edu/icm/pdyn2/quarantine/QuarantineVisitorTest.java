@@ -27,7 +27,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.edu.icm.pdyn2.*;
 import pl.edu.icm.pdyn2.simulation.StatsService;
-import pl.edu.icm.pdyn2.time.SimulationTimer;
+import pl.edu.icm.pdyn2.clock.SimulationClock;
 import pl.edu.icm.trurl.ecs.Entity;
 
 import static org.mockito.Mockito.never;
@@ -45,7 +45,7 @@ class QuarantineVisitorTest {
     AgentStateService agentStateService;
 
     @Mock
-    SimulationTimer simulationTimer;
+    SimulationClock simulationClock;
 
     @Mock
     QuarantineConfig quarantineConfig;
@@ -63,7 +63,7 @@ class QuarantineVisitorTest {
         Entity justStarted = entityMocker.entity(behaviour(QUARANTINE, 7));
         Entity shouldEnd = entityMocker.entity(behaviour(QUARANTINE, 1));
         Mockito.when(quarantineConfig.getQuarantineLengthDays()).thenReturn(10);
-        Mockito.when(simulationTimer.getDaysPassed()).thenReturn(12);
+        Mockito.when(simulationClock.getDaysPassed()).thenReturn(12);
 
         // execute
         quarantineVisitor.maybeEndQuarantine(justStarted);

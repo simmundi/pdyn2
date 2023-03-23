@@ -20,40 +20,37 @@ package pl.edu.icm.pdyn2.progression;
 
 import net.snowyhollows.bento.annotation.WithFactory;
 import net.snowyhollows.bento.config.WorkDir;
-import pl.edu.icm.pdyn2.immunization.ImmunizationService;
+import pl.edu.icm.pdyn2.clock.SimulationClock;
+import pl.edu.icm.pdyn2.immunization.ImmunizationStrategy;
 import pl.edu.icm.pdyn2.model.AgeRanges;
 import pl.edu.icm.pdyn2.model.immunization.Load;
 import pl.edu.icm.pdyn2.model.progression.Stages;
-import pl.edu.icm.pdyn2.time.SimulationTimer;
 
 /**
  * Service for reading LoadDiseaseStageTransitions for the given load.
  */
 class LoadDiseaseStageTransitionsReader {
-    private final ImmunizationService immunizationService;
-    private final SimulationTimer simulationTimer;
     private final WorkDir workDir;
     private final Stages stages;
     private final AgeRanges ageRanges;
+    private final OutcomeModifier outcomeModifier;
 
 
     @WithFactory
-    public LoadDiseaseStageTransitionsReader(ImmunizationService immunizationService, SimulationTimer simulationTimer, WorkDir workDir, Stages stages, AgeRanges ageRanges) {
-        this.immunizationService = immunizationService;
-        this.simulationTimer = simulationTimer;
+    public LoadDiseaseStageTransitionsReader(WorkDir workDir, Stages stages, AgeRanges ageRanges, OutcomeModifier outcomeModifier) {
         this.workDir = workDir;
         this.stages = stages;
         this.ageRanges = ageRanges;
+        this.outcomeModifier = outcomeModifier;
     }
 
     public LoadDiseaseStageTransitions readFromFile(String absolutePath, Load load) {
         return new LoadDiseaseStageTransitions(
-                    absolutePath,
-                    immunizationService,
-                    simulationTimer,
-                    workDir,
-                    stages,
-                    ageRanges,
-                    load);
+                absolutePath,
+                workDir,
+                stages,
+                ageRanges,
+                load,
+                outcomeModifier);
     }
 }

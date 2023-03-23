@@ -74,7 +74,7 @@ public class AgentImpactVisitorIT {
         agentStateService.infect(data.agent3, basicConfig.loads.WILD);
         agentStateService.progressToDiseaseStage(data.agent3, basicConfig.stages.INFECTIOUS_SYMPTOMATIC);
 
-        agentStateService.infect(data.agent4, basicConfig.loads.OMICRON);
+        agentStateService.infect(data.agent4, basicConfig.OMICRON);
         agentStateService.progressToDiseaseStage(data.agent4, basicConfig.stages.INFECTIOUS_SYMPTOMATIC);
 
         // execute
@@ -95,7 +95,7 @@ public class AgentImpactVisitorIT {
         assertThat(contaminationLevel(data.streetsB, basicConfig.loads.WILD)).isCloseTo(2f, VERY_CLOSE);
         assertThat(contaminationLevel(data.streetsC, basicConfig.loads.WILD)).isZero();
         assertThat(contaminationLevel(data.school1, basicConfig.loads.WILD)).isEqualTo(2f);
-        assertThat(contaminationLevel(data.school1, basicConfig.loads.DELTA)).isZero();
+        assertThat(contaminationLevel(data.school1, basicConfig.DELTA)).isZero();
     }
 
     private float agentCount(Entity contextEntity) {

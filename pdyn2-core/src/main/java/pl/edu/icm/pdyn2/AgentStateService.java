@@ -19,19 +19,20 @@
 package pl.edu.icm.pdyn2;
 
 import com.google.common.base.Preconditions;
+import net.snowyhollows.bento.annotation.ByName;
 import net.snowyhollows.bento.annotation.WithFactory;
+import pl.edu.icm.em.common.math.pdf.SoftEnumDiscretePDF;
+import pl.edu.icm.pdyn2.clock.SimulationClock;
 import pl.edu.icm.pdyn2.model.behaviour.Behaviour;
 import pl.edu.icm.pdyn2.model.behaviour.BehaviourType;
 import pl.edu.icm.pdyn2.model.context.ContextInfectivityClass;
+import pl.edu.icm.pdyn2.model.context.ContextInfectivityClasses;
 import pl.edu.icm.pdyn2.model.immunization.*;
 import pl.edu.icm.pdyn2.model.progression.HealthStatus;
 import pl.edu.icm.pdyn2.model.progression.Stage;
 import pl.edu.icm.pdyn2.model.progression.Stages;
 import pl.edu.icm.pdyn2.model.travel.Travel;
-import pl.edu.icm.pdyn2.time.SimulationTimer;
 import pl.edu.icm.trurl.ecs.Entity;
-import pl.edu.icm.trurl.sampleSpace.EnumSampleSpace;
-
 
 /**
  * <p>
@@ -57,13 +58,20 @@ import pl.edu.icm.trurl.sampleSpace.EnumSampleSpace;
  */
 public class AgentStateService {
 
-    private final SimulationTimer simulationTimer;
+    private final SimulationClock simulationClock;
+    private final ContextInfectivityClasses contextInfectivityClasses;
     private final Stages stages;
+    private final Stage initialStage;
 
     @WithFactory
-    public AgentStateService(SimulationTimer simulationTimer, Stages stages) {
-        this.simulationTimer = simulationTimer;
+    public AgentStateService(SimulationClock simulationClock,
+                             ContextInfectivityClasses contextInfectivityClasses,
+                             Stages stages,
+                             @ByName("stages.initialStage") String initialStage) {
+        this.simulationClock = simulationClock;
+        this.contextInfectivityClasses = contextInfectivityClasses;
         this.stages = stages;
+        this.initialStage = stages.getByName(initialStage);
     }
 
     public void activate(Entity agentEntity) {
@@ -71,7 +79,7 @@ public class AgentStateService {
         if (behavior.getType() != BehaviourType.DORMANT) {
             throw new IllegalArgumentException("Agent must be DORMANT to be activated; tried to activate " + behavior.getType() + " (" + agentEntity.getId() + ")");
         }
-        behavior.transitionTo(BehaviourType.ROUTINE, simulationTimer.getDaysPassed());
+        behavior.transitionTo(BehaviourType.ROUTINE, simulationClock.getDaysPassed());
     }
 
 
@@ -107,7 +115,7 @@ public class AgentStateService {
         HealthStatus healthStatus = getHealthStatusWhenNotSick(agentEntity);
         healthStatus.setDiseaseLoad(load);
         healthStatus.resetDiseaseHistory();
-        healthStatus.transitionTo(stages.LATENT, simulationTimer.getDaysPassed() - dayInState);
+        healthStatus.transitionTo(initialStage, simulationClock.getDaysPassed() - dayInState);
     }
 
     /**
@@ -126,24 +134,24 @@ public class AgentStateService {
     public void progressToDiseaseStage(Entity agentEntity, Stage targetStage, int dayInState) {
         Preconditions.checkArgument(dayInState >= 0, "Cannot progress agent at a future date. dayInState should be >= 0: %s", dayInState);
         HealthStatus healthStatus = getHealthStatus(agentEntity);
-        healthStatus.transitionTo(targetStage, simulationTimer.getDaysPassed() - dayInState);
+        healthStatus.transitionTo(targetStage, simulationClock.getDaysPassed() - dayInState);
 
         if (targetStage == stages.DECEASED) {
-            agentEntity.getOrCreate(Behaviour.class).transitionTo(BehaviourType.DEAD, simulationTimer.getDaysPassed());
+            agentEntity.getOrCreate(Behaviour.class).transitionTo(BehaviourType.DEAD, simulationClock.getDaysPassed());
         }
 
         if (!targetStage.sick) { // no longer sick, (probably deceased or healthy)
             Behaviour behaviour = agentEntity.getOrCreate(Behaviour.class);
             if (behaviour.getType() == BehaviourType.SELF_ISOLATION
                     || behaviour.getType() == BehaviourType.HOSPITALIZED) { // but still traveling, if was before
-                behaviour.transitionTo(BehaviourType.ROUTINE, simulationTimer.getDaysPassed());
+                behaviour.transitionTo(BehaviourType.ROUTINE, simulationClock.getDaysPassed());
             }
             addImmunizationEvent(agentEntity, createEventFromHealth(healthStatus));
         }
 
         if (targetStage.hospitalized) {
             agentEntity.getOrCreate(Behaviour.class)
-                    .transitionTo(BehaviourType.HOSPITALIZED, simulationTimer.getDaysPassed());
+                    .transitionTo(BehaviourType.HOSPITALIZED, simulationClock.getDaysPassed());
         }
 
     }
@@ -156,9 +164,9 @@ public class AgentStateService {
         Behaviour behaviour = agentEntity.getOrCreate(Behaviour.class);
         Preconditions.checkArgument(behaviour.getType() == BehaviourType.ROUTINE, "Illegal agent behaviour for private travel: %s", behaviour.getType());
 
-        behaviour.transitionTo(BehaviourType.PRIVATE_TRAVEL, simulationTimer.getDaysPassed());
+        behaviour.transitionTo(BehaviourType.PRIVATE_TRAVEL, simulationClock.getDaysPassed());
         Travel travel = getOrCreateTravel(agentEntity);
-        travel.setDayOfTravel((short) simulationTimer.getDaysPassed());
+        travel.setDayOfTravel((short) simulationClock.getDaysPassed());
         travel.setStayingAt(targetHousehold);
 
     }
@@ -171,7 +179,7 @@ public class AgentStateService {
     }
 
     public void beginQuarantine(Entity agentEntity) {
-        beginQuarantineOnDay(agentEntity, simulationTimer.getDaysPassed());
+        beginQuarantineOnDay(agentEntity, simulationClock.getDaysPassed());
     }
 
     public void beginQuarantineOnDay(Entity agentEntity, int day) {
@@ -197,7 +205,7 @@ public class AgentStateService {
             return false;
         }
 
-        behaviour.transitionTo(BehaviourType.SELF_ISOLATION, simulationTimer.getDaysPassed());
+        behaviour.transitionTo(BehaviourType.SELF_ISOLATION, simulationClock.getDaysPassed());
         return true;
     }
 
@@ -216,16 +224,16 @@ public class AgentStateService {
     public void changeLoad(Entity agentEntity, Load targetLoad) {
         var health = getHealthStatus(agentEntity);
         Preconditions.checkArgument(targetLoad.classification.equals(LoadClassification.VIRUS), "Variant can be changed only to another virus load");
-        Preconditions.checkArgument(health.getStage().equals(stages.LATENT), "Only latent agents can have their load changed");
+        Preconditions.checkArgument(health.getStage().equals(initialStage), "Only latent agents can have their load changed");
 
         health.setDiseaseLoad(targetLoad);
     }
 
-    public void addSourcesDistribution(Entity agent, EnumSampleSpace<ContextInfectivityClass> exposurePerContext) {
+    public void addSourcesDistribution(Entity agent, SoftEnumDiscretePDF<ContextInfectivityClass> exposurePerContext) {
         var immunizationSources = agent.getOrCreate(ImmunizationSources.class);
         var immunizationSource = new ImmunizationSource();
-        for (var contextType : ContextInfectivityClass.values()) {
-            immunizationSource.setForContextType(contextType, exposurePerContext.getProbability(contextType));
+        for (var contextType : contextInfectivityClasses.values()) {
+            immunizationSource.setForContextType(contextInfectivityClasses, contextType, exposurePerContext.get(contextType));
         }
         immunizationSources.getImmunizationSources().add(immunizationSource);
     }
@@ -261,6 +269,6 @@ public class AgentStateService {
     }
 
     private void resumeRoutine(Entity agentEntity, Behaviour behaviour) {
-        behaviour.transitionTo(BehaviourType.ROUTINE, simulationTimer.getDaysPassed());
+        behaviour.transitionTo(BehaviourType.ROUTINE, simulationClock.getDaysPassed());
     }
 }

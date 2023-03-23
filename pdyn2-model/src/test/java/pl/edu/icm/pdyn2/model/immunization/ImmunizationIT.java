@@ -75,18 +75,18 @@ public class ImmunizationIT {
         assertThat(items.stream().flatMap(i -> i.getEvents().stream()))
                 .extracting(ImmunizationEvent::getDay, ImmunizationEvent::getLoad)
                 .containsExactly(
-                        tuple(0, basicConfig.loads.ALPHA),
-                        tuple(4, basicConfig.loads.ASTRA),
-                        tuple(0, basicConfig.loads.ALPHA),
+                        tuple(0, basicConfig.ALPHA),
+                        tuple(4, basicConfig.ASTRA),
+                        tuple(0, basicConfig.ALPHA),
                         tuple(0, null),
-                        tuple(100, basicConfig.loads.BOOSTER),
-                        tuple(Integer.MAX_VALUE, basicConfig.loads.ALPHA),
-                        tuple(34, basicConfig.loads.ALPHA),
-                        tuple(21, basicConfig.loads.PFIZER),
-                        tuple(67, basicConfig.loads.ALPHA),
-                        tuple(34, basicConfig.loads.MODERNA),
+                        tuple(100, basicConfig.BOOSTER),
+                        tuple(Integer.MAX_VALUE, basicConfig.ALPHA),
+                        tuple(34, basicConfig.ALPHA),
+                        tuple(21, basicConfig.PFIZER),
+                        tuple(67, basicConfig.ALPHA),
+                        tuple(34, basicConfig.MODERNA),
                         tuple(-15, null),
-                        tuple(478, basicConfig.loads.DELTA)
+                        tuple(478, basicConfig.DELTA)
                 );
     }
 
@@ -102,7 +102,7 @@ public class ImmunizationIT {
         var item = mapper.create();
         mapper.load(null, item, index);
         item.getEvents().remove(0);
-        item.getEvents().add(event(99, basicConfig.loads.BOOSTER));
+        item.getEvents().add(event(99, basicConfig.BOOSTER));
         var modified = mapper.isModified(item, index);
         mapper.save(item, index);
 
@@ -113,29 +113,29 @@ public class ImmunizationIT {
         assertThat(result.getEvents().stream())
                 .extracting(ImmunizationEvent::getDay, ImmunizationEvent::getLoad)
                 .containsExactly(
-                        tuple(34, basicConfig.loads.MODERNA),
-                        tuple(99, basicConfig.loads.BOOSTER));
+                        tuple(34, basicConfig.MODERNA),
+                        tuple(99, basicConfig.BOOSTER));
         assertThat(modified).isTrue();
     }
 
     private List<Immunization> exampleData() {
         return List.of(
                 immunization(
-                        event(0, basicConfig.loads.ALPHA),
-                        event(4, basicConfig.loads.ASTRA),
-                        event(0, basicConfig.loads.ALPHA),
+                        event(0, basicConfig.ALPHA),
+                        event(4, basicConfig.ASTRA),
+                        event(0, basicConfig.ALPHA),
                         event(0, null),
-                        event(100, basicConfig.loads.BOOSTER),
-                        event(Integer.MAX_VALUE, basicConfig.loads.ALPHA)),
+                        event(100, basicConfig.BOOSTER),
+                        event(Integer.MAX_VALUE, basicConfig.ALPHA)),
                 immunization(
-                        event(34, basicConfig.loads.ALPHA),
-                        event(21, basicConfig.loads.PFIZER)),
+                        event(34, basicConfig.ALPHA),
+                        event(21, basicConfig.PFIZER)),
                 immunization(
-                        event(67, basicConfig.loads.ALPHA),
-                        event(34, basicConfig.loads.MODERNA)),
+                        event(67, basicConfig.ALPHA),
+                        event(34, basicConfig.MODERNA)),
                 immunization(
                         event(-15, null),
-                        event(478, basicConfig.loads.DELTA)));
+                        event(478, basicConfig.DELTA)));
     }
 
     private Immunization immunization(ImmunizationEvent... events) {

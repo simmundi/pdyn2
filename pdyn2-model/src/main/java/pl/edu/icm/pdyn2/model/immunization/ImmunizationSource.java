@@ -19,6 +19,7 @@
 package pl.edu.icm.pdyn2.model.immunization;
 
 import pl.edu.icm.pdyn2.model.context.ContextInfectivityClass;
+import pl.edu.icm.pdyn2.model.context.ContextInfectivityClasses;
 import pl.edu.icm.trurl.ecs.annotation.WithMapper;
 
 @WithMapper
@@ -91,30 +92,23 @@ public class ImmunizationSource {
         this.streetInfluence = streetInfluence;
     }
 
-    public void setForContextType(ContextInfectivityClass contextType, float probability) {
-        switch (contextType) {
-            case HOUSEHOLD:
-                setHouseholdInfluence(probability);
-                break;
-            case WORKPLACE:
-                setWorkplaceInfluence(probability);
-                break;
-            case KINDERGARTEN:
-                setKindergartenInfluence(probability);
-                break;
-            case SCHOOL:
-                setSchoolInfluence(probability);
-                break;
-            case UNIVERSITY:
-                setUniversityInfluence(probability);
-                break;
-            case BIG_UNIVERSITY:
-                setBigUniversityInfluence(probability);
-                break;
-            case STREET:
-                setStreetInfluence(probability);
-                break;
-            default:
+    public void setForContextType(ContextInfectivityClasses contextInfectivityClasses, ContextInfectivityClass contextType, float probability) {
+        int contextTypeIndex = contextType.ordinal();
+        if (contextTypeIndex == contextInfectivityClasses.HOUSEHOLD.ordinal()) {
+            setHouseholdInfluence(probability);
+        } else if (contextTypeIndex == contextInfectivityClasses.WORKPLACE.ordinal()) {
+            setWorkplaceInfluence(probability);
+        } else if (contextTypeIndex == contextInfectivityClasses.KINDERGARTEN.ordinal()) {
+            setKindergartenInfluence(probability);
+        } else if (contextTypeIndex == contextInfectivityClasses.STREET.ordinal()) {
+            setStreetInfluence(probability);
+        } else if (contextTypeIndex == contextInfectivityClasses.SCHOOL.ordinal()) {
+            setSchoolInfluence(probability);
+        } else if (contextTypeIndex == contextInfectivityClasses.UNIVERSITY.ordinal()) {
+            setUniversityInfluence(probability);
+        } else if (contextTypeIndex == contextInfectivityClasses.BIG_UNIVERSITY.ordinal()) {
+            setBigUniversityInfluence(probability);
+        } else {
                 throw new IllegalStateException("Unexpected value: " + contextType);
         }
     }

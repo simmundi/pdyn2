@@ -78,23 +78,23 @@ class StatsServiceTest {
 
         //2 hospitalised_icu
         for (int i = 0; i < 2; i++) {
-            statsService.tickStage(basicConfig.stages.HOSPITALIZED_ICU);
+            statsService.tickStage(basicConfig.HOSPITALIZED_ICU);
         }
 
         //3 new latent
         for (int i = 0; i < 3; i++) {
-            statsService.tickStageChange(basicConfig.stages.LATENT);
-            statsService.tickStage(basicConfig.stages.LATENT);
+            statsService.tickStageChange(basicConfig.LATENT);
+            statsService.tickStage(basicConfig.LATENT);
         }
 
         //1 new hospitalized_icu
-        statsService.tickStageChange(basicConfig.stages.HOSPITALIZED_ICU);
-        statsService.tickStage(basicConfig.stages.HOSPITALIZED_ICU);
+        statsService.tickStageChange(basicConfig.HOSPITALIZED_ICU);
+        statsService.tickStage(basicConfig.HOSPITALIZED_ICU);
 
         //4 new hospitalized_pre_icu
         for (int i = 0; i < 4; i++) {
-            statsService.tickStageChange(basicConfig.stages.HOSPITALIZED_PRE_ICU);
-            statsService.tickStage(basicConfig.stages.HOSPITALIZED_PRE_ICU);
+            statsService.tickStageChange(basicConfig.HOSPITALIZED_PRE_ICU);
+            statsService.tickStage(basicConfig.HOSPITALIZED_PRE_ICU);
         }
 
         //5 tested positive

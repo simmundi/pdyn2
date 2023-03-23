@@ -24,15 +24,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.edu.icm.pdyn2.BasicConfig;
+import pl.edu.icm.pdyn2.immunization.strategy.ImmunizationStrategyFromPdyn1Rewritten;
 import pl.edu.icm.pdyn2.model.immunization.Immunization;
 import pl.edu.icm.pdyn2.model.immunization.ImmunizationEvent;
-import pl.edu.icm.pdyn2.model.immunization.Load;
-import pl.edu.icm.trurl.ecs.Entity;
 
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -48,9 +46,9 @@ class ImmunizationStrategyFromPdyn1RewrittenTest {
 
     @BeforeEach
     void setup() {
-        immunizationEvent1.setLoad(basicConfig.loads.ALPHA);
+        immunizationEvent1.setLoad(basicConfig.ALPHA);
         immunizationEvent1.setDay(1);
-        immunizationEvent2.setLoad(basicConfig.loads.BA45);
+        immunizationEvent2.setLoad(basicConfig.BA45);
         immunizationEvent2.setDay(59);
         when(immunization1.getEvents()).thenReturn(List.of(immunizationEvent1, immunizationEvent2));
         when(immunization2.getEvents()).thenReturn(List.of(immunizationEvent1));
@@ -61,8 +59,8 @@ class ImmunizationStrategyFromPdyn1RewrittenTest {
         //given
         var immunizationStrategy = new ImmunizationStrategyFromPdyn1Rewritten(basicConfig.loads);
         //execute
-        var coef1 = immunizationStrategy.getImmunizationCoefficient(immunization1, ImmunizationStage.LATENTNY, basicConfig.loads.OMICRON, 73);
-        var coef2 = immunizationStrategy.getImmunizationCoefficient(immunization2, ImmunizationStage.LATENTNY, basicConfig.loads.OMICRON, 73);
+        var coef1 = immunizationStrategy.getImmunizationCoefficient(immunization1, ImmunizationStage.LATENT, basicConfig.OMICRON, 73);
+        var coef2 = immunizationStrategy.getImmunizationCoefficient(immunization2, ImmunizationStage.LATENT, basicConfig.OMICRON, 73);
         //assert
         assertThat(coef1).isEqualTo(0.9f);
         assertThat(coef2).isEqualTo(0.76f);

@@ -30,12 +30,8 @@ public class ContextTypes extends SoftEnumManager<ContextType> {
     public final ContextType BIG_UNIVERSITY;
     public final ContextType UNIVERSITY;
     public final ContextType KINDERGARTEN;
+
     public final ContextType SCHOOL;
-
-
-
-
-
     final public ContextType STREET_00;
     final public ContextType STREET_10;
     final public ContextType STREET_20;

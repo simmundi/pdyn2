@@ -28,8 +28,8 @@ public class StageImpactConfig {
     @WithFactory
     public StageImpactConfig(float asymptomaticInfluenceShare, float symptomaticInfluenceShare, Stages stages) {
         influenceOfStage  = new float[stages.values().size()];;
-        influenceOfStage[stages.INFECTIOUS_ASYMPTOMATIC.ordinal()] = asymptomaticInfluenceShare;
-        influenceOfStage[stages.INFECTIOUS_SYMPTOMATIC.ordinal()] = symptomaticInfluenceShare;
+        influenceOfStage[stages.getByName("INFECTIOUS_ASYMPTOMATIC").ordinal()] = asymptomaticInfluenceShare;
+        influenceOfStage[stages.getByName("INFECTIOUS_SYMPTOMATIC").ordinal()] = symptomaticInfluenceShare;
     }
 
     public float getInfluenceOf(Stage stage) {

@@ -34,12 +34,12 @@ public class TravelVisitor {
     private RandomAccessSelector households;
 
     @WithFactory
-    public TravelVisitor(AreaClusteredSelectors areaClusteredSelectors, AgentStateService agentStateService,
+    public TravelVisitor(AreaClusteredSelectors areaClusteredSelectors,
+                         AgentStateService agentStateService,
                          TravelConfig travelConfig) {
         this.areaClusteredSelectors = areaClusteredSelectors;
         this.agentStateService = agentStateService;
         this.travelConfig = travelConfig;
-        this.households = households;
     }
 
     public void visit(RandomGenerator randomGenerator, Entity e) {

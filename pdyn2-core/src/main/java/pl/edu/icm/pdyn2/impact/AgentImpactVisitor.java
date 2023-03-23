@@ -42,8 +42,8 @@ public class AgentImpactVisitor {
     private final StatsService statsService;
     private final StageImpactConfig stageImpactConfig;
     private final Stages stages;
-    private final int REMOVE = -1;
-    private final int ADD = 1;
+    private final static int REMOVE = -1;
+    private final static int ADD = 1;
 
     @WithFactory
     public AgentImpactVisitor(ContextsService contextsService,

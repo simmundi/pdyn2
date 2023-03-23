@@ -20,12 +20,8 @@ package pl.edu.icm.pdyn2.transmission;
 
 import net.snowyhollows.bento.annotation.ImplementationSwitch;
 import pl.edu.icm.board.model.Person;
-import pl.edu.icm.pdyn2.immunization.ImmunizationStrategyFromPdyn1;
-import pl.edu.icm.pdyn2.immunization.ImmunizationStrategyFromPdyn1Rewritten;
-import pl.edu.icm.pdyn2.immunization.SimpleImmunizationStrategy;
-import pl.edu.icm.pdyn2.model.AgeRange;
 import pl.edu.icm.pdyn2.model.context.Context;
-import pl.edu.icm.pdyn2.model.context.ContextType;
+
 @ImplementationSwitch(
         configKey = "contextImpactService",
         cases = {
