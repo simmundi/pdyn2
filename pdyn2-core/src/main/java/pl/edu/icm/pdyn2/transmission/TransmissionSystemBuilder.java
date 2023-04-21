@@ -76,15 +76,25 @@ public class TransmissionSystemBuilder {
                             agent);
                     float totalExposure = exposurePerLoad.sumOfProbabilities(); // TODO sumValues?
 
-                    if (totalExposure > 0) {
-                        var probability = transmissionService.exposureToProbability(totalExposure);
-                        var chosenLoad = transmissionService.selectLoad(exposurePerLoad, random.nextDouble());
-                        var adjustedProbability = transmissionService.adjustProbabilityWithImmunity(probability, chosenLoad, agent);
+                    var probabilityPerLoad = new EnumSampleSpace<Load>(Load.class);
 
-                        if (adjustedProbability > 0 && random.nextDouble() <= adjustedProbability) {
-                            agentStateService.infect(agent, chosenLoad);
-                            agentStateService.addSourcesDistribution(agent, exposurePerContext);
-                            statsService.tickStageChange(Stage.LATENT);
+                    if (totalExposure > 0) {
+                        var tmpProbability = transmissionService.exposureToProbability(totalExposure);
+
+                        for (Load load : Load.values()) {
+                            var adjustedProbability = transmissionService.adjustProbabilityWithImmunity(tmpProbability, load, agent);
+                            probabilityPerLoad.changeOutcome(load, (float) (adjustedProbability * exposurePerLoad.getProbability(load) / totalExposure));
+                        }
+
+                        var totalProbabilityOfInfection = probabilityPerLoad.sumOfProbabilities();
+
+                        if (totalProbabilityOfInfection > 0) {
+                            double r = random.nextDouble();
+                            if (r <= totalProbabilityOfInfection) {
+                                agentStateService.infect(agent, probabilityPerLoad.sample(r));
+                                agentStateService.addSourcesDistribution(agent, exposurePerContext);
+                                statsService.tickStageChange(Stage.LATENT);
+                            }
                         }
                     }
                 });
