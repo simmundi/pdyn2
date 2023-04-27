@@ -23,15 +23,14 @@ import net.snowyhollows.bento.annotation.WithFactory;
 import org.apache.commons.math3.random.RandomGenerator;
 import pl.edu.icm.em.common.math.pdf.SoftEnumDiscretePDF;
 import pl.edu.icm.pdyn2.AgentStateService;
-import pl.edu.icm.pdyn2.model.context.ContextInfectivityClasses;
-import pl.edu.icm.pdyn2.model.progression.Stage;
-import pl.edu.icm.pdyn2.simulation.StatsService;
 import pl.edu.icm.pdyn2.model.context.ContextInfectivityClass;
+import pl.edu.icm.pdyn2.model.context.ContextInfectivityClasses;
 import pl.edu.icm.pdyn2.model.immunization.Load;
 import pl.edu.icm.pdyn2.model.immunization.Loads;
+import pl.edu.icm.pdyn2.model.progression.Stage;
 import pl.edu.icm.pdyn2.model.progression.Stages;
+import pl.edu.icm.pdyn2.simulation.StatsService;
 import pl.edu.icm.trurl.ecs.Entity;
-import pl.edu.icm.trurl.sampleSpace.SoftEnumSampleSpace;
 
 public class TransmissionVisitor {
     private final TransmissionService transmissionService;
@@ -75,14 +74,23 @@ public class TransmissionVisitor {
         float totalExposure = exposurePerLoad.total();
 
         if (totalExposure > 0) {
-            var probability = transmissionService.exposureToProbability(totalExposure);
-            var chosenLoad = transmissionService.selectLoad(exposurePerLoad, random.nextDouble());
-            var adjustedProbability = transmissionService.adjustProbabilityWithImmunity(probability, chosenLoad, agent);
+            var baseProbability = transmissionService.exposureToProbability(totalExposure);
+            for (var load : loads.viruses()) {
+                double adjustedProbability = transmissionService.adjustProbabilityWithImmunity(baseProbability, load, agent);
+                exposurePerLoad.set(load,
+                        (float) (exposurePerLoad.get(load) * adjustedProbability / totalExposure)
+                );
+            }
 
-            if (adjustedProbability > 0 && random.nextDouble() <= adjustedProbability) {
-                agentStateService.infect(agent, chosenLoad);
-                agentStateService.addSourcesDistribution(agent, exposurePerContext);
-                statsService.tickStageChange(initialStage);
+            double jointProbability = exposurePerLoad.total();
+            if (jointProbability > 0) {
+                double r = random.nextDouble();
+                if (r <= jointProbability) {
+                    var chosenLoad = exposurePerLoad.sampleUnnormalized(r);
+                    agentStateService.infect(agent, chosenLoad);
+                    agentStateService.addSourcesDistribution(agent, exposurePerContext);
+                    statsService.tickStageChange(initialStage);
+                }
             }
         }
     }
