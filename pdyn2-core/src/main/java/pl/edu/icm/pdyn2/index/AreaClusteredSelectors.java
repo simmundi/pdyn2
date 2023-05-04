@@ -43,6 +43,8 @@ public class AreaClusteredSelectors {
     private RandomAccessSelector personInGridSelector;
     private RandomAccessSelector householdInGridSelector;
     private RandomAccessSelector personInCommuneSelector;
+    private RandomAccessSelector householdInCommuneSelector;
+
     @WithFactory
     public AreaClusteredSelectors(EngineConfiguration engineConfiguration,
                                   SelectorFromQueryService selectorFromQueryService,
@@ -87,6 +89,26 @@ public class AreaClusteredSelectors {
         };
     }
 
+    public synchronized Selector householdsByTerytPrefixSelector(Collection<String> prefixes) {
+        if (householdInCommuneSelector == null) {
+            createSelectors();
+        }
+        return new Selector() {
+            @Override
+            public Stream<Chunk> chunks() {
+                return householdInCommuneSelector.chunks()
+                        .filter(chunk -> prefixes.stream()
+                                .anyMatch(t -> chunk.getChunkInfo().getLabel().startsWith(t))
+                        );
+            }
+
+            @Override
+            public int estimatedChunkSize() {
+                return targetChunkSize;
+            }
+        };
+    }
+
     private void createSelectors() {
         HouseholdMapper householdMapper = (HouseholdMapper) engineConfiguration.getEngine().getMapperSet().classToMapper(Household.class);
         LocationMapper locationMapper = (LocationMapper) engineConfiguration.getEngine().getMapperSet().classToMapper(Location.class);
@@ -94,6 +116,7 @@ public class AreaClusteredSelectors {
         Status status = Status.of("Building area clustered selectors", 1_000_000);
         Map<SelectorType, Integer> tagClassifiersWithInitialSizes = Map.of(
                 SelectorType.HOUSEHOLD_IN_GRID, 512,
+                SelectorType.HOUSEHOLD_IN_COMMUNE, 2048,
                 SelectorType.PERSON_IN_GRID, 4094,
                 SelectorType.PERSON_IN_COMMUNE, 16384
         );
@@ -108,6 +131,7 @@ public class AreaClusteredSelectors {
                         var gridTag = getGridTagForLocation(kgc);
                         var communeTag = getCommuneTagForLocation(kgc);
                         result.add(id, gridTag, SelectorType.HOUSEHOLD_IN_GRID);
+                        result.add(id, communeTag, SelectorType.HOUSEHOLD_IN_COMMUNE);
 
                         householdMapper.getMembers(id, (index, value) -> {
                             result.add(value, gridTag, SelectorType.PERSON_IN_GRID);
@@ -118,6 +142,7 @@ public class AreaClusteredSelectors {
                 });
 
         householdInGridSelector = builtSelectors.get(SelectorType.HOUSEHOLD_IN_GRID);
+        householdInCommuneSelector = builtSelectors.get(SelectorType.HOUSEHOLD_IN_COMMUNE);
         personInGridSelector = builtSelectors.get(SelectorType.PERSON_IN_GRID);
         personInCommuneSelector = builtSelectors.get(SelectorType.PERSON_IN_COMMUNE);
         status.done();
@@ -140,6 +165,7 @@ public class AreaClusteredSelectors {
     private enum SelectorType {
         PERSON_IN_GRID,
         HOUSEHOLD_IN_GRID,
-        PERSON_IN_COMMUNE
+        PERSON_IN_COMMUNE,
+        HOUSEHOLD_IN_COMMUNE
     }
 }
