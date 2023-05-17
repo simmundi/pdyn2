@@ -18,6 +18,7 @@
 
 package pl.edu.icm.pdyn2.impact;
 
+import net.snowyhollows.bento.annotation.ByName;
 import net.snowyhollows.bento.annotation.WithFactory;
 import pl.edu.icm.board.model.Person;
 import pl.edu.icm.pdyn2.simulation.StatsService;
@@ -41,7 +42,7 @@ public class AgentImpactVisitor {
     private final ContextImpactService contextImpactService;
     private final StatsService statsService;
     private final StageImpactConfig stageImpactConfig;
-    private final Stages stages;
+    private final Stage susceptibleStage;
     private final static int REMOVE = -1;
     private final static int ADD = 1;
 
@@ -50,12 +51,13 @@ public class AgentImpactVisitor {
                               ContextImpactService contextImpactService,
                               StatsService statsService,
                               StageImpactConfig stageImpactConfig,
-                              Stages stages) {
+                              Stages stages,
+                              @ByName("stages.susceptible") String susceptibleStageName) {
         this.contextsService = contextsService;
         this.contextImpactService = contextImpactService;
         this.statsService = statsService;
         this.stageImpactConfig = stageImpactConfig;
-        this.stages = stages;
+        this.susceptibleStage = stages.getByName(susceptibleStageName);
     }
 
     public void updateImpact(Entity agentEntity) {
@@ -78,15 +80,14 @@ public class AgentImpactVisitor {
     }
 
     private void applyAgentInfluence(Entity agentEntity, Impact impact, Person person, int sign) {
-        Stage currentStage = impact.getStage() == null ? stages.HEALTHY : impact.getStage();
+        Stage currentStage = impact.getStage() == null ? susceptibleStage : impact.getStage();
         Load load = currentStage.isInfectious() ? impact.getLoad() : null;
 
-        float activityDelta = sign;
         float infectionDelta = stageImpactConfig.getInfluenceOf(currentStage) * sign;
 
         contextsService.findActiveContextsForAgent(agentEntity, impact).forEach(c -> {
             float influenceFraction = contextImpactService.calculateInfluenceFractionFor(person, c);
-            c.updateAgentCount(activityDelta * influenceFraction);
+            c.updateAgentCount(sign * influenceFraction);
             if (load != null) {
                 float scaledInfectionDelta = infectionDelta * influenceFraction;
                 c.changeContaminationLevel(load, scaledInfectionDelta);

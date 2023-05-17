@@ -16,7 +16,7 @@ pipeline {
             }
             steps {
                 updateGitlabCommitStatus name: 'Build', state: 'running'
-                sh "./gradlew clean build"
+                sh "./gradlew --no-daemon clean build"
             }
             post {
                 failure { updateGitlabCommitStatus name: 'Build', state: 'failed' }
@@ -34,7 +34,7 @@ pipeline {
             }
             steps {
                 updateGitlabCommitStatus name: 'Publish', state: 'running'
-                sh "./gradlew publish"
+                sh "./gradlew --no-daemon publish"
             }
             post {
                 failure { updateGitlabCommitStatus name: 'Publish', state: 'failed' }

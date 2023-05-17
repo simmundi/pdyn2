@@ -20,7 +20,6 @@ package pl.edu.icm.pdyn2.progression;
 
 import net.snowyhollows.bento.annotation.WithFactory;
 import org.apache.commons.math3.random.RandomGenerator;
-import pl.edu.icm.board.model.Person;
 import pl.edu.icm.pdyn2.AgentStateService;
 import pl.edu.icm.pdyn2.clock.SimulationClock;
 import pl.edu.icm.pdyn2.simulation.StatsService;
@@ -56,7 +55,6 @@ public class DiseaseProgressionVisitor {
     public void visit(RandomGenerator random, Entity agent) {
         HealthStatus health = agent.get(HealthStatus.class);
         if (health == null) return;
-        Person person = agent.get(Person.class);
         Stage currentStage = health.getStage();
 
         if (!currentStage.isSick()) {
@@ -67,10 +65,10 @@ public class DiseaseProgressionVisitor {
         int elapsed = health.getElapsedDays(simulationClock.getDaysPassed());
 
         int stageDuration = diseaseStageTransitionsService
-                .durationOf(health.getDiseaseLoad(), currentStage, person.getAge());
+                .selectDurationOf(currentStage, agent, health.getDiseaseLoad(), 0);
 
         if (elapsed >= stageDuration) {
-            Stage nextStage = diseaseStageTransitionsService.outcomeOf(
+            Stage nextStage = diseaseStageTransitionsService.selectOutcomeOf(
                     currentStage,
                     agent,
                     health.getDiseaseLoad(),

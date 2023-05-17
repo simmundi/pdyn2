@@ -1,0 +1,22 @@
+plugins {
+    id 'java'
+}
+
+group 'pl.edu.icm.em'
+version '1.2-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    api project(":pdyn2-core")
+    api project(":pdyn2-model")
+    api project(":pdyn2-covid19")
+    api project(":pdyn2-seird")
+
+}
+
+test {
+    useJUnitPlatform()
+}

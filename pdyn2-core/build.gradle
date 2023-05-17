@@ -4,12 +4,12 @@ dependencies {
 
     implementation "com.graphhopper:graphhopper-core:${grasshopperVersion}"
     implementation "net.snowyhollows.bento:bento-config:${bentoVersion}"
-    implementation "pl.edu.icm.em:em-common:${emCommonVersion}"
 
     api project(":pdyn2-model")
 
     api "pl.edu.icm.em:soc-struct-core:${socStructVersion}"
     api "pl.edu.icm.em:soc-struct-model:${socStructVersion}"
+    api "pl.edu.icm.em:em-common:${emCommonVersion}"
     api "pl.edu.icm.em:trurl-orc:${trurlVersion}"
     api "pl.edu.icm.em:trurl-store-tablesaw:${trurlVersion}"
     api "pl.edu.icm.em:trurl-core:${trurlVersion}"

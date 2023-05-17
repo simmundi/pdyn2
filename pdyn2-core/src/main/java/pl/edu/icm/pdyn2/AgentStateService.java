@@ -60,18 +60,22 @@ public class AgentStateService {
 
     private final SimulationClock simulationClock;
     private final ContextInfectivityClasses contextInfectivityClasses;
-    private final Stages stages;
-    private final Stage initialStage;
+    private final Stage exposedStage;
+    private final Stage deceasedStage;
+    private final Stage susceptibleStage;
 
     @WithFactory
     public AgentStateService(SimulationClock simulationClock,
                              ContextInfectivityClasses contextInfectivityClasses,
                              Stages stages,
-                             @ByName("stages.initialStage") String initialStage) {
+                             @ByName("stages.exposed") String exposedStageName,
+                             @ByName("stages.susceptible") String susceptibleStageName,
+                             @ByName("stages.deceased") String deceasedStageName) {
         this.simulationClock = simulationClock;
         this.contextInfectivityClasses = contextInfectivityClasses;
-        this.stages = stages;
-        this.initialStage = stages.getByName(initialStage);
+        this.exposedStage = stages.getByName(exposedStageName);
+        this.deceasedStage = stages.getByName(deceasedStageName);
+        this.susceptibleStage = stages.getByName(susceptibleStageName);
     }
 
     public void activate(Entity agentEntity) {
@@ -115,7 +119,7 @@ public class AgentStateService {
         HealthStatus healthStatus = getHealthStatusWhenNotSick(agentEntity);
         healthStatus.setDiseaseLoad(load);
         healthStatus.resetDiseaseHistory();
-        healthStatus.transitionTo(initialStage, simulationClock.getDaysPassed() - dayInState);
+        healthStatus.transitionTo(exposedStage, simulationClock.getDaysPassed() - dayInState);
     }
 
     /**
@@ -136,7 +140,7 @@ public class AgentStateService {
         HealthStatus healthStatus = getHealthStatus(agentEntity);
         healthStatus.transitionTo(targetStage, simulationClock.getDaysPassed() - dayInState);
 
-        if (targetStage == stages.DECEASED) {
+        if (targetStage == deceasedStage) {
             agentEntity.getOrCreate(Behaviour.class).transitionTo(BehaviourType.DEAD, simulationClock.getDaysPassed());
         }
 
@@ -224,7 +228,7 @@ public class AgentStateService {
     public void changeLoad(Entity agentEntity, Load targetLoad) {
         var health = getHealthStatus(agentEntity);
         Preconditions.checkArgument(targetLoad.classification.equals(LoadClassification.VIRUS), "Variant can be changed only to another virus load");
-        Preconditions.checkArgument(health.getStage().equals(initialStage), "Only latent agents can have their load changed");
+        Preconditions.checkArgument(health.getStage().equals(exposedStage), "Only latent agents can have their load changed");
 
         health.setDiseaseLoad(targetLoad);
     }
@@ -248,7 +252,7 @@ public class AgentStateService {
 
     private HealthStatus getHealthStatusWhenNotSick(Entity agentEntity) {
         HealthStatus healthStatus = agentEntity.get(HealthStatus.class);
-        Preconditions.checkArgument(healthStatus.getStage() == stages.HEALTHY,
+        Preconditions.checkArgument(healthStatus.getStage() == susceptibleStage,
                 "Agent to infect must be alive and healthy - tried to infect %s agent.",
                 healthStatus.getStage());
         return healthStatus;

@@ -21,19 +21,29 @@ package pl.edu.icm.pdyn2.progression;
 import net.snowyhollows.bento.annotation.ImplementationSwitch;
 import pl.edu.icm.pdyn2.model.immunization.Load;
 import pl.edu.icm.pdyn2.model.progression.Stage;
+import pl.edu.icm.pdyn2.progression.lookup.LookupStageTransitionsService;
 import pl.edu.icm.trurl.ecs.Entity;
 
+/**
+ * A stateless service that allows sampling outcomes and durations of any given stage of a given disease (load),
+ * taking into account parameters of an actual person (like age or sex).
+ *
+ * The default implementation uses a lookup table in the form of (load, age range, stage) -> (discrete PDF of outcomes, duration in days)
+ */
 @ImplementationSwitch(
         configKey = "diseaseStageTransitionService",
         cases = {
-                @ImplementationSwitch.When(name="basic", implementation = DiseaseStageTransitionsServiceImpl.class, useByDefault = true),
+                @ImplementationSwitch.When(name="lookup", implementation = LookupStageTransitionsService.class, useByDefault = true),
         }
 )
 public interface DiseaseStageTransitionsService {
-    int durationOf(Load load, Stage stage, int age);
+    int selectDurationOf(Stage stage,
+                         Entity person,
+                         Load load,
+                         double random);
 
-    Stage outcomeOf(Stage stage,
-                    Entity person,
-                    Load load,
-                    double random);
+    Stage selectOutcomeOf(Stage stage,
+                          Entity person,
+                          Load load,
+                          double random);
 }

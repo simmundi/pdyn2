@@ -18,6 +18,7 @@
 
 package pl.edu.icm.pdyn2.transmission;
 
+import net.snowyhollows.bento.annotation.ByName;
 import net.snowyhollows.bento.annotation.WithFactory;
 import pl.edu.icm.em.common.math.pdf.SoftEnumDiscretePDF;
 import pl.edu.icm.pdyn2.clock.SimulationClock;
@@ -31,9 +32,9 @@ import pl.edu.icm.pdyn2.model.immunization.Immunization;
 import pl.edu.icm.pdyn2.model.immunization.Load;
 import pl.edu.icm.pdyn2.model.immunization.Loads;
 import pl.edu.icm.pdyn2.model.progression.HealthStatus;
+import pl.edu.icm.pdyn2.model.progression.Stage;
 import pl.edu.icm.pdyn2.model.progression.Stages;
 import pl.edu.icm.trurl.ecs.Entity;
-import pl.edu.icm.trurl.sampleSpace.SoftEnumSampleSpace;
 
 /**
  * Logic for transmission of the disease.
@@ -45,10 +46,10 @@ public class TransmissionService {
     private final TransmissionConfig transmissionConfig;
     private final ContextsService contextsService;
     private final SimulationClock simulationClock;
-    private final Loads loads;
     private final Stages stages;
     private final ImmunizationStrategy immunizationStrategy;
     private final SoftEnumDiscretePDF<Load> relativeAlpha;
+    private final Stage susceptibleStage;
 
     @WithFactory
     public TransmissionService(ContextsService contextsService,
@@ -57,13 +58,14 @@ public class TransmissionService {
                                SimulationClock simulationClock,
                                Loads loads,
                                Stages stages,
+                               @ByName("stages.susceptible") String susceptibleStageName,
                                ImmunizationStrategy immunizationStrategy) {
         this.relativeAlpha = new SoftEnumDiscretePDF<>(loads);
         this.contextsService = contextsService;
         this.transmissionConfig = transmissionConfig;
         this.simulationClock = simulationClock;
-        this.loads = loads;
         this.stages = stages;
+        this.susceptibleStage = stages.getByName(susceptibleStageName);
         this.immunizationStrategy = immunizationStrategy;
         for (Load currentLoad : loads.viruses()) {
             relativeAlpha.set(currentLoad, relativeAlphaConfig.getRelativeAlpha(currentLoad));
@@ -78,7 +80,7 @@ public class TransmissionService {
      */
     public boolean consideredForInfection(Entity agent) {
         HealthStatus healthStatus = agent.get(HealthStatus.class);
-        return healthStatus != null && healthStatus.getStage() == stages.HEALTHY;
+        return healthStatus != null && healthStatus.getStage() == susceptibleStage;
     }
 
 

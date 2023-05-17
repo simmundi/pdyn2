@@ -18,6 +18,7 @@
 
 package pl.edu.icm.pdyn2.setup;
 
+import net.snowyhollows.bento.annotation.ByName;
 import net.snowyhollows.bento.annotation.WithFactory;
 import pl.edu.icm.board.model.*;
 import pl.edu.icm.pdyn2.model.behaviour.Behaviour;
@@ -26,6 +27,7 @@ import pl.edu.icm.pdyn2.model.context.Context;
 import pl.edu.icm.pdyn2.model.context.ContextTypes;
 import pl.edu.icm.pdyn2.model.context.Inhabitant;
 import pl.edu.icm.pdyn2.model.progression.HealthStatus;
+import pl.edu.icm.pdyn2.model.progression.Stage;
 import pl.edu.icm.pdyn2.model.progression.Stages;
 import pl.edu.icm.trurl.ecs.Entity;
 import pl.edu.icm.trurl.ecs.EntitySystem;
@@ -39,12 +41,16 @@ public class ContextSetupSystem implements EntitySystem {
     private final Selectors selectors;
     private final Stages stages;
     private final ContextTypes contextTypes;
+    private final Stage susceptibleStage;
 
     @WithFactory
     public ContextSetupSystem(Selectors selectors,
-                              Stages stages, ContextTypes contextTypes) {
+                              @ByName("stages.susceptible") String susceptibleStageName,
+                              Stages stages,
+                              ContextTypes contextTypes) {
         this.selectors = selectors;
         this.stages = stages;
+        this.susceptibleStage = stages.getByName(susceptibleStageName);
         this.contextTypes = contextTypes;
     }
 
@@ -101,7 +107,7 @@ public class ContextSetupSystem implements EntitySystem {
 
     private HealthStatus defaultHealthStatus() {
         HealthStatus healthStatus = new HealthStatus();
-        healthStatus.transitionTo(stages.HEALTHY, 0);
+        healthStatus.transitionTo(susceptibleStage, 0);
         return healthStatus;
     }
 

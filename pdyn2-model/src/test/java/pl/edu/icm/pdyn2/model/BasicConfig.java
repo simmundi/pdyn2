@@ -38,6 +38,7 @@ public class BasicConfig {
     public final Loads loads;
     public final AgeRanges ageRanges;
     public final ContextTypes contextTypes;
+    public final Load WILD;
     public final Load ALPHA;
     public final Load DELTA;
     public final Load MODERNA;
@@ -61,14 +62,15 @@ public class BasicConfig {
                     .loadConfigResource("/ageRanges.properties")
                     .loadConfigResource("/contextTypes.properties")
                     .loadConfigResource("/contextInfectivityClasses.properties")
-                    .loadConfigResource("/loads.properties")
-                    .loadConfigResource("/stages.properties")
+                    .loadConfigResource("/loads-test.properties")
+                    .loadConfigResource("/stages-test.properties")
                     .getConfig();
             stages = bento.get(StagesFactory.IT);
             loads = bento.get(LoadsFactory.IT);
             ageRanges = bento.get(AgeRangesFactory.IT);
             contextTypes = bento.get(ContextTypesFactory.IT);
 
+            WILD = loads.getByName("WILD");
             ALPHA = loads.getByName("ALPHA");
             MODERNA = loads.getByName("MODERNA");
             DELTA = loads.getByName("DELTA");

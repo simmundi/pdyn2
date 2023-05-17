@@ -18,6 +18,7 @@
 
 package pl.edu.icm.pdyn2.immunization.strategy;
 
+import net.snowyhollows.bento.annotation.ByName;
 import net.snowyhollows.bento.annotation.WithFactory;
 import pl.edu.icm.pdyn2.immunization.ImmunizationStage;
 import pl.edu.icm.pdyn2.immunization.ImmunizationStrategy;
@@ -28,7 +29,7 @@ public class SimpleImmunizationStrategy implements ImmunizationStrategy {
     private final float simpleImmunizationStrategyValue;
 
     @WithFactory
-    public SimpleImmunizationStrategy(float simpleImmunizationStrategyValue){
+    public SimpleImmunizationStrategy(@ByName(fallbackValue = "1") float simpleImmunizationStrategyValue){
         this.simpleImmunizationStrategyValue = simpleImmunizationStrategyValue;
     }
 

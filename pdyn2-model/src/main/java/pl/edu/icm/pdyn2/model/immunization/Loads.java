@@ -25,14 +25,12 @@ import net.snowyhollows.bento.soft.SoftEnumManager;
 import java.util.stream.Collectors;
 
 public class Loads extends SoftEnumManager<Load> {
-    public final Load WILD;
     private final Load[] strains;
 
 
     @WithFactory
     public Loads(Bento bento) {
         super(bento, "loads", LoadFactory.IT);
-        WILD = getByName("WILD");
         strains = values().stream().filter(load -> load.classification == LoadClassification.VIRUS).collect(Collectors.toList()).toArray(emptyArray());
     }
 

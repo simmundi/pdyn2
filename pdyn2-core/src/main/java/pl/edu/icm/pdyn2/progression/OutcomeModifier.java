@@ -23,12 +23,11 @@ import pl.edu.icm.em.common.math.pdf.SoftEnumDiscretePDF;
 import pl.edu.icm.pdyn2.model.immunization.Load;
 import pl.edu.icm.pdyn2.model.progression.Stage;
 import pl.edu.icm.trurl.ecs.Entity;
-import pl.edu.icm.trurl.sampleSpace.SoftEnumSampleSpace;
 
 @ImplementationSwitch(
         configKey = "outcomeModifier",
         cases = {
-                @ImplementationSwitch.When(name="immunityAffectsHospitalization", implementation = ImmunityEffectsOutcomeModifier.class, useByDefault = true),
+                @ImplementationSwitch.When(name="none", implementation = NoneOutcomeModifier.class, useByDefault = true),
         }
 )
 public interface OutcomeModifier {

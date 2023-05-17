@@ -61,7 +61,7 @@ public class RelativeAlphaConfig {
         if (load.name().equals("BA45")) {
             return alphaBA45;
         }
-        if (load == loads.WILD) {
+        if (load.name().equals("WILD")) {
             return 1.0f;
         }
         throw new IllegalArgumentException("Invalid load: " + load.name());

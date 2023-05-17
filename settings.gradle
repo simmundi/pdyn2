@@ -1,4 +1,7 @@
 rootProject.name = 'pdyn2'
-include 'pdyn2-core',
-        'pdyn2-model'
+include 'pdyn2-core'
+include 'pdyn2-model'
+include 'pdyn2-seird'
+include 'pdyn2-covid19'
+include 'pdyn2-testing'
 

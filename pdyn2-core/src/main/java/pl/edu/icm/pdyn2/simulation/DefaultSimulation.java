@@ -21,11 +21,11 @@ package pl.edu.icm.pdyn2.simulation;
 import net.snowyhollows.bento.annotation.WithFactory;
 import pl.edu.icm.board.util.RandomForChunkProvider;
 import pl.edu.icm.board.util.RandomProvider;
-import pl.edu.icm.pdyn2.administrative.AgentStartsGettingSymptomsVisitor;
+import pl.edu.icm.pdyn2.administrative.SymptomOnsetVisitor;
 import pl.edu.icm.pdyn2.impact.AgentImpactVisitor;
 import pl.edu.icm.pdyn2.index.AreaClusteredSelectors;
 import pl.edu.icm.pdyn2.progression.DiseaseProgressionVisitor;
-import pl.edu.icm.pdyn2.quarantine.QuarantineVisitor;
+import pl.edu.icm.pdyn2.quarantine.EndQuarantineVisitor;
 import pl.edu.icm.pdyn2.transmission.TransmissionVisitor;
 import pl.edu.icm.pdyn2.travel.TravelVisitor;
 import pl.edu.icm.trurl.ecs.EntitySystem;
@@ -46,8 +46,8 @@ public class DefaultSimulation {
     private final TransmissionVisitor transmissionVisitor;
     private final DiseaseProgressionVisitor diseaseProgressionVisitor;
     private final TravelVisitor travelVisitor;
-    private final QuarantineVisitor quarantineVisitor;
-    private final AgentStartsGettingSymptomsVisitor startsFeelingSickVisitor;
+    private final EndQuarantineVisitor endQuarantineVisitor;
+    private final SymptomOnsetVisitor startsFeelingSickVisitor;
     private final AgentImpactVisitor agentImpactVisitor;
     private final AreaClusteredSelectors areaClusteredSelectors;
     private final RandomForChunkProvider randomForChunkProvider;
@@ -56,8 +56,8 @@ public class DefaultSimulation {
     public DefaultSimulation(TransmissionVisitor transmissionVisitor,
                              DiseaseProgressionVisitor diseaseProgressionVisitor,
                              TravelVisitor travelVisitor,
-                             QuarantineVisitor quarantineVisitor,
-                             AgentStartsGettingSymptomsVisitor startsFeelingSickVisitor,
+                             EndQuarantineVisitor endQuarantineVisitor,
+                             SymptomOnsetVisitor startsFeelingSickVisitor,
                              AgentImpactVisitor agentImpactVisitor,
                              AreaClusteredSelectors areaClusteredSelectors,
                              RandomProvider randomProvider) {
@@ -65,7 +65,7 @@ public class DefaultSimulation {
         this.transmissionVisitor = transmissionVisitor;
         this.diseaseProgressionVisitor = diseaseProgressionVisitor;
         this.travelVisitor = travelVisitor;
-        this.quarantineVisitor = quarantineVisitor;
+        this.endQuarantineVisitor = endQuarantineVisitor;
         this.startsFeelingSickVisitor = startsFeelingSickVisitor;
         this.agentImpactVisitor = agentImpactVisitor;
         this.areaClusteredSelectors = areaClusteredSelectors;
@@ -88,7 +88,7 @@ public class DefaultSimulation {
                 .perform(Visit.of(transmissionVisitor::visit))
                 .andPerform(Visit.of(diseaseProgressionVisitor::visit))
                 .andPerform(Visit.of(travelVisitor::visit))
-                .andPerform(Visit.of(quarantineVisitor::maybeEndQuarantine))
+                .andPerform(Visit.of(endQuarantineVisitor::maybeEndQuarantine))
                 .andPerform(Visit.of(startsFeelingSickVisitor::visit))
                 .build();
 

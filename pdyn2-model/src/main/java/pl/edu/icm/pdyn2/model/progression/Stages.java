@@ -23,16 +23,11 @@ import net.snowyhollows.bento.annotation.WithFactory;
 import net.snowyhollows.bento.soft.SoftEnumManager;
 
 public class Stages extends SoftEnumManager<Stage> {
-    public final Stage HEALTHY;
-    public final Stage INFECTIOUS_SYMPTOMATIC;
-    public final Stage DECEASED;
+
 
     @WithFactory
     public Stages(Bento bento) {
         super(bento, "stages", StageFactory.IT);
-        INFECTIOUS_SYMPTOMATIC = getByName("INFECTIOUS_SYMPTOMATIC");
-        DECEASED = getByName("DECEASED");
-        HEALTHY = getByName("HEALTHY");
     }
 
     @Override

@@ -39,7 +39,7 @@ public class TransmissionVisitor {
     private final Loads loads;
     private final Stages stages;
     private final ContextInfectivityClasses contextInfectivityClasses;
-    private final Stage initialStage;
+    private final Stage exposed;
 
     @WithFactory
     public TransmissionVisitor(TransmissionService transmissionService,
@@ -48,14 +48,14 @@ public class TransmissionVisitor {
                                Loads loads,
                                Stages stages,
                                ContextInfectivityClasses contextInfectivityClasses,
-                               @ByName("stages.initialStage") String initialStage) {
+                               @ByName("stages.exposed") String exposedStage) {
         this.transmissionService = transmissionService;
         this.agentStateService = agentStateService;
         this.statsService = statsService;
         this.loads = loads;
         this.stages = stages;
         this.contextInfectivityClasses = contextInfectivityClasses;
-        this.initialStage = stages.getByName(initialStage);
+        this.exposed = stages.getByName(exposedStage);
     }
 
 
@@ -89,7 +89,7 @@ public class TransmissionVisitor {
                     var chosenLoad = exposurePerLoad.sampleUnnormalized(r);
                     agentStateService.infect(agent, chosenLoad);
                     agentStateService.addSourcesDistribution(agent, exposurePerContext);
-                    statsService.tickStageChange(initialStage);
+                    statsService.tickStageChange(exposed);
                 }
             }
         }
