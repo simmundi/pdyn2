@@ -72,7 +72,7 @@ class TransmissionVisitorTest {
 
         when(relativeAlphaConfig.getRelativeAlpha(any())).thenReturn(1000f);
         when(relativeAlphaConfig.getRelativeAlpha(basicConfig.BA2)).thenReturn(1f);
-        when(relativeAlphaConfig.getRelativeAlpha(basicConfig.OMICRON)).thenReturn(2f);
+        when(relativeAlphaConfig.getRelativeAlpha(basicConfig.BA1)).thenReturn(2f);
 
         TransmissionService transmissionService = new TransmissionService(contextsService,
                 relativeAlphaConfig,
@@ -100,19 +100,19 @@ class TransmissionVisitorTest {
         when(contextsService.findActiveContextsForAgent(agent)).then(unused -> Stream.of(
                 context(
                         basicConfig.contextTypes.HOUSEHOLD, 10,
-                        Map.of(basicConfig.OMICRON, 0f, basicConfig.BA2, 3f)
+                        Map.of(basicConfig.BA1, 0f, basicConfig.BA2, 3f)
                 ),
                 context(
                         basicConfig.contextTypes.SCHOOL, 100,
-                        Map.of(basicConfig.OMICRON, 0f, basicConfig.BA2, 1f)
+                        Map.of(basicConfig.BA1, 0f, basicConfig.BA2, 1f)
                 ),
                 context(
                         basicConfig.contextTypes.WORKPLACE, 7,
-                        Map.of(basicConfig.OMICRON, 1f, basicConfig.BA2, 3f)
+                        Map.of(basicConfig.BA1, 1f, basicConfig.BA2, 3f)
                 )));
 
         when(randomProvider.getRandomGenerator().nextDouble())
-                .thenReturn(0.0).thenReturn(0.17915835) //OMICRON
+                .thenReturn(0.0).thenReturn(0.17915835) //BA1
                 .thenReturn(0.17915837).thenReturn(0.6391473) //BA2
                 .thenReturn(0.6391475).thenReturn(0.9999999); //NOT INFECTED
 
@@ -122,7 +122,7 @@ class TransmissionVisitorTest {
         }
 
         // assert
-        verify(agentStateService, times(2)).infect(agent, basicConfig.OMICRON);
+        verify(agentStateService, times(2)).infect(agent, basicConfig.BA1);
         verify(agentStateService, times(2)).infect(agent, basicConfig.BA2);
     }
 }

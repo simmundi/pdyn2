@@ -54,6 +54,7 @@ class ImmunizationFromCsvProviderTest {
                 "sFunctionTest.csv",
                 "sFunctionTest.csv",
                 "sFunctionTest.csv",
+                "sFunctionTest.csv",
                 "crossImmunityTest.csv",
                 "crossImmunityTest.csv",
                 "crossImmunityTest2.csv",

@@ -18,7 +18,6 @@
 
 package pl.edu.icm.pdyn2.impact;
 
-import org.assertj.core.api.Assertions;
 import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -75,7 +74,7 @@ public class AgentImpactVisitorIT {
         agentStateService.infect(data.agent3, basicConfig.WILD);
         agentStateService.progressToDiseaseStage(data.agent3, basicConfig.INFECTIOUS_SYMPTOMATIC);
 
-        agentStateService.infect(data.agent4, basicConfig.OMICRON);
+        agentStateService.infect(data.agent4, basicConfig.BA1);
         agentStateService.progressToDiseaseStage(data.agent4, basicConfig.INFECTIOUS_SYMPTOMATIC);
 
         // execute

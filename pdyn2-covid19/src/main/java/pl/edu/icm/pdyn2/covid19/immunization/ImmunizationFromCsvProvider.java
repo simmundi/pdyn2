@@ -36,16 +36,17 @@ import java.util.Scanner;
 public class ImmunizationFromCsvProvider {
     private final Loads loads;
 
-    private final List<List<double[]>> sFunction = new ArrayList<>(3);
+    private final List<List<double[]>> sFunction = new ArrayList<>(4);
     private final List<List<double[]>> crossImmunity = new ArrayList<>(4);
-    private final String sFunctionLatentnyObjawowyFilename;
-    private final String sFunctionHospitalizowanyBezOiomFilename;
-    private final String sFunctionHospitalizowanyPrzedOiomFilename;
-    private final String crossImmunityLatentnyFilename;
-    private final String crossImmunityObjawowyFilename;
-    private final String crossImmunityHospitalizowanyBezOiomFilename;
-    private final String crossImmunityHospitalizowanyPrzedOiomFilename;
-    private final List<InputStream> sFunctionStream = new ArrayList<>(3);
+    private final String sFunctionLatentFilename;
+    private final String sFunctionSymptomsFilename;
+    private final String sFunctionHospitalizationFilename;
+    private final String sFunctionIcuFilename;
+    private final String crossImmunityLatentFilename;
+    private final String crossImmunitySymptomsFilename;
+    private final String crossImmunityHospitalizationFilename;
+    private final String crossImmunityIcuFilename;
+    private final List<InputStream> sFunctionStream = new ArrayList<>(4);
     private final List<InputStream> crossImmunityStream = new ArrayList<>(4);
     private final List<Load> immunityLabelsList = new ArrayList<>();
     private final List<Load> diseaseLabelsList = new ArrayList<>();
@@ -53,31 +54,34 @@ public class ImmunizationFromCsvProvider {
     @WithFactory
     public ImmunizationFromCsvProvider(WorkDir fileToStreamService,
                                        Loads loads,
-                                       String sFunctionLatentnyObjawowyFilename,
-                                       String sFunctionHospitalizowanyBezOiomFilename,
-                                       String sFunctionHospitalizowanyPrzedOiomFilename,
-                                       String crossImmunityLatentnyFilename,
-                                       String crossImmunityObjawowyFilename,
-                                       String crossImmunityHospitalizowanyBezOiomFilename,
-                                       String crossImmunityHospitalizowanyPrzedOiomFilename) {
+                                       String sFunctionLatentFilename,
+                                       String sFunctionSymptomsFilename,
+                                       String sFunctionHospitalizationFilename,
+                                       String sFunctionIcuFilename,
+                                       String crossImmunityLatentFilename,
+                                       String crossImmunitySymptomsFilename,
+                                       String crossImmunityHospitalizationFilename,
+                                       String crossImmunityIcuFilename) {
         this.loads = loads;
-        this.sFunctionLatentnyObjawowyFilename = sFunctionLatentnyObjawowyFilename;
-        this.sFunctionHospitalizowanyBezOiomFilename = sFunctionHospitalizowanyBezOiomFilename;
-        this.sFunctionHospitalizowanyPrzedOiomFilename = sFunctionHospitalizowanyPrzedOiomFilename;
-        this.crossImmunityLatentnyFilename = crossImmunityLatentnyFilename;
-        this.crossImmunityObjawowyFilename = crossImmunityObjawowyFilename;
-        this.crossImmunityHospitalizowanyBezOiomFilename = crossImmunityHospitalizowanyBezOiomFilename;
-        this.crossImmunityHospitalizowanyPrzedOiomFilename = crossImmunityHospitalizowanyPrzedOiomFilename;
+        this.sFunctionLatentFilename = sFunctionLatentFilename;
+        this.sFunctionSymptomsFilename = sFunctionSymptomsFilename;
+        this.sFunctionHospitalizationFilename = sFunctionHospitalizationFilename;
+        this.sFunctionIcuFilename = sFunctionIcuFilename;
+        this.crossImmunityLatentFilename = crossImmunityLatentFilename;
+        this.crossImmunitySymptomsFilename = crossImmunitySymptomsFilename;
+        this.crossImmunityHospitalizationFilename = crossImmunityHospitalizationFilename;
+        this.crossImmunityIcuFilename = crossImmunityIcuFilename;
 
-        sFunctionStream.add(0, fileToStreamService.openForReading(new File(sFunctionLatentnyObjawowyFilename)));
-        sFunctionStream.add(1, fileToStreamService.openForReading(new File(sFunctionHospitalizowanyBezOiomFilename)));
-        sFunctionStream.add(2, fileToStreamService.openForReading(new File(sFunctionHospitalizowanyPrzedOiomFilename)));
-        crossImmunityStream.add(0, fileToStreamService.openForReading(new File(crossImmunityLatentnyFilename)));
-        crossImmunityStream.add(1, fileToStreamService.openForReading(new File(crossImmunityObjawowyFilename)));
-        crossImmunityStream.add(2, fileToStreamService.openForReading(new File(crossImmunityHospitalizowanyBezOiomFilename)));
-        crossImmunityStream.add(3, fileToStreamService.openForReading(new File(crossImmunityHospitalizowanyPrzedOiomFilename)));
+        sFunctionStream.add(0, fileToStreamService.openForReading(new File(sFunctionLatentFilename)));
+        sFunctionStream.add(1, fileToStreamService.openForReading(new File(sFunctionSymptomsFilename)));
+        sFunctionStream.add(2, fileToStreamService.openForReading(new File(sFunctionHospitalizationFilename)));
+        sFunctionStream.add(3, fileToStreamService.openForReading(new File(sFunctionIcuFilename)));
+        crossImmunityStream.add(0, fileToStreamService.openForReading(new File(crossImmunityLatentFilename)));
+        crossImmunityStream.add(1, fileToStreamService.openForReading(new File(crossImmunitySymptomsFilename)));
+        crossImmunityStream.add(2, fileToStreamService.openForReading(new File(crossImmunityHospitalizationFilename)));
+        crossImmunityStream.add(3, fileToStreamService.openForReading(new File(crossImmunityIcuFilename)));
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 4; i++) {
             sFunction.add(new ArrayList<>());
         }
 
@@ -95,14 +99,16 @@ public class ImmunizationFromCsvProvider {
         loadFunction(sFunctionStream.get(0), sFunction.get(0), false, false);
         loadFunction(sFunctionStream.get(1), sFunction.get(1), false, false);
         loadFunction(sFunctionStream.get(2), sFunction.get(2), false, false);
+        loadFunction(sFunctionStream.get(3), sFunction.get(3), false, false);
         status.done("Functions loaded from files: \n" +
-                sFunctionLatentnyObjawowyFilename + " (S LATENTNY I OBJAWOWY) \n" +
-                sFunctionHospitalizowanyBezOiomFilename + " (S HOSPITALIZOWANY_BEZ_OIOM) \n" +
-                sFunctionHospitalizowanyPrzedOiomFilename + " (S HOSPITALIZOWANY_PRZED_OIOM) \n" +
-                crossImmunityLatentnyFilename + " (CI LATENTNY) \n" +
-                crossImmunityObjawowyFilename + " (CI OBJAWOWY) \n" +
-                crossImmunityHospitalizowanyBezOiomFilename + " (CI HOSPITALIZOWANY_BEZ_OIOM) \n" +
-                crossImmunityHospitalizowanyPrzedOiomFilename + " (CI HOSPITALIZOWANY_PRZED_OIOM) \n");
+                sFunctionLatentFilename + " (S LATENTNY) \n" +
+                sFunctionSymptomsFilename + " (S OBJAWOWY) \n" +
+                sFunctionHospitalizationFilename + " (S HOSPITALIZOWANY_BEZ_OIOM) \n" +
+                sFunctionIcuFilename + " (S HOSPITALIZOWANY_PRZED_OIOM) \n" +
+                crossImmunityLatentFilename + " (CI LATENTNY) \n" +
+                crossImmunitySymptomsFilename + " (CI OBJAWOWY) \n" +
+                crossImmunityHospitalizationFilename + " (CI HOSPITALIZOWANY_BEZ_OIOM) \n" +
+                crossImmunityIcuFilename + " (CI HOSPITALIZOWANY_PRZED_OIOM) \n");
     }
 
     private void loadFunction(InputStream stream, List<double[]> list, boolean getLabels, boolean checkDiseaseLabels) throws IOException {
@@ -161,11 +167,7 @@ public class ImmunizationFromCsvProvider {
     public double getSFunction(Load immunizationType,
                                ImmunizationStage immunizationStage,
                                int day) {
-        if (immunizationStage == ImmunizationStage.LATENT) {
-            return sFunction.get(immunizationStage.id)
-                    .get(immunityLabelsList.indexOf(immunizationType))[day];
-        }
-        return sFunction.get(immunizationStage.id - 1)
+        return sFunction.get(immunizationStage.id)
                 .get(immunityLabelsList.indexOf(immunizationType))[day];
     }
 

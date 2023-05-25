@@ -26,7 +26,7 @@ public class Covid19Loads {
     public final Load WILD;
     public final Load ALPHA;
     public final Load DELTA;
-    public final Load OMICRON;
+    public final Load BA1;
     public final Load BA2;
     public final Load BA45;
     public final Load PFIZER;
@@ -41,7 +41,7 @@ public class Covid19Loads {
         DELTA = loads.getByName("DELTA");
         BOOSTER = loads.getByName("BOOSTER");
         PFIZER = loads.getByName("PFIZER");
-        OMICRON = loads.getByName("OMICRON");
+        BA1 = loads.getByName("BA1");
         BA2 = loads.getByName("BA2");
         BA45 = loads.getByName("BA45");
         ASTRA = loads.getByName("ASTRA");

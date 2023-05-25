@@ -102,7 +102,7 @@ class TransmissionServiceTest {
                         // so in HOUSEHOLD (10 agents), 1f of exposure is equal to impact 1f
                         ComponentCreator.context(basicConfig.contextTypes.HOUSEHOLD, 10, Map.of(basicConfig.WILD, 1f, basicConfig.BA2, 1f, basicConfig.ALPHA, 3f)),
                         // so in SCHOOL (100 agents), 10f of exposure is equal to impact 1f
-                        ComponentCreator.context(basicConfig.contextTypes.SCHOOL, 100, Map.of(basicConfig.DELTA, 10f, basicConfig.BA2, 10f, basicConfig.OMICRON, 80f)),
+                        ComponentCreator.context(basicConfig.contextTypes.SCHOOL, 100, Map.of(basicConfig.DELTA, 10f, basicConfig.BA2, 10f, basicConfig.BA1, 80f)),
                         ComponentCreator.context(basicConfig.contextTypes.STREET_10, 100, Map.of(basicConfig.BA45, 100f)),
                         ComponentCreator.context(basicConfig.contextTypes.STREET_20, 100, Map.of(basicConfig.BA45, 50f))));
 
@@ -119,7 +119,7 @@ class TransmissionServiceTest {
         assertThat(exposure.get(basicConfig.BA2)).isEqualTo(2f);
         assertThat(exposure.get(basicConfig.ALPHA)).isEqualTo(3f);
         assertThat(exposure.get(basicConfig.DELTA)).isEqualTo(1f);
-        assertThat(exposure.get(basicConfig.OMICRON)).isEqualTo(8f);
+        assertThat(exposure.get(basicConfig.BA1)).isEqualTo(8f);
         assertThat(exposure.get(basicConfig.BA45)).isEqualTo(15f);
         assertThat(exposure.total()).isEqualTo(30f);
 
@@ -149,7 +149,7 @@ class TransmissionServiceTest {
         // given
         SoftEnumDiscretePDF<Load> exposure = new SoftEnumDiscretePDF<>(basicConfig.loads);
         exposure.set(basicConfig.BA2, 0.1f);
-        exposure.set(basicConfig.OMICRON, 0.1f);
+        exposure.set(basicConfig.BA1, 0.1f);
 
         // execute
         var loadA = transmissionService.selectLoad(exposure, 0.49);
@@ -157,7 +157,7 @@ class TransmissionServiceTest {
         var loadC = transmissionService.selectLoad(exposure, 0.999999999999);
 
         // assert
-        assertThat(loadA).isEqualTo(basicConfig.OMICRON);
+        assertThat(loadA).isEqualTo(basicConfig.BA1);
         assertThat(loadB).isEqualTo(basicConfig.BA2);
         assertThat(loadC).isEqualTo(basicConfig.BA2);
     }

@@ -59,8 +59,8 @@ class ImmunizationStrategyFromPdyn1RewrittenTest {
         //given
         var immunizationStrategy = new ImmunizationStrategyFromPdyn1Rewritten(basicConfig.loads);
         //execute
-        var coef1 = immunizationStrategy.getImmunizationCoefficient(immunization1, ImmunizationStage.LATENT, basicConfig.OMICRON, 73);
-        var coef2 = immunizationStrategy.getImmunizationCoefficient(immunization2, ImmunizationStage.LATENT, basicConfig.OMICRON, 73);
+        var coef1 = immunizationStrategy.getImmunizationCoefficient(immunization1, ImmunizationStage.LATENT, basicConfig.BA1, 73);
+        var coef2 = immunizationStrategy.getImmunizationCoefficient(immunization2, ImmunizationStage.LATENT, basicConfig.BA1, 73);
         //assert
         assertThat(coef1).isEqualTo(0.9f);
         assertThat(coef2).isEqualTo(0.76f);

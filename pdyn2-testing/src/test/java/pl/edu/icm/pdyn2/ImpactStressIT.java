@@ -50,7 +50,7 @@ public class ImpactStressIT {
 
     EmptyDataForIntegrationTests data = new EmptyDataForIntegrationTests(basicConfig);
     BehaviourType[] behaviours = { BehaviourType.ROUTINE, BehaviourType.PRIVATE_TRAVEL, BehaviourType.HOSPITALIZED };
-    Load[] loads = { basicConfig.WILD, basicConfig.ALPHA, basicConfig.OMICRON };
+    Load[] loads = { basicConfig.WILD, basicConfig.ALPHA, basicConfig.BA1};
     Stage[] stages = { basicConfig.HEALTHY, basicConfig.INFECTIOUS_SYMPTOMATIC, basicConfig.INFECTIOUS_ASYMPTOMATIC };
 
     Random random = new Random(0);

@@ -26,7 +26,7 @@ public class RelativeAlphaConfig {
     private final Loads loads;
     private final float alphaAlpha;
     private final float alphaDelta;
-    private final float alphaOmicron;
+    private final float alphaBA1;
     private final float alphaBA2;
     private final float alphaBA45;
 
@@ -34,13 +34,13 @@ public class RelativeAlphaConfig {
     public RelativeAlphaConfig(Loads loads,
                                float alphaAlpha,
                                float alphaDelta,
-                               float alphaOmicron,
+                               float alphaBA1,
                                float alphaBA2,
                                float alphaBA45) {
         this.loads = loads;
         this.alphaAlpha = alphaAlpha;
         this.alphaDelta = alphaDelta;
-        this.alphaOmicron = alphaOmicron;
+        this.alphaBA1 = alphaBA1;
         this.alphaBA2 = alphaBA2;
         this.alphaBA45 = alphaBA45;
     }
@@ -52,8 +52,8 @@ public class RelativeAlphaConfig {
         if (load.name().equals("DELTA")) {
             return alphaDelta;
         }
-        if (load.name().equals("OMICRON")) {
-            return alphaOmicron;
+        if (load.name().equals("BA1")) {
+            return alphaBA1;
         }
         if (load.name().equals("BA2")) {
             return alphaBA2;

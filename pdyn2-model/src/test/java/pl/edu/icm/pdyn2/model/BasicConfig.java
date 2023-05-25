@@ -42,7 +42,7 @@ public class BasicConfig {
     public final Load ALPHA;
     public final Load DELTA;
     public final Load MODERNA;
-    public final Load OMICRON;
+    public final Load BA1;
     public final Load PFIZER;
     public final Load ASTRA;
     public final Load BOOSTER;
@@ -74,7 +74,7 @@ public class BasicConfig {
             ALPHA = loads.getByName("ALPHA");
             MODERNA = loads.getByName("MODERNA");
             DELTA = loads.getByName("DELTA");
-            OMICRON = loads.getByName("OMICRON");
+            BA1 = loads.getByName("BA1");
             PFIZER = loads.getByName("PFIZER");
             BA45 = loads.getByName("BA45");
             BA2 = loads.getByName("BA2");

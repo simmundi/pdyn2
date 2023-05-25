@@ -42,7 +42,7 @@ public class ImmunizationStrategyFromPdyn1Rewritten implements ImmunizationStrat
     private final Load WILD;
     private final Load ALPHA;
     private final Load DELTA;
-    private final Load OMICRON;
+    private final Load BA1;
     private final Load BA2;
     private final Load BA45;
     private final Load PFIZER;
@@ -55,7 +55,7 @@ public class ImmunizationStrategyFromPdyn1Rewritten implements ImmunizationStrat
         WILD = loads.getByName("WILD");
         ALPHA = loads.getByName("ALPHA");
         DELTA = loads.getByName("DELTA");
-        OMICRON = loads.getByName("OMICRON");
+        BA1 = loads.getByName("BA1");
         BA2 = loads.getByName("BA2");
         BA45 = loads.getByName("BA45");
         PFIZER = loads.getByName("PFIZER");
@@ -66,7 +66,7 @@ public class ImmunizationStrategyFromPdyn1Rewritten implements ImmunizationStrat
                         WILD, day -> day < 90 ? 1.0 : max(0.800000, 1.0 - 0.00133333 * (day - 90)),
                         ALPHA, day -> day < 90 ? 1.0 : max(0.800000, 1.0 - 0.00133333 * (day - 90)),
                         DELTA, day -> day < 90 ? 1.0 : max(0.800000, 1.0 - 0.00133333 * (day - 90)),
-                        OMICRON, day -> day < 90 ? 1.0 : max(0.800000, 1.0 - 0.00133333 * (day - 90)),
+                        BA1, day -> day < 90 ? 1.0 : max(0.800000, 1.0 - 0.00133333 * (day - 90)),
                         BA2, day -> day < 90 ? 1.0 : max(0.800000, 1.0 - 0.00133333 * (day - 90)),
                         BA45, day -> day < 90 ? 1.0 : max(0.800000, 1.0 - 0.00133333 * (day - 90)),
                         PFIZER, day -> day < 90 ? min(day / 14.0, 1.0) : max(0.800000, 1.0 - 0.00133333 * (day - 90)),
@@ -76,7 +76,7 @@ public class ImmunizationStrategyFromPdyn1Rewritten implements ImmunizationStrat
                         WILD, day -> day < 90 ? 1.0 : max(0.800000, 1.0 - 0.00133333 * (day - 90)),
                         ALPHA, day -> day < 90 ? 1.0 : max(0.800000, 1.0 - 0.00133333 * (day - 90)),
                         DELTA, day -> day < 90 ? 1.0 : max(0.800000, 1.0 - 0.00133333 * (day - 90)),
-                        OMICRON, day -> day < 90 ? 1.0 : max(0.800000, 1.0 - 0.00133333 * (day - 90)),
+                        BA1, day -> day < 90 ? 1.0 : max(0.800000, 1.0 - 0.00133333 * (day - 90)),
                         BA2, day -> day < 90 ? 1.0 : max(0.800000, 1.0 - 0.00133333 * (day - 90)),
                         BA45, day -> day < 90 ? 1.0 : max(0.800000, 1.0 - 0.00133333 * (day - 90)),
                         PFIZER, day -> day < 90 ? min(day / 14.0, 1.0) : max(0.800000, 1.0 - 0.00133333 * (day - 90)),
@@ -86,7 +86,7 @@ public class ImmunizationStrategyFromPdyn1Rewritten implements ImmunizationStrat
                         WILD, day -> 1.0,
                         ALPHA, day -> 1.0,
                         DELTA, day -> 1.0,
-                        OMICRON, day -> 1.0,
+                        BA1, day -> 1.0,
                         BA2, day -> 1.0,
                         BA45, day -> 1.0,
                         PFIZER, day -> min(day / 14.0, 1.0),
@@ -96,7 +96,7 @@ public class ImmunizationStrategyFromPdyn1Rewritten implements ImmunizationStrat
                         WILD, day -> 1.0,
                         ALPHA, day -> 1.0,
                         DELTA, day -> 1.0,
-                        OMICRON, day -> 1.0,
+                        BA1, day -> 1.0,
                         BA2, day -> 1.0,
                         BA45, day -> 1.0,
                         PFIZER, day -> min(day / 14.0, 1.0),
@@ -109,7 +109,7 @@ public class ImmunizationStrategyFromPdyn1Rewritten implements ImmunizationStrat
                         WILD, generateCrossImmunity(1.0, 1.0, 0.975, 0.76, 0.76, 0.76),
                         ALPHA, generateCrossImmunity(1.0, 1.0, 0.975, 0.76, 0.76, 0.76),
                         DELTA, generateCrossImmunity(0.975, 0.975, 1.0, 0.76, 0.76, 0.76),
-                        OMICRON, generateCrossImmunity(0.76, 0.76, 0.76, 1.0, 1.0, 0.9),
+                        BA1, generateCrossImmunity(0.76, 0.76, 0.76, 1.0, 1.0, 0.9),
                         BA2, generateCrossImmunity(0.76, 0.76, 0.76, 1.0, 1.0, 0.9),
                         BA45, generateCrossImmunity(0.76, 0.76, 0.76, 0.9, 0.9, 1.0),
                         PFIZER, generateCrossImmunity(1.0, 1.0, 0.975, 0.76, 0.76, 0.76),
@@ -119,7 +119,7 @@ public class ImmunizationStrategyFromPdyn1Rewritten implements ImmunizationStrat
                         WILD, generateCrossImmunity(1.0, 1.0, 0.975, 0.0, 0.0, 0.0),
                         ALPHA, generateCrossImmunity(1.0, 1.0, 0.975, 0.0, 0.0, 0.0),
                         DELTA, generateCrossImmunity(0.975, 0.975, 1.0, 0.0, 0.0, 0.0),
-                        OMICRON, generateCrossImmunity(0.76, 0.76, 0.76, 0.0, 0.0, 0.0),
+                        BA1, generateCrossImmunity(0.76, 0.76, 0.76, 0.0, 0.0, 0.0),
                         BA2, generateCrossImmunity(0.76, 0.76, 0.76, 0.0, 0.0, 0.0),
                         BA45, generateCrossImmunity(0.76, 0.76, 0.76, 0.0, 0.0, 0.0),
                         PFIZER, generateCrossImmunity(1.0, 1.0, 0.975, 0.0, 0.0, 0.0),
@@ -129,7 +129,7 @@ public class ImmunizationStrategyFromPdyn1Rewritten implements ImmunizationStrat
                         WILD, generateCrossImmunity(0.8, 0.77, 0.77, 0.5, 0.5, 0.5),
                         ALPHA, generateCrossImmunity(0.77, 0.8, 0.77, 0.5, 0.5, 0.5),
                         DELTA, generateCrossImmunity(0.77, 0.77, 0.8, 0.5, 0.5, 0.5),
-                        OMICRON, generateCrossImmunity(0.5, 0.5, 0.5, 0.8, 0.8, 0.8),
+                        BA1, generateCrossImmunity(0.5, 0.5, 0.5, 0.8, 0.8, 0.8),
                         BA2, generateCrossImmunity(0.5, 0.5, 0.5, 0.8, 0.8, 0.8),
                         BA45, generateCrossImmunity(0.5, 0.5, 0.5, 0.8, 0.8, 0.8),
                         PFIZER, generateCrossImmunity(0.77, 0.77, 0.77, 0.5, 0.5, 0.5),
@@ -139,7 +139,7 @@ public class ImmunizationStrategyFromPdyn1Rewritten implements ImmunizationStrat
                         WILD, generateCrossImmunity(0.87, 0.87, 0.87, 0.67, 0.67, 0.67),
                         ALPHA, generateCrossImmunity(0.87, 0.87, 0.87, 0.67, 0.67, 0.67),
                         DELTA, generateCrossImmunity(0.87, 0.87, 0.87, 0.67, 0.67, 0.67),
-                        OMICRON, generateCrossImmunity(0.67, 0.67, 0.67, 0.87, 0.87, 0.87),
+                        BA1, generateCrossImmunity(0.67, 0.67, 0.67, 0.87, 0.87, 0.87),
                         BA2, generateCrossImmunity(0.67, 0.67, 0.67, 0.87, 0.87, 0.87),
                         BA45, generateCrossImmunity(0.67, 0.67, 0.67, 0.87, 0.87, 0.87),
                         PFIZER, generateCrossImmunity(0.87, 0.87, 0.87, 0.67, 0.67, 0.67),
@@ -149,12 +149,12 @@ public class ImmunizationStrategyFromPdyn1Rewritten implements ImmunizationStrat
 
     }
 
-    private SoftEnumMap<Load, Double> generateCrossImmunity(double wildValue, double alphaValue, double deltaValue, double omicronValue, double ba2Value, double ba45Value) {
+    private SoftEnumMap<Load, Double> generateCrossImmunity(double wildValue, double alphaValue, double deltaValue, double ba1Value, double ba2Value, double ba45Value) {
         var wildCrossImmunityInfection = new SoftEnumMap<Load, Double>(loads);
         wildCrossImmunityInfection.put(WILD, wildValue);
         wildCrossImmunityInfection.put(ALPHA, alphaValue);
         wildCrossImmunityInfection.put(DELTA, deltaValue);
-        wildCrossImmunityInfection.put(OMICRON, omicronValue);
+        wildCrossImmunityInfection.put(BA1, ba1Value);
         wildCrossImmunityInfection.put(BA2, ba2Value);
         wildCrossImmunityInfection.put(BA45, ba45Value);
         return wildCrossImmunityInfection;

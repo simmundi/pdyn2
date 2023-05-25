@@ -43,7 +43,7 @@ public class Covid19StageTransitionsProvider implements LookupTransitionsProvide
     private final String wildStageTransitionsFilename;
     private final String alphaStageTransitionsFilename;
     private final String deltaStageTransitionsFilename;
-    private final String omicronStageTransitionsFilename;
+    private final String ba1StageTransitionsFilename;
     private final String ba2StageTransitionsFilename;
     private final Loads loads;
     private final WorkDir workDir;
@@ -57,7 +57,7 @@ public class Covid19StageTransitionsProvider implements LookupTransitionsProvide
     public Covid19StageTransitionsProvider(String wildStageTransitionsFilename,
                                            String alphaStageTransitionsFilename,
                                            String deltaStageTransitionsFilename,
-                                           String omicronStageTransitionsFilename,
+                                           String ba1StageTransitionsFilename,
                                            String ba2StageTransitionsFilename,
                                            Loads loads,
                                            WorkDir workDir,
@@ -66,7 +66,7 @@ public class Covid19StageTransitionsProvider implements LookupTransitionsProvide
         this.wildStageTransitionsFilename = wildStageTransitionsFilename;
         this.alphaStageTransitionsFilename = alphaStageTransitionsFilename;
         this.deltaStageTransitionsFilename = deltaStageTransitionsFilename;
-        this.omicronStageTransitionsFilename = omicronStageTransitionsFilename;
+        this.ba1StageTransitionsFilename = ba1StageTransitionsFilename;
         this.ba2StageTransitionsFilename = ba2StageTransitionsFilename;
         this.loads = loads;
         this.workDir = workDir;
@@ -82,7 +82,7 @@ public class Covid19StageTransitionsProvider implements LookupTransitionsProvide
         readFromFile(wildStageTransitionsFilename, loads.getByName("WILD"), consumer);
         readFromFile(alphaStageTransitionsFilename, loads.getByName("ALPHA"), consumer);
         readFromFile(deltaStageTransitionsFilename, loads.getByName("DELTA"), consumer);
-        readFromFile(omicronStageTransitionsFilename, loads.getByName("OMICRON"), consumer);
+        readFromFile(ba1StageTransitionsFilename, loads.getByName("BA1"), consumer);
         readFromFile(ba2StageTransitionsFilename, loads.getByName("BA2"), consumer);    }
 
     public void readFromFile(String infectionTransitionsFilename, Load load, Consumer<Quadruple<Load, AgeRange, Stage, TransitionDescriptor>> consumer) {
