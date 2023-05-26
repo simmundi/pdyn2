@@ -50,7 +50,7 @@ public final class IsolationService {
 
         if (baseProbabilityOfSelfIsolation > 0) {
             if (random < baseProbabilityOfSelfIsolation * selfIsolationWeight) {
-                // selflessly stays at home
+                // doesn't self-isolate
             } else {
                 if (agentStateService.beginIsolation(agentEntity)) {
                     statsService.tickIsolated();

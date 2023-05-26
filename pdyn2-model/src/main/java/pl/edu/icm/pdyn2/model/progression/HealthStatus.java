@@ -60,9 +60,9 @@ public class HealthStatus {
         return dayOfLastChange;
     }
 
-    public void transitionTo(Stage stage, int currentDay) {
+    public void transitionTo(Stage stage, int dayOfLastChange) {
         this.stage = stage;
-        this.dayOfLastChange = currentDay;
+        this.dayOfLastChange = dayOfLastChange;
         addStageToHistory(stage);
     }
 
