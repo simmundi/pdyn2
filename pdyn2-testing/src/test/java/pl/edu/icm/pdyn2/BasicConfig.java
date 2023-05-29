@@ -27,7 +27,10 @@ import pl.edu.icm.pdyn2.immunization.ImmunizationStrategyFactory;
 import pl.edu.icm.pdyn2.model.AgeRange;
 import pl.edu.icm.pdyn2.model.AgeRanges;
 import pl.edu.icm.pdyn2.model.AgeRangesFactory;
-import pl.edu.icm.pdyn2.model.context.*;
+import pl.edu.icm.pdyn2.model.context.ContextInfectivityClasses;
+import pl.edu.icm.pdyn2.model.context.ContextInfectivityClassesFactory;
+import pl.edu.icm.pdyn2.model.context.ContextTypes;
+import pl.edu.icm.pdyn2.model.context.ContextTypesFactory;
 import pl.edu.icm.pdyn2.model.immunization.Load;
 import pl.edu.icm.pdyn2.model.immunization.Loads;
 import pl.edu.icm.pdyn2.model.immunization.LoadsFactory;
@@ -38,6 +41,7 @@ import pl.edu.icm.pdyn2.progression.OutcomeModifier;
 import pl.edu.icm.pdyn2.progression.OutcomeModifierFactory;
 
 import java.io.IOException;
+import java.util.Map;
 
 public class BasicConfig {
 
@@ -70,17 +74,20 @@ public class BasicConfig {
     public final AgeRange RANGE_0_10;
     public final AgeRange RANGE_120_130;
 
-    public BasicConfig() {
+    public BasicConfig(Map<String, ?> configExtension) {
         try {
-            bento = new Configurer()
+            var bentoConfigurer = new Configurer()
                     .loadConfigResource("/ageRanges.properties")
                     .loadConfigResource("/contextTypes.properties")
                     .loadConfigResource("/loads-covid19.properties")
                     .loadConfigResource("/stages-covid19.properties")
                     .loadConfigResource("/contextInfectivityClasses.properties")
                     .setParam("immunizationStrategy", ImmunizationStrategyFromPdyn1Rewritten.class.getName())
-                    .setParam("simulationStartDate", "2001-01-01")
-                    .getConfig();
+                    .setParam("simulationStartDate", "2001-01-01");
+
+            configExtension.forEach(bentoConfigurer::setParam);
+
+            bento = bentoConfigurer.getConfig();
             stages = bento.get(StagesFactory.IT);
             loads = bento.get(LoadsFactory.IT);
             bento.register(ImmunizationStrategyFactory.IT, Mockito.spy(bento.get(ImmunizationStrategyFactory.IT)));
@@ -113,5 +120,9 @@ public class BasicConfig {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public BasicConfig() {
+        this(Map.of());
     }
 }

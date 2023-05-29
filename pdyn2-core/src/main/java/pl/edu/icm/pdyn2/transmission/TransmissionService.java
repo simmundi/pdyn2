@@ -53,7 +53,6 @@ public class TransmissionService {
 
     @WithFactory
     public TransmissionService(ContextsService contextsService,
-                               RelativeAlphaConfig relativeAlphaConfig,
                                TransmissionConfig transmissionConfig,
                                SimulationClock simulationClock,
                                Loads loads,
@@ -68,7 +67,7 @@ public class TransmissionService {
         this.susceptibleStage = stages.getByName(susceptibleStageName);
         this.immunizationStrategy = immunizationStrategy;
         for (Load currentLoad : loads.viruses()) {
-            relativeAlpha.set(currentLoad, relativeAlphaConfig.getRelativeAlpha(currentLoad));
+            relativeAlpha.set(currentLoad, currentLoad.virulence);
         }
     }
 

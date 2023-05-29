@@ -41,7 +41,7 @@ class SimpleImmunizationStrategyTest {
         //execute
         var coef = simpleImmunizationStrategy.getImmunizationCoefficient(immunization,
                 ImmunizationStage.LATENT,
-                new Load("WILD", 0, LoadClassification.VIRUS),
+                new Load("WILD", 0, LoadClassification.VIRUS, 1.0f),
                 0);
         //assert
         assertThat(coef).isEqualTo(0.3f);

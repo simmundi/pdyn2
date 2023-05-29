@@ -47,7 +47,14 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class TransmissionServiceTest {
-    BasicConfig basicConfig = new BasicConfig();
+    BasicConfig basicConfig = new BasicConfig(
+            Map.of("loads.WILD.virulence", 10f,
+                    "loads.ALPHA.virulence", 10f,
+                    "loads.DELTA.virulence", 10f,
+                    "loads.BA1.virulence", 10f,
+                    "loads.BA45.virulence", 10f,
+                    "loads.BA2.virulence", 10f)
+    );
     @Mock
     TransmissionConfig transmissionConfig;
     @Mock
@@ -56,8 +63,6 @@ class TransmissionServiceTest {
     SimulationClock simulationClock;
     @Mock
     ImmunizationStrategy immunizationStrategy;
-    @Mock
-    RelativeAlphaConfig relativeAlphaConfig;
     Session session;
     EntityMocker entityMocker;
     TransmissionService transmissionService;
@@ -65,9 +70,7 @@ class TransmissionServiceTest {
     @BeforeEach
     void before() {
         entityMocker = new EntityMocker(basicConfig, session);
-        when(relativeAlphaConfig.getRelativeAlpha(any())).thenReturn(10f);
         transmissionService = new TransmissionService(contextsService,
-                relativeAlphaConfig,
                 transmissionConfig,
                 simulationClock,
                 basicConfig.loads,

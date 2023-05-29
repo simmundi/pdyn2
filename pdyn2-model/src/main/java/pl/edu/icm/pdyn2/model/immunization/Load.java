@@ -19,20 +19,17 @@
 package pl.edu.icm.pdyn2.model.immunization;
 
 import net.snowyhollows.bento.annotation.WithFactory;
-import net.snowyhollows.bento.soft.SoftEnum;
-import net.snowyhollows.bento.soft.SoftEnumManager;
 import pl.edu.icm.trurl.util.AbstractSoftEnum;
-
-import static pl.edu.icm.pdyn2.model.immunization.LoadClassification.VACCINE;
-import static pl.edu.icm.pdyn2.model.immunization.LoadClassification.VIRUS;
 
 public class Load extends AbstractSoftEnum {
     public final LoadClassification classification;
+    public final float virulence;
 
     @WithFactory
-    public Load(String name, int ordinal, LoadClassification classification) {
+    public Load(String name, int ordinal, LoadClassification classification, float virulence) {
         super(name, ordinal);
         this.classification = classification;
+        this.virulence = virulence;
     }
 
 }

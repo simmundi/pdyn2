@@ -36,14 +36,17 @@ import pl.edu.icm.trurl.ecs.Session;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static pl.edu.icm.pdyn2.ComponentCreator.context;
 import static pl.edu.icm.pdyn2.ComponentCreator.health;
 
 @ExtendWith(MockitoExtension.class)
 class TransmissionVisitorTest {
-    private final BasicConfig basicConfig = new BasicConfig();
+    private final BasicConfig basicConfig = new BasicConfig(
+            Map.of("loads.WILD.virulence", 1000f,
+                    "loads.BA1.virulence", 2f,
+                    "loads.BA2.virulence", 1f)
+    );
     @Mock
     private Session session;
     private final MockRandomProvider randomProvider = new MockRandomProvider();
@@ -56,8 +59,6 @@ class TransmissionVisitorTest {
     @Mock
     private StatsService statsService;
     @Mock
-    private RelativeAlphaConfig relativeAlphaConfig;
-    @Mock
     private TransmissionConfig transmissionConfig;
     @Mock
     private SimulationClock simulationClock;
@@ -69,13 +70,7 @@ class TransmissionVisitorTest {
         when(transmissionConfig.getTotalWeightForContextType(basicConfig.contextTypes.SCHOOL)).thenReturn(.5f);
         when(transmissionConfig.getTotalWeightForContextType(basicConfig.contextTypes.WORKPLACE)).thenReturn(1f);
         when(transmissionConfig.getAlpha()).thenReturn(1f);
-
-        when(relativeAlphaConfig.getRelativeAlpha(any())).thenReturn(1000f);
-        when(relativeAlphaConfig.getRelativeAlpha(basicConfig.BA2)).thenReturn(1f);
-        when(relativeAlphaConfig.getRelativeAlpha(basicConfig.BA1)).thenReturn(2f);
-
         TransmissionService transmissionService = new TransmissionService(contextsService,
-                relativeAlphaConfig,
                 transmissionConfig,
                 simulationClock,
                 basicConfig.loads,
