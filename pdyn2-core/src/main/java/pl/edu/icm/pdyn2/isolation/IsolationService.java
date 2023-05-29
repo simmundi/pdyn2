@@ -21,7 +21,6 @@ package pl.edu.icm.pdyn2.isolation;
 import net.snowyhollows.bento.annotation.WithFactory;
 import pl.edu.icm.pdyn2.AgentStateService;
 import pl.edu.icm.pdyn2.simulation.StatsService;
-import pl.edu.icm.pdyn2.model.progression.Stages;
 import pl.edu.icm.trurl.ecs.Entity;
 
 /**
@@ -50,8 +49,6 @@ public final class IsolationService {
 
         if (baseProbabilityOfSelfIsolation > 0) {
             if (random < baseProbabilityOfSelfIsolation * selfIsolationWeight) {
-                // doesn't self-isolate
-            } else {
                 if (agentStateService.beginIsolation(agentEntity)) {
                     statsService.tickIsolated();
                 }

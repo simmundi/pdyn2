@@ -45,8 +45,13 @@ class ImmunizationFromCsvProviderTest {
 
     @BeforeEach
     void setUp() throws FileNotFoundException {
-        when(this.workDir.openForReading(new File("sFunctionTest.csv"))).thenReturn(ImmunizationFromCsvProviderTest.class.getResourceAsStream("/sFunctionTest.csv"));
-        when(this.workDir.openForReading(new File("crossImmunityTest.csv"))).thenReturn(ImmunizationFromCsvProviderTest.class.getResourceAsStream("/crossImmunityTest.csv"));
+        when(this.workDir.openForReading(new File("sFunctionTest.csv"))).thenReturn(ImmunizationFromCsvProviderTest.class.getResourceAsStream("/sFunctionTest.csv"),
+                ImmunizationFromCsvProviderTest.class.getResourceAsStream("/sFunctionTest.csv"),
+                ImmunizationFromCsvProviderTest.class.getResourceAsStream("/sFunctionTest.csv"),
+                ImmunizationFromCsvProviderTest.class.getResourceAsStream("/sFunctionTest.csv"));
+        when(this.workDir.openForReading(new File("crossImmunityTest.csv"))).thenReturn(ImmunizationFromCsvProviderTest.class.getResourceAsStream("/crossImmunityTest.csv"),
+                ImmunizationFromCsvProviderTest.class.getResourceAsStream("/crossImmunityTest.csv"),
+                ImmunizationFromCsvProviderTest.class.getResourceAsStream("/crossImmunityTest.csv"));
         when(this.workDir.openForReading(new File("crossImmunityTest2.csv"))).thenReturn(ImmunizationFromCsvProviderTest.class.getResourceAsStream("/crossImmunityTest2.csv"));
 
         immunizationFromCsvProvider = new ImmunizationFromCsvProvider(workDir,

@@ -47,8 +47,8 @@ public class ImmunizationFromCsvProvider {
     private final String crossImmunitySymptomsFilename;
     private final String crossImmunityHospitalizationFilename;
     private final String crossImmunityIcuFilename;
-    private final List<InputStream> sFunctionStream = new ArrayList<>(4);
-    private final List<InputStream> crossImmunityStream = new ArrayList<>(4);
+    private final List<BufferedInputStream> sFunctionStream = new ArrayList<>(4);
+    private final List<BufferedInputStream> crossImmunityStream = new ArrayList<>(4);
     private final List<Load> immunityLabelsList = new ArrayList<>();
     private final List<Load> diseaseLabelsList = new ArrayList<>();
 
@@ -73,14 +73,14 @@ public class ImmunizationFromCsvProvider {
         this.crossImmunityHospitalizationFilename = crossImmunityHospitalizationFilename;
         this.crossImmunityIcuFilename = crossImmunityIcuFilename;
 
-        sFunctionStream.add(0, fileToStreamService.openForReading(new File(sFunctionInfectionFilename)));
-        sFunctionStream.add(1, fileToStreamService.openForReading(new File(sFunctionSymptomsFilename)));
-        sFunctionStream.add(2, fileToStreamService.openForReading(new File(sFunctionHospitalizationFilename)));
-        sFunctionStream.add(3, fileToStreamService.openForReading(new File(sFunctionIcuFilename)));
-        crossImmunityStream.add(0, fileToStreamService.openForReading(new File(crossImmunityInfectionFilename)));
-        crossImmunityStream.add(1, fileToStreamService.openForReading(new File(crossImmunitySymptomsFilename)));
-        crossImmunityStream.add(2, fileToStreamService.openForReading(new File(crossImmunityHospitalizationFilename)));
-        crossImmunityStream.add(3, fileToStreamService.openForReading(new File(crossImmunityIcuFilename)));
+        sFunctionStream.add(0, new BufferedInputStream(fileToStreamService.openForReading(new File(sFunctionInfectionFilename))));
+        sFunctionStream.add(1, new BufferedInputStream(fileToStreamService.openForReading(new File(sFunctionSymptomsFilename))));
+        sFunctionStream.add(2, new BufferedInputStream(fileToStreamService.openForReading(new File(sFunctionHospitalizationFilename))));
+        sFunctionStream.add(3, new BufferedInputStream(fileToStreamService.openForReading(new File(sFunctionIcuFilename))));
+        crossImmunityStream.add(0, new BufferedInputStream(fileToStreamService.openForReading(new File(crossImmunityInfectionFilename))));
+        crossImmunityStream.add(1, new BufferedInputStream(fileToStreamService.openForReading(new File(crossImmunitySymptomsFilename))));
+        crossImmunityStream.add(2, new BufferedInputStream(fileToStreamService.openForReading(new File(crossImmunityHospitalizationFilename))));
+        crossImmunityStream.add(3, new BufferedInputStream(fileToStreamService.openForReading(new File(crossImmunityIcuFilename))));
 
         for (int i = 0; i < 4; i++) {
             sFunction.add(new ArrayList<>());
@@ -102,20 +102,19 @@ public class ImmunizationFromCsvProvider {
         loadFunction(sFunctionStream.get(2), sFunction.get(2), false, false);
         loadFunction(sFunctionStream.get(3), sFunction.get(3), false, false);
         status.done("Functions loaded from files: \n" +
-                sFunctionInfectionFilename + " (S LATENTNY) \n" +
-                sFunctionSymptomsFilename + " (S OBJAWOWY) \n" +
-                sFunctionHospitalizationFilename + " (S HOSPITALIZOWANY_BEZ_OIOM) \n" +
-                sFunctionIcuFilename + " (S HOSPITALIZOWANY_PRZED_OIOM) \n" +
-                crossImmunityInfectionFilename + " (CI LATENTNY) \n" +
-                crossImmunitySymptomsFilename + " (CI OBJAWOWY) \n" +
-                crossImmunityHospitalizationFilename + " (CI HOSPITALIZOWANY_BEZ_OIOM) \n" +
-                crossImmunityIcuFilename + " (CI HOSPITALIZOWANY_PRZED_OIOM) \n");
+                sFunctionInfectionFilename + " (S INFECTION) \n" +
+                sFunctionSymptomsFilename + " (S SYMPTOMS) \n" +
+                sFunctionHospitalizationFilename + " (S HOSPITALIZATION) \n" +
+                sFunctionIcuFilename + " (S ICU) \n" +
+                crossImmunityInfectionFilename + " (CI INFECTION) \n" +
+                crossImmunitySymptomsFilename + " (CI SYMPTOMS) \n" +
+                crossImmunityHospitalizationFilename + " (CI HOSPITALIZATION) \n" +
+                crossImmunityIcuFilename + " (CI ICU) \n");
     }
 
     private void loadFunction(InputStream stream, List<double[]> list, boolean getLabels, boolean checkDiseaseLabels) throws IOException {
-        BufferedInputStream bufferedStream = new BufferedInputStream(stream);
-        bufferedStream.mark(Integer.MAX_VALUE);
-        Scanner cFunctionScanner = new Scanner(bufferedStream);
+        stream.mark(Integer.MAX_VALUE);
+        Scanner cFunctionScanner = new Scanner(stream);
         int cFunctionCols = 0;
         int cFunctionRow = 0;
         if (cFunctionScanner.hasNextLine()) {
@@ -156,7 +155,7 @@ public class ImmunizationFromCsvProvider {
             }
             cFunctionRow++;
         }
-        bufferedStream.reset();
+        stream.reset();
     }
 
     public double getCrossImmunity(Load immunizationType,
