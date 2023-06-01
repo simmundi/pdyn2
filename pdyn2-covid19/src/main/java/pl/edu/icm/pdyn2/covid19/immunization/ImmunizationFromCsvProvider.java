@@ -161,15 +161,28 @@ public class ImmunizationFromCsvProvider {
     public double getCrossImmunity(Load immunizationType,
                                    Load diseaseType,
                                    ImmunizationStage immunizationStage) {
-        return crossImmunity.get(immunizationStage.id)
-                .get(immunityLabelsList.indexOf(immunizationType))[diseaseLabelsList.indexOf(diseaseType)];
+        try {
+            return crossImmunity.get(immunizationStage.id)
+                    .get(immunityLabelsList.indexOf(immunizationType))[diseaseLabelsList.indexOf(diseaseType)];
+        } catch (IndexOutOfBoundsException e) {
+            throw new IllegalArgumentException("Cannot find value for didease=" +
+                    diseaseType + " from " + diseaseLabelsList +
+                    ", immunization=" + immunizationType + " from " + immunityLabelsList +
+                    " and stage=" + immunizationStage);
+        }
+
     }
 
     public double getSFunction(Load immunizationType,
                                ImmunizationStage immunizationStage,
                                int day) {
-        return sFunction.get(immunizationStage.id)
-                .get(immunityLabelsList.indexOf(immunizationType))[day];
+        try {
+            return sFunction.get(immunizationStage.id)
+                    .get(immunityLabelsList.indexOf(immunizationType))[day];
+        } catch (IndexOutOfBoundsException e) {
+            throw new IllegalArgumentException("Cannot find value for immunization=" +
+                    immunizationType + " from " + immunityLabelsList +
+                    " and stage=" + immunizationStage);
+        }
     }
-
 }
