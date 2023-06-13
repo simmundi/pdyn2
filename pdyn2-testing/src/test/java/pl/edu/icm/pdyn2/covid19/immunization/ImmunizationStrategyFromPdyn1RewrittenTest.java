@@ -24,6 +24,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.edu.icm.pdyn2.BasicConfig;
+import pl.edu.icm.pdyn2.covid19.Covid19Loads;
 import pl.edu.icm.pdyn2.immunization.ImmunizationStage;
 import pl.edu.icm.pdyn2.model.immunization.Immunization;
 import pl.edu.icm.pdyn2.model.immunization.ImmunizationEvent;
@@ -57,7 +58,7 @@ class ImmunizationStrategyFromPdyn1RewrittenTest {
     @Test
     void getImmunizationCoefficient() {
         //given
-        var immunizationStrategy = new ImmunizationStrategyFromPdyn1Rewritten(basicConfig.loads);
+        var immunizationStrategy = new ImmunizationStrategyFromPdyn1Rewritten(new Covid19Loads(basicConfig.loads), basicConfig.loads);
         //execute
         var coef1 = immunizationStrategy.getImmunizationCoefficient(immunization1, ImmunizationStage.LATENT, basicConfig.OMICRON, 73);
         var coef2 = immunizationStrategy.getImmunizationCoefficient(immunization2, ImmunizationStage.LATENT, basicConfig.OMICRON, 73);
