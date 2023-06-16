@@ -27,8 +27,8 @@ import java.util.Objects;
 
 @WithMapper
 public class Immunization {
-    @MappedCollection(margin = 5)
-    private List<ImmunizationEvent> events = new ArrayList<>(5);
+    @MappedCollection(margin = 8)
+    private List<ImmunizationEvent> events = new ArrayList<>(8);
 
     public List<ImmunizationEvent> getEvents() {
         return events;
