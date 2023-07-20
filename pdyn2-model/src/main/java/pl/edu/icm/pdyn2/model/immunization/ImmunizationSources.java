@@ -26,8 +26,8 @@ import java.util.List;
 
 @WithMapper
 public class ImmunizationSources {
-    @MappedCollection(margin = 8)
-    private final List<ImmunizationSource> immunizationSources = new ArrayList<>(8);
+    @MappedCollection(margin = 7)
+    private final List<ImmunizationSource> immunizationSources = new ArrayList<>(7);
 
     public ImmunizationSources() {
     }
