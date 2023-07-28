@@ -21,6 +21,7 @@ package pl.edu.icm.pdyn2.impact;
 import net.snowyhollows.bento.annotation.ByName;
 import net.snowyhollows.bento.annotation.WithFactory;
 import pl.edu.icm.board.model.Person;
+import pl.edu.icm.pdyn2.model.context.Context;
 import pl.edu.icm.pdyn2.simulation.StatsService;
 import pl.edu.icm.pdyn2.model.progression.Stages;
 import pl.edu.icm.pdyn2.transmission.ContextImpactService;
@@ -85,12 +86,13 @@ public class AgentImpactVisitor {
 
         float infectionDelta = stageImpactConfig.getInfluenceOf(currentStage) * sign;
 
-        contextsService.findActiveContextsForAgent(agentEntity, impact).forEach(c -> {
-            float influenceFraction = contextImpactService.calculateInfluenceFractionFor(person, c);
-            c.updateAgentCount(sign * influenceFraction);
+        contextsService.findActiveContextsForAgent(agentEntity, impact).forEach(contextEntity -> {
+            Context context = contextEntity.get(Context.class);
+            float influenceFraction = contextImpactService.calculateInfluenceFractionFor(agentEntity, contextEntity);
+            context.updateAgentCount(sign * influenceFraction);
             if (load != null) {
                 float scaledInfectionDelta = infectionDelta * influenceFraction;
-                c.changeContaminationLevel(load, scaledInfectionDelta);
+                context.changeContaminationLevel(load, scaledInfectionDelta);
             }
         });
     }

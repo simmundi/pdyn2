@@ -90,11 +90,11 @@ class AgentImpactVisitorTest {
                 behaviour(BehaviourType.ROUTINE),
                 health(basicConfig.WILD, basicConfig.INFECTIOUS_SYMPTOMATIC),
                 person(34, Person.Sex.M));
-        Context uni = context(basicConfig.contextTypes.BIG_UNIVERSITY, 123, Map.of(basicConfig.WILD, 0.1f));
-        Context street = context(basicConfig.contextTypes.STREET_20, 10.5f, Map.of(basicConfig.WILD, 1.05f));
+        Entity uni = entityMocker.entity(context(basicConfig.contextTypes.BIG_UNIVERSITY, 123, Map.of(basicConfig.WILD, 0.1f)));
+        Entity street = entityMocker.entity(context(basicConfig.contextTypes.STREET_20, 10.5f, Map.of(basicConfig.WILD, 1.05f)));
 
-        when(contextImpactService.calculateInfluenceFractionFor(entity.get(Person.class), uni)).thenReturn(1f);
-        when(contextImpactService.calculateInfluenceFractionFor(entity.get(Person.class), street)).thenReturn(0.5f);
+        when(contextImpactService.calculateInfluenceFractionFor(entity, uni)).thenReturn(1f);
+        when(contextImpactService.calculateInfluenceFractionFor(entity, street)).thenReturn(0.5f);
         when(stageImpactConfig.getInfluenceOf(basicConfig.INFECTIOUS_ASYMPTOMATIC)).thenReturn(0.1f);
         when(stageImpactConfig.getInfluenceOf(basicConfig.INFECTIOUS_SYMPTOMATIC)).thenReturn(1f);
         when(contextsService.findActiveContextsForAgent(entity, entity.get(Impact.class))).thenReturn(
@@ -104,12 +104,12 @@ class AgentImpactVisitorTest {
         agentImpactVisitor.updateImpact(entity);
 
         // assert
-        assertThat(uni.getContaminations()).hasSize(1);
-        assertThat(uni.getAgentCount()).isEqualTo(123);
-        assertThat(uni.getContaminationByLoad(basicConfig.WILD).getLevel()).isEqualTo(1f);
+        assertThat(uni.get(Context.class).getContaminations()).hasSize(1);
+        assertThat(uni.get(Context.class).getAgentCount()).isEqualTo(123);
+        assertThat(uni.get(Context.class).getContaminationByLoad(basicConfig.WILD).getLevel()).isEqualTo(1f);
 
-        assertThat(street.getContaminations()).hasSize(1);
-        assertThat(street.getAgentCount()).isEqualTo(10.5f);
-        assertThat(street.getContaminationByLoad(basicConfig.WILD).getLevel()).isEqualTo(1.5f);
+        assertThat(street.get(Context.class).getContaminations()).hasSize(1);
+        assertThat(street.get(Context.class).getAgentCount()).isEqualTo(10.5f);
+        assertThat(street.get(Context.class).getContaminationByLoad(basicConfig.WILD).getLevel()).isEqualTo(1.5f);
     }
 }

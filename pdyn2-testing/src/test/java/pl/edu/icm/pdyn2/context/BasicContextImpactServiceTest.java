@@ -28,9 +28,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import pl.edu.icm.board.model.Person;
 import pl.edu.icm.pdyn2.BasicConfig;
 import pl.edu.icm.pdyn2.ComponentCreator;
+import pl.edu.icm.pdyn2.EntityMocker;
 import pl.edu.icm.pdyn2.model.AgeRanges;
 import pl.edu.icm.pdyn2.model.context.ContextTypes;
 import pl.edu.icm.pdyn2.transmission.BasicContextImpactService;
+import pl.edu.icm.trurl.ecs.Entity;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;

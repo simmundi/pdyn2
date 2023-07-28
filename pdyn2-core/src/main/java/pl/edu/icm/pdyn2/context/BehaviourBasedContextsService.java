@@ -49,19 +49,19 @@ public class BehaviourBasedContextsService implements ContextsService {
     }
 
     @Override
-    public Stream<Context> findActiveContextsForAgent(Entity agentEntity) {
+    public Stream<Entity> findActiveContextsForAgent(Entity agentEntity) {
         Behaviour behaviour = agentEntity.get(Behaviour.class);
         BehaviourType type = behaviour == null ? BehaviourType.DORMANT : behaviour.getType();
         return findActiveContextsForAgent(agentEntity, type);
     }
 
     @Override
-    public Stream<Context> findActiveContextsForAgent(Entity agentEntity, Impact impact) {
+    public Stream<Entity> findActiveContextsForAgent(Entity agentEntity, Impact impact) {
         BehaviourType type = impact.getType() == null ? BehaviourType.DORMANT : impact.getType();
         return findActiveContextsForAgent(agentEntity, type);
     }
 
-    private Stream<Context> findActiveContextsForAgent(Entity agentEntity, BehaviourType type) {
+    private Stream<Entity> findActiveContextsForAgent(Entity agentEntity, BehaviourType type) {
         switch (type) {
             case DORMANT:
             case DEAD:
@@ -73,19 +73,19 @@ public class BehaviourBasedContextsService implements ContextsService {
                 contexts.add(inhabitant.getHomeContext());
                 contexts.addAll(inhabitant.getContexts());
                 appendHood(inhabitant.getHomeContext(), contexts);
-                return contexts.stream().map(e -> e.get(Context.class));
+                return contexts.stream();
             }
             case PRIVATE_TRAVEL: {  // target place of travel plus its linked contexts (e.g. street)
                 Travel travel = agentEntity.get(Travel.class);
                 List<Entity> contexts = new ArrayList(100);
                 contexts.add(travel.getStayingAt());
                 appendHood(travel.getStayingAt(), contexts);
-                return contexts.stream().map(e -> e.get(Context.class));
+                return contexts.stream();
             }
             case QUARANTINE:
             case SELF_ISOLATION: {  // just the home context
                 Inhabitant inhabitant = agentEntity.get(Inhabitant.class);
-                return Stream.of(inhabitant.getHomeContext().get(Context.class));
+                return Stream.of(inhabitant.getHomeContext());
             }
         }
 

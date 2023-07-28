@@ -1,0 +1,24 @@
+plugins {
+    id("java")
+}
+
+group = "pl.edu.icm.em"
+version = "1.2-SNAPSHOT"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation(platform("org.junit:junit-bom:5.9.1"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+
+    implementation(project(":pdyn2-core"))
+    implementation(project(":pdyn2-core"))
+    annotationProcessor("net.snowyhollows.bento:bento-generator:${bentoVersion}")
+    annotationProcessor("pl.edu.icm.em:trurl-generator:${trurlVersion}")
+}
+
+tasks.test {
+    useJUnitPlatform()
+}

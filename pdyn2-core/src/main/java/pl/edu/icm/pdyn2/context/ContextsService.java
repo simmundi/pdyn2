@@ -35,7 +35,7 @@ import java.util.stream.Stream;
         }
 )
 public interface ContextsService {
-    Stream<Context> findActiveContextsForAgent(Entity agentEntity);
+    Stream<Entity> findActiveContextsForAgent(Entity agentEntity);
 
-    Stream<Context> findActiveContextsForAgent(Entity agentEntity, Impact impact);
+    Stream<Entity> findActiveContextsForAgent(Entity agentEntity, Impact impact);
 }

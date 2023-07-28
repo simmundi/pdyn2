@@ -4,4 +4,5 @@ include 'pdyn2-model'
 include 'pdyn2-seird'
 include 'pdyn2-covid19'
 include 'pdyn2-testing'
+include 'pdyn2-spatial'
 

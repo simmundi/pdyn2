@@ -25,6 +25,7 @@ import pl.edu.icm.pdyn2.model.AgeRanges;
 import pl.edu.icm.pdyn2.model.context.Context;
 import pl.edu.icm.pdyn2.model.context.ContextType;
 import pl.edu.icm.pdyn2.model.context.ContextTypes;
+import pl.edu.icm.trurl.ecs.Entity;
 import pl.edu.icm.trurl.sampleSpace.EnumSampleSpace;
 import pl.edu.icm.trurl.sampleSpace.SoftEnumSampleSpace;
 
@@ -56,12 +57,14 @@ public class BasicContextImpactService implements ContextImpactService {
      * Street contexts are age-specific (to allow for mixing), and the fraction of the load
      * per context depends on person's age and the exact street context type.
      *
-     * @param person
+     * @param agentEntity
      * @param context
      * @return
      */
     @Override
-    public float calculateInfluenceFractionFor(Person person, Context context) {
+    public float calculateInfluenceFractionFor(Entity agentEntity, Entity contextEntity) {
+        Context context = contextEntity.get(Context.class);
+        Person person = agentEntity.get(Person.class);
         AgeRange ageRange = ageRanges.of(person.getAge());
         return fractions[idxFor(ageRange, context.getContextType())];
     }

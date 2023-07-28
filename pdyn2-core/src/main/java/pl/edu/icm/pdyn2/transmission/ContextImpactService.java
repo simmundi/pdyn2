@@ -19,8 +19,8 @@
 package pl.edu.icm.pdyn2.transmission;
 
 import net.snowyhollows.bento.annotation.ImplementationSwitch;
-import pl.edu.icm.board.model.Person;
-import pl.edu.icm.pdyn2.model.context.Context;
+import pl.edu.icm.trurl.ecs.Entity;
+
 
 @ImplementationSwitch(
         configKey = "contextImpactService",
@@ -29,5 +29,5 @@ import pl.edu.icm.pdyn2.model.context.Context;
         }
 )
 public interface ContextImpactService {
-    float calculateInfluenceFractionFor(Person person, Context context);
+    float calculateInfluenceFractionFor(Entity agent, Entity context);
 }

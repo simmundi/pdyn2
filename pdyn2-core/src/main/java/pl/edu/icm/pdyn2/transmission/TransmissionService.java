@@ -95,11 +95,13 @@ public class TransmissionService {
     public void gatherExposurePerLoadAndContextForAgent(SoftEnumDiscretePDF<Load> infectivity,
                                                         SoftEnumDiscretePDF<ContextInfectivityClass> infectionSourcePDF,
                                                         Entity entity) {
-        var contexts = contextsService.findActiveContextsForAgent(entity);
-        contexts.forEach(context -> {
-            addContextInfectivity(context, infectivity);
-            updateSources(context, infectionSourcePDF);
-        });
+        contextsService
+                .findActiveContextsForAgent(entity)
+                .map(e -> e.get(Context.class))
+                .forEach(context -> {
+                    addContextInfectivity(context, infectivity);
+                    updateSources(context, infectionSourcePDF);
+                });
         infectivity.multiply(relativeAlpha);
     }
 

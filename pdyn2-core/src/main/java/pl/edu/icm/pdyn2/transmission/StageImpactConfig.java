@@ -18,18 +18,27 @@
 
 package pl.edu.icm.pdyn2.transmission;
 
+import net.snowyhollows.bento.Bento;
 import net.snowyhollows.bento.annotation.WithFactory;
 import pl.edu.icm.pdyn2.model.progression.Stage;
 import pl.edu.icm.pdyn2.model.progression.Stages;
+
+import java.util.Arrays;
 
 public class StageImpactConfig {
     private final float[] influenceOfStage;
 
     @WithFactory
-    public StageImpactConfig(float asymptomaticInfluenceShare, float symptomaticInfluenceShare, Stages stages) {
-        influenceOfStage  = new float[stages.values().size()];;
-        influenceOfStage[stages.getByName("INFECTIOUS_ASYMPTOMATIC").ordinal()] = asymptomaticInfluenceShare;
-        influenceOfStage[stages.getByName("INFECTIOUS_SYMPTOMATIC").ordinal()] = symptomaticInfluenceShare;
+    public StageImpactConfig(Bento bento, float asymptomaticInfluenceShare, float symptomaticInfluenceShare, Stages stages) {
+        influenceOfStage  = new float[stages.values().size()];
+        for (int i = 0; i < stages.values().size(); i++) {
+            Stage stage = stages.values().get(i);
+            if (bento.get("stage_impact." + stage.name(), "absent") != "absent") {
+                influenceOfStage[i] = bento.getFloat("stage_impact." + stage.name());
+            } else if (stage.infectious) {
+                influenceOfStage[i] = 1;
+            }
+        }
     }
 
     public float getInfluenceOf(Stage stage) {
