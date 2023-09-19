@@ -27,7 +27,7 @@ public class Stages extends SoftEnumManager<Stage> {
 
     @WithFactory
     public Stages(Bento bento) {
-        super(bento, "stages", StageFactory.IT);
+        super(bento, "pdyn2.infectivity.stages", StageFactory.IT);
     }
 
     @Override

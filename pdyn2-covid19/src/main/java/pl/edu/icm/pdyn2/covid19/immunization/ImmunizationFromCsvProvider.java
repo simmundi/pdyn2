@@ -18,6 +18,7 @@
 
 package pl.edu.icm.pdyn2.covid19.immunization;
 
+import net.snowyhollows.bento.annotation.ByName;
 import net.snowyhollows.bento.annotation.WithFactory;
 import net.snowyhollows.bento.config.WorkDir;
 import pl.edu.icm.pdyn2.immunization.ImmunizationStage;
@@ -55,14 +56,14 @@ public class ImmunizationFromCsvProvider {
     @WithFactory
     public ImmunizationFromCsvProvider(WorkDir fileToStreamService,
                                        Loads loads,
-                                       String sFunctionInfectionFilename,
-                                       String sFunctionSymptomsFilename,
-                                       String sFunctionHospitalizationFilename,
-                                       String sFunctionIcuFilename,
-                                       String crossImmunityInfectionFilename,
-                                       String crossImmunitySymptomsFilename,
-                                       String crossImmunityHospitalizationFilename,
-                                       String crossImmunityIcuFilename) {
+                                       @ByName("pdyn2.infectivity.immunization.from-pdyn1.s-function.infection") String sFunctionInfectionFilename,
+                                       @ByName("pdyn2.infectivity.immunization.from-pdyn1.s-function.symptoms") String sFunctionSymptomsFilename,
+                                       @ByName("pdyn2.infectivity.immunization.from-pdyn1.s-function.hospitalization") String sFunctionHospitalizationFilename,
+                                       @ByName("pdyn2.infectivity.immunization.from-pdyn1.s-function.icu") String sFunctionIcuFilename,
+                                       @ByName("pdyn2.infectivity.immunization.from-pdyn1.cross-immunity.infection") String crossImmunityInfectionFilename,
+                                       @ByName("pdyn2.infectivity.immunization.from-pdyn1.cross-immunity.symptoms") String crossImmunitySymptomsFilename,
+                                       @ByName("pdyn2.infectivity.immunization.from-pdyn1.cross-immunity.hospitalization") String crossImmunityHospitalizationFilename,
+                                       @ByName("pdyn2.infectivity.immunization.from-pdyn1.cross-immunity.icu") String crossImmunityIcuFilename) {
         this.loads = loads;
         this.sFunctionInfectionFilename = sFunctionInfectionFilename;
         this.sFunctionSymptomsFilename = sFunctionSymptomsFilename;
@@ -165,7 +166,7 @@ public class ImmunizationFromCsvProvider {
             return crossImmunity.get(immunizationStage.id)
                     .get(immunityLabelsList.indexOf(immunizationType))[diseaseLabelsList.indexOf(diseaseType)];
         } catch (IndexOutOfBoundsException e) {
-            throw new IllegalArgumentException("Cannot find value for didease=" +
+            throw new IllegalArgumentException("Cannot find value for disease=" +
                     diseaseType + " from " + diseaseLabelsList +
                     ", immunization=" + immunizationType + " from " + immunityLabelsList +
                     " and stage=" + immunizationStage);

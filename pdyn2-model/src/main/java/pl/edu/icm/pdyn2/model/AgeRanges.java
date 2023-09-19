@@ -27,7 +27,7 @@ public class AgeRanges extends SoftEnumManager<AgeRange> {
 
     @WithFactory
     public AgeRanges(Bento bento) {
-        super(bento, "ageRanges", AgeRangeFactory.IT);
+        super(bento, "pdyn2.infectivity.progression.lookup.age-ranges", AgeRangeFactory.IT);
     }
 
     @Override

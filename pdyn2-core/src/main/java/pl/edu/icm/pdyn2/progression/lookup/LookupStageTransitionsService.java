@@ -49,9 +49,7 @@ public class LookupStageTransitionsService implements DiseaseStageTransitionsSer
         this.ageRanges = ageRanges;
         this.tmp = ThreadLocal.withInitial(() -> new SoftEnumDiscretePDF<>(stages));
 
-        lookupTransitionsProvider.readTransitions(data -> {
-            transitions.put(data.first, data.second, data.third, data.fourth);
-        });
+        lookupTransitionsProvider.readTransitions(data -> transitions.put(data.first, data.second, data.third, data.fourth));
     }
 
     @Override
@@ -71,12 +69,13 @@ public class LookupStageTransitionsService implements DiseaseStageTransitionsSer
         outcomes.copy(retrieveTransition(stage, person, load).getOutcomes());
         outcomeModifier.modifyOutcomes(outcomes, load, person);
 
+        if (!outcomes.isNormalized())
+            throw new IllegalArgumentException("Possible outcomes should summarize to 1");
         return outcomes.sample(random);
     }
 
     private TransitionDescriptor retrieveTransition(Stage stage, Entity person, Load load) {
         var age = ageRanges.of(person.get(Person.class).getAge());
-        var transition = transitions.get(load, age, stage);
-        return transition;
+        return transitions.get(load, age, stage);
     }
 }

@@ -18,6 +18,7 @@
 
 package pl.edu.icm.pdyn2.model.context;
 
+import net.snowyhollows.bento.annotation.ByName;
 import net.snowyhollows.bento.annotation.WithFactory;
 import pl.edu.icm.trurl.util.AbstractSoftEnum;
 
@@ -25,7 +26,10 @@ public class ContextType extends AbstractSoftEnum {
     private final ContextInfectivityClass infectivityClass;
 
     @WithFactory
-    public ContextType(String name, int ordinal, ContextInfectivityClasses contextInfectivityClasses, String infectivityClass) {
+    public ContextType(String name,
+                       int ordinal,
+                       ContextInfectivityClasses contextInfectivityClasses,
+                       @ByName("infectivity-class") String infectivityClass) {
         super(name, ordinal);
         this.infectivityClass = contextInfectivityClasses.getByName(infectivityClass);
     }

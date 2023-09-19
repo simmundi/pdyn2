@@ -45,7 +45,7 @@ public class ContextSetupSystem implements EntitySystem {
 
     @WithFactory
     public ContextSetupSystem(Selectors selectors,
-                              @ByName("stages.susceptible") String susceptibleStageName,
+                              @ByName("pdyn2.infectivity.stages.susceptible") String susceptibleStageName,
                               Stages stages,
                               ContextTypes contextTypes) {
         this.selectors = selectors;

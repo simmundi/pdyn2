@@ -26,7 +26,7 @@ import pl.edu.icm.trurl.util.Quadruple;
 
 import java.util.function.Consumer;
 @ImplementationSwitch(
-        configKey = "lookupTransitionsProvider",
+        configKey = "pdyn2.infectivity.progression.lookup.lookup-data-provider.strategy",
         cases = {
                 @ImplementationSwitch.When(name="config", implementation = ConfigLookupTransitionProvider.class, useByDefault = true),
         }

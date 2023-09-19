@@ -29,7 +29,7 @@ public class SimpleImmunizationStrategy implements ImmunizationStrategy {
     private final float simpleImmunizationStrategyValue;
 
     @WithFactory
-    public SimpleImmunizationStrategy(@ByName(fallbackValue = "1") float simpleImmunizationStrategyValue){
+    public SimpleImmunizationStrategy(@ByName(value = "pdyn2.infectivity.immunization.constant.value", fallbackValue = "1") float simpleImmunizationStrategyValue) {
         this.simpleImmunizationStrategyValue = simpleImmunizationStrategyValue;
     }
 

@@ -50,14 +50,14 @@ public class ConfigLookupTransitionProvider implements LookupTransitionsProvider
         for (Load load : loads.values()) {
             for (AgeRange ageRange : ageRanges.values()) {
                 for (Stage stage : stages.values()) {
-                    String durationProperty = String.format("pdyn2.progression.transition.%s.%s.%s.duration", load.name(), ageRange.name(), stage.name());
+                    String durationProperty = String.format("pdyn2.infectivity.progression.lookup.lookup-data-provider.config.%s.%s.%s.duration", load.name(), ageRange.name(), stage.name());
 
                     if (bento.get(durationProperty, this) != this) {
                         TransitionDescriptor transitionDescriptor = new TransitionDescriptor(stages);
                         transitionDescriptor.setDuration(bento.getInt(durationProperty));
 
                         for (Stage targetStage : stages.values()) {
-                            String outcomeProbability = String.format("pdyn2.progression.transition.%s.%s.%s.%s", load.name(), ageRange.name(), stage.name(), targetStage.name());
+                            String outcomeProbability = String.format("pdyn2.infectivity.progression.lookup.lookup-data-provider.config.%s.%s.%s.%s", load.name(), ageRange.name(), stage.name(), targetStage.name());
                             if (bento.get(outcomeProbability, this) != this) {
                                 transitionDescriptor.setProbableOutcome(bento.getFloat(outcomeProbability), targetStage);
                             }

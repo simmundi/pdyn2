@@ -30,7 +30,7 @@ public class Loads extends SoftEnumManager<Load> {
 
     @WithFactory
     public Loads(Bento bento) {
-        super(bento, "loads", LoadFactory.IT);
+        super(bento, "pdyn2.infectivity.loads", LoadFactory.IT);
         strains = values().stream().filter(load -> load.classification == LoadClassification.VIRUS).collect(Collectors.toList()).toArray(emptyArray());
     }
 

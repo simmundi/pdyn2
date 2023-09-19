@@ -68,9 +68,9 @@ public class AgentStateService {
     public AgentStateService(SimulationClock simulationClock,
                              ContextInfectivityClasses contextInfectivityClasses,
                              Stages stages,
-                             @ByName("stages.exposed") String exposedStageName,
-                             @ByName("stages.susceptible") String susceptibleStageName,
-                             @ByName("stages.deceased") String deceasedStageName) {
+                             @ByName("pdyn2.infectivity.stages.exposed") String exposedStageName,
+                             @ByName("pdyn2.infectivity.stages.susceptible") String susceptibleStageName,
+                             @ByName("pdyn2.infectivity.stages.deceased") String deceasedStageName) {
         this.simulationClock = simulationClock;
         this.contextInfectivityClasses = contextInfectivityClasses;
         this.exposedStage = stages.getByName(exposedStageName);

@@ -18,6 +18,7 @@
 
 package pl.edu.icm.pdyn2.model;
 
+import net.snowyhollows.bento.annotation.ByName;
 import net.snowyhollows.bento.annotation.WithFactory;
 import pl.edu.icm.trurl.util.AbstractSoftEnum;
 
@@ -26,7 +27,7 @@ public class AgeRange extends AbstractSoftEnum {
     public final int ageTo;
 
     @WithFactory
-    public AgeRange(String name, int ordinal, int ageFrom, int ageTo) {
+    public AgeRange(String name, int ordinal, @ByName("age-from") int ageFrom, @ByName("age-to")int ageTo) {
         super(name, ordinal);
         this.ageFrom = ageFrom;
         this.ageTo = ageTo;

@@ -26,12 +26,12 @@ import pl.edu.icm.trurl.ecs.Entity;
 import java.util.stream.Stream;
 
 /**
- * Implementation should return list of context that the agents currently interacts with.
+ * Implementation should return a list of context that the agents currently interact with.
  */
 @ImplementationSwitch(
-        configKey = "contextService",
+        configKey = "pdyn2.infectivity.transmission.contexts.context-strategy",
         cases = {
-                @ImplementationSwitch.When(name="behaviourBased", implementation = BehaviourBasedContextsService.class),
+                @ImplementationSwitch.When(name="behavior-based", implementation = BehaviorBasedContextsService.class),
         }
 )
 public interface ContextsService {

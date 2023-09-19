@@ -57,7 +57,7 @@ public class TransmissionService {
                                SimulationClock simulationClock,
                                Loads loads,
                                Stages stages,
-                               @ByName("stages.susceptible") String susceptibleStageName,
+                               @ByName("pdyn2.infectivity.stages.susceptible") String susceptibleStageName,
                                ImmunizationStrategy immunizationStrategy) {
         this.relativeAlpha = new SoftEnumDiscretePDF<>(loads);
         this.contextsService = contextsService;

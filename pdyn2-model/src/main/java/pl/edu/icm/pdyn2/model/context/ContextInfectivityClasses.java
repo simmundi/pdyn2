@@ -33,7 +33,7 @@ public class ContextInfectivityClasses extends SoftEnumManager<ContextInfectivit
 
     @WithFactory
     public ContextInfectivityClasses(Bento bento) {
-        super(bento, "contextInfectivityClasses", ContextInfectivityClassFactory.IT);
+        super(bento, "pdyn2.infectivity.transmission.contexts.context-infectivity-classes", ContextInfectivityClassFactory.IT);
 
         HOUSEHOLD = getByName("HOUSEHOLD");
         WORKPLACE = getByName("WORKPLACE");

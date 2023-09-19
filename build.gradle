@@ -86,7 +86,7 @@ subprojects {
 
     ext {
         guavaVersion = '30.1-jre'
-        bentoVersion = '1.4.9-SNAPSHOT'
+        bentoVersion = '1.4.11'
         emCommonVersion = "1.2-SNAPSHOT"
         socStructVersion = "1.2-SNAPSHOT"
         trurlVersion = "1.2-SNAPSHOT"

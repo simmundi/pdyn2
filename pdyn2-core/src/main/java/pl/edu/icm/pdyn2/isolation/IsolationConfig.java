@@ -18,6 +18,7 @@
 
 package pl.edu.icm.pdyn2.isolation;
 
+import net.snowyhollows.bento.annotation.ByName;
 import net.snowyhollows.bento.annotation.WithFactory;
 
 /**
@@ -28,7 +29,7 @@ public class IsolationConfig {
     float selfIsolationWeight;
 
     @WithFactory
-    public IsolationConfig(float baseProbabilityOfSelfIsolation) {
+    public IsolationConfig(@ByName("pdyn2.behavior.self-isolation.probability") float baseProbabilityOfSelfIsolation) {
         this.baseProbabilityOfSelfIsolation = baseProbabilityOfSelfIsolation;
     }
 

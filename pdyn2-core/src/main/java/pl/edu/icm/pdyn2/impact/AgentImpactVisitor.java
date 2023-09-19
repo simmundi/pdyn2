@@ -52,7 +52,7 @@ public class AgentImpactVisitor {
                               StatsService statsService,
                               StageImpactConfig stageImpactConfig,
                               Stages stages,
-                              @ByName("stages.susceptible") String susceptibleStageName) {
+                              @ByName("pdyn2.infectivity.stages.susceptible") String susceptibleStageName) {
         this.contextsService = contextsService;
         this.contextImpactService = contextImpactService;
         this.statsService = statsService;

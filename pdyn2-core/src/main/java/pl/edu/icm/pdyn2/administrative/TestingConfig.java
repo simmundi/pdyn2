@@ -18,13 +18,14 @@
 
 package pl.edu.icm.pdyn2.administrative;
 
+import net.snowyhollows.bento.annotation.ByName;
 import net.snowyhollows.bento.annotation.WithFactory;
 
 public class TestingConfig {
     private final float baseProbabilityOfTest;
 
     @WithFactory
-    public TestingConfig(float baseProbabilityOfTest) {
+    public TestingConfig(@ByName("pdyn2.behavior.testing.probability") float baseProbabilityOfTest) {
         this.baseProbabilityOfTest = baseProbabilityOfTest;
     }
 

@@ -18,6 +18,7 @@
 
 package pl.edu.icm.pdyn2.index;
 
+import net.snowyhollows.bento.annotation.ByName;
 import net.snowyhollows.bento.annotation.WithFactory;
 import pl.edu.icm.board.geography.KilometerGridCell;
 import pl.edu.icm.board.model.Area;
@@ -37,7 +38,9 @@ public class AreaIndex extends ComponentIndex<Area> {
     private final int[] positions;
 
     @WithFactory
-    public AreaIndex(EngineConfiguration engineConfiguration, int gridColumns, int gridRows) {
+    public AreaIndex(EngineConfiguration engineConfiguration,
+                     @ByName("soc-struct.geography.grid-columns") int gridColumns,
+                     @ByName("soc-struct.geography.grid-rows") int gridRows) {
         super(engineConfiguration, Area.class);
         positions = new int[gridColumns * gridRows * SLOTS];
 

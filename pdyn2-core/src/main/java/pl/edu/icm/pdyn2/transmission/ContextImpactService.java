@@ -23,7 +23,7 @@ import pl.edu.icm.board.model.Person;
 import pl.edu.icm.pdyn2.model.context.Context;
 
 @ImplementationSwitch(
-        configKey = "contextImpactService",
+        configKey = "pdyn2.infectivity.transmission.contexts.context-impact-strategy",
         cases = {
                 @ImplementationSwitch.When(name="basic", implementation = BasicContextImpactService.class),
         }

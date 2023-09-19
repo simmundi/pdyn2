@@ -66,7 +66,7 @@ class Covid19StageTransitionsProviderTest {
         // execute
         Properties result = new Properties();
         reader.readFromFile("stan_czas.txt", basicConfig.WILD, q -> {
-            String v = String.format("pdyn2.progression.transition.%s.%s.%s.", q.first, q.second, q.third);
+            String v = String.format("pdyn2.infectivity.progression.lookup.lookup-data-provider.config.%s.%s.%s.", q.first, q.second, q.third);
             result.put(v + "duration", Integer.toString(q.fourth.getDuration()));
 
             if (!q.fourth.getOutcomes().isEmpty()) {

@@ -19,6 +19,7 @@
 package pl.edu.icm.pdyn2.clock;
 
 import com.google.common.base.Strings;
+import net.snowyhollows.bento.annotation.ByName;
 import net.snowyhollows.bento.annotation.WithFactory;
 import pl.edu.icm.trurl.ecs.EntitySystem;
 import pl.edu.icm.trurl.ecs.SessionFactory;
@@ -37,7 +38,7 @@ public class SimulationClock implements EntitySystem {
     private Duration simulationTime = Duration.ZERO;
 
     @WithFactory
-    public SimulationClock(String simulationStartDate) {
+    public SimulationClock(@ByName("pdyn2.simulation.start") String simulationStartDate) {
         this.simulationStartDate = Strings.isNullOrEmpty(simulationStartDate)
                 ? LocalDateTime.now()
                 : LocalDate.parse(simulationStartDate).atStartOfDay();

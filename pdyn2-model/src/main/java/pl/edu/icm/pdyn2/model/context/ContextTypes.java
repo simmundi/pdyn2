@@ -44,7 +44,7 @@ public class ContextTypes extends SoftEnumManager<ContextType> {
     final public ContextType STREET_90;
     @WithFactory
     public ContextTypes(Bento bento) {
-        super(bento, "contextTypes", ContextTypeFactory.IT);
+        super(bento, "pdyn2.infectivity.transmission.contexts.context-types", ContextTypeFactory.IT);
         STREET_00 = getByName("STREET_00");
         STREET_10 = getByName("STREET_10");
         STREET_20 = getByName("STREET_20");

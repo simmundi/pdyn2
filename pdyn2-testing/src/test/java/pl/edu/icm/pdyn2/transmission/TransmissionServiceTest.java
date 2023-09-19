@@ -48,12 +48,12 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class TransmissionServiceTest {
     BasicConfig basicConfig = new BasicConfig(
-            Map.of("loads.WILD.virulence", 10f,
-                    "loads.ALPHA.virulence", 10f,
-                    "loads.DELTA.virulence", 10f,
-                    "loads.BA1.virulence", 10f,
-                    "loads.BA45.virulence", 10f,
-                    "loads.BA2.virulence", 10f)
+            Map.of("pdyn2.infectivity.loads.WILD.virulence", 10f,
+                    "pdyn2.infectivity.loads.ALPHA.virulence", 10f,
+                    "pdyn2.infectivity.loads.DELTA.virulence", 10f,
+                    "pdyn2.infectivity.loads.BA1.virulence", 10f,
+                    "pdyn2.infectivity.loads.BA45.virulence", 10f,
+                    "pdyn2.infectivity.loads.BA2.virulence", 10f)
     );
     @Mock
     TransmissionConfig transmissionConfig;

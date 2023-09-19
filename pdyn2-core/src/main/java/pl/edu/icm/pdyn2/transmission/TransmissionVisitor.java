@@ -48,7 +48,7 @@ public class TransmissionVisitor {
                                Loads loads,
                                Stages stages,
                                ContextInfectivityClasses contextInfectivityClasses,
-                               @ByName("stages.exposed") String exposedStage) {
+                               @ByName("pdyn2.infectivity.stages.exposed") String exposedStage) {
         this.transmissionService = transmissionService;
         this.agentStateService = agentStateService;
         this.statsService = statsService;

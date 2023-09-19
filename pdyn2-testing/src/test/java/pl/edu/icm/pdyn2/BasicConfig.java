@@ -77,13 +77,13 @@ public class BasicConfig {
     public BasicConfig(Map<String, ?> configExtension) {
         try {
             var bentoConfigurer = new Configurer()
-                    .loadConfigResource("/ageRanges.properties")
-                    .loadConfigResource("/contextTypes.properties")
-                    .loadConfigResource("/loads-covid19.properties")
-                    .loadConfigResource("/stages-covid19.properties")
-                    .loadConfigResource("/contextInfectivityClasses.properties")
-                    .setParam("immunizationStrategy", ImmunizationStrategyFromPdyn1Rewritten.class.getName())
-                    .setParam("simulationStartDate", "2001-01-01");
+                    .loadConfigResource("/ageRanges-basicConfig.properties")
+                    .loadConfigResource("/contextTypes-basicConfig.properties")
+                    .loadConfigResource("/loads-covid19-basicConfig.properties")
+                    .loadConfigResource("/stages-covid19-basicConfig.properties")
+                    .loadConfigResource("/contextInfectivityClasses-basicConfig.properties")
+                    .setParam("pdyn2.infectivity.immunization.strategy", ImmunizationStrategyFromPdyn1Rewritten.class.getName())
+                    .setParam("pdyn2.simulation.start", "2001-01-01");
 
             configExtension.forEach(bentoConfigurer::setParam);
 

@@ -25,7 +25,7 @@ import pl.edu.icm.pdyn2.model.immunization.Immunization;
 import pl.edu.icm.pdyn2.model.immunization.Load;
 
 @ImplementationSwitch(
-        configKey = "immunizationStrategy",
+        configKey = "pdyn2.infectivity.immunization.strategy",
         cases = {
                 @When(name="constant", implementation = SimpleImmunizationStrategy.class, useByDefault = true)
         }

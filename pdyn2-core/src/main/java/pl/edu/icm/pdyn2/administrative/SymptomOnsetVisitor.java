@@ -45,7 +45,7 @@ public class SymptomOnsetVisitor {
     public SymptomOnsetVisitor(TestingService testingService,
                                IsolationService isolationService,
                                SimulationClock simulationClock,
-                               @ByName("stages.symptomOnset") String symptomOnsetStage,
+                               @ByName("pdyn2.behavior.testing.symptoms-onset") String symptomOnsetStage,
                                Stages stages) {
         this.testingService = testingService;
         this.isolationService = isolationService;

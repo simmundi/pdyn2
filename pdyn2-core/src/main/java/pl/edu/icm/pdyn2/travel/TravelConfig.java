@@ -18,6 +18,7 @@
 
 package pl.edu.icm.pdyn2.travel;
 
+import net.snowyhollows.bento.annotation.ByName;
 import net.snowyhollows.bento.annotation.WithFactory;
 
 public class TravelConfig {
@@ -25,7 +26,8 @@ public class TravelConfig {
     private float probabilityOfEndingTravel;
 
     @WithFactory
-    public TravelConfig(float probabilityOfTravel, float probabilityOfEndingTravel) {
+    public TravelConfig(@ByName("pdyn2.behavior.travel.probability-start") float probabilityOfTravel,
+                        @ByName("pdyn2.behavior.travel.probability-end") float probabilityOfEndingTravel) {
         this.probabilityOfTravel = probabilityOfTravel;
         this.probabilityOfEndingTravel = probabilityOfEndingTravel;
     }

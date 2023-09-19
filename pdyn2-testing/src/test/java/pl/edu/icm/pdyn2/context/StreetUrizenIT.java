@@ -56,7 +56,7 @@ class StreetUrizenIT {
 
     @BeforeEach
     void before() {
-        engineConfiguration = new Configurer().setParam("trurl.engine.storeFactory", TablesawStoreFactory.class.getName()).getConfig().get(EngineConfigurationFactory.IT);
+        engineConfiguration = new Configurer().setParam("trurl.engine.store-factory", TablesawStoreFactory.class.getName()).getConfig().get(EngineConfigurationFactory.IT);
         selectors = new Selectors(engineConfiguration);
         engineConfiguration.addComponentClasses(Area.class, Location.class, Context.class);
         engineConfiguration.getEngine().execute(ctx -> {

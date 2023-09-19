@@ -31,7 +31,7 @@ import pl.edu.icm.trurl.ecs.Entity;
  * The default implementation uses a lookup table in the form of (load, age range, stage) -> (discrete PDF of outcomes, duration in days)
  */
 @ImplementationSwitch(
-        configKey = "diseaseStageTransitionService",
+        configKey = "pdyn2.infectivity.progression.strategy",
         cases = {
                 @ImplementationSwitch.When(name="lookup", implementation = LookupStageTransitionsService.class, useByDefault = true),
         }

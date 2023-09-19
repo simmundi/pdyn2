@@ -43,9 +43,9 @@ import static pl.edu.icm.pdyn2.ComponentCreator.health;
 @ExtendWith(MockitoExtension.class)
 class TransmissionVisitorTest {
     private final BasicConfig basicConfig = new BasicConfig(
-            Map.of("loads.WILD.virulence", 1000f,
-                    "loads.BA1.virulence", 2f,
-                    "loads.BA2.virulence", 1f)
+            Map.of("pdyn2.infectivity.loads.WILD.virulence", 1000f,
+                    "pdyn2.infectivity.loads.BA1.virulence", 2f,
+                    "pdyn2.infectivity.loads.BA2.virulence", 1f)
     );
     @Mock
     private Session session;

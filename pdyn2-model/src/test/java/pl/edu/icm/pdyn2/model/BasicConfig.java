@@ -59,11 +59,11 @@ public class BasicConfig {
     public BasicConfig() {
         try {
             bento = new Configurer()
-                    .loadConfigResource("/ageRanges.properties")
-                    .loadConfigResource("/contextTypes.properties")
-                    .loadConfigResource("/contextInfectivityClasses.properties")
-                    .loadConfigResource("/loads-test.properties")
-                    .loadConfigResource("/stages-test.properties")
+                    .loadConfigResource("/ageRanges-basicConfig.properties")
+                    .loadConfigResource("/contextTypes-basicConfig.properties")
+                    .loadConfigResource("/contextInfectivityClasses-basicConfig.properties")
+                    .loadConfigResource("/loads-covid19-basicConfig.properties")
+                    .loadConfigResource("/stages-covid19-basicConfig.properties")
                     .getConfig();
             stages = bento.get(StagesFactory.IT);
             loads = bento.get(LoadsFactory.IT);

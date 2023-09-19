@@ -36,15 +36,15 @@ import java.util.List;
 import java.util.stream.Stream;
 
 /**
- * The main factor for establishing the contexts is the agent's Behaviour (or rather - its type),
+ * The main factor for establishing the contexts is the agent's Behavior (or rather - its type),
  * but the information might come from different components, like Travel and Inhabitant.
  */
-public class BehaviourBasedContextsService implements ContextsService {
+public class BehaviorBasedContextsService implements ContextsService {
 
     private final AreaIndex areaIndex;
 
     @WithFactory
-    public BehaviourBasedContextsService(AreaIndex areaIndex) {
+    public BehaviorBasedContextsService(AreaIndex areaIndex) {
         this.areaIndex = areaIndex;
     }
 

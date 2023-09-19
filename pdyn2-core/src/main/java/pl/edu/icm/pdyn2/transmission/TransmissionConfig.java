@@ -18,6 +18,8 @@
 
 package pl.edu.icm.pdyn2.transmission;
 
+import net.snowyhollows.bento.annotation.ByFactory;
+import net.snowyhollows.bento.annotation.ByName;
 import net.snowyhollows.bento.annotation.WithFactory;
 import pl.edu.icm.pdyn2.model.context.ContextInfectivityClass;
 import pl.edu.icm.pdyn2.model.context.ContextInfectivityClasses;
@@ -44,14 +46,15 @@ public class TransmissionConfig {
     final ContextInfectivityClasses contextInfectivityClasses;
 
     @WithFactory
-    public TransmissionConfig(float alpha,
-                              float baseHouseholdWeight,
-                              float baseWorkplaceWeight,
-                              float baseSchoolsWeight,
-                              float baseKindergartenWeight,
-                              float baseUniversityWeight,
-                              float baseBigUniversityWeight,
-                              float baseStreetWeight, ContextInfectivityClasses contextInfectivityClasses) {
+    public TransmissionConfig(@ByName("pdyn2.infectivity.transmission.alpha") float alpha,
+                              @ByName("pdyn2.infectivity.transmission.contexts.context-infectivity-classes.HOUSEHOLD.base-weight") float baseHouseholdWeight,
+                              @ByName("pdyn2.infectivity.transmission.contexts.context-infectivity-classes.WORKPLACE.base-weight") float baseWorkplaceWeight,
+                              @ByName("pdyn2.infectivity.transmission.contexts.context-infectivity-classes.SCHOOL.base-weight") float baseSchoolsWeight,
+                              @ByName("pdyn2.infectivity.transmission.contexts.context-infectivity-classes.KINDERGARTEN.base-weight") float baseKindergartenWeight,
+                              @ByName("pdyn2.infectivity.transmission.contexts.context-infectivity-classes.UNIVERSITY.base-weight") float baseUniversityWeight,
+                              @ByName("pdyn2.infectivity.transmission.contexts.context-infectivity-classes.BIG_UNIVERSITY.base-weight") float baseBigUniversityWeight,
+                              @ByName("pdyn2.infectivity.transmission.contexts.context-infectivity-classes.STREET.base-weight") float baseStreetWeight,
+                              ContextInfectivityClasses contextInfectivityClasses) {
         this.alpha = alpha;
         this.baseHouseholdWeight = baseHouseholdWeight;
         this.baseWorkplaceWeight = baseWorkplaceWeight;

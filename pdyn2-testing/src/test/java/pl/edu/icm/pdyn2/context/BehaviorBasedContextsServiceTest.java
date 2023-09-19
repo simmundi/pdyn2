@@ -18,7 +18,6 @@
 
 package pl.edu.icm.pdyn2.context;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,12 +42,12 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
-class BehaviourBasedContextsServiceTest {
+class BehaviorBasedContextsServiceTest {
     private final BasicConfig basicConfig = new BasicConfig();
     @Mock
     private AreaIndex areaIndex;
     @InjectMocks
-    BehaviourBasedContextsService contextsService;
+    BehaviorBasedContextsService contextsService;
 
     @Test
     @DisplayName("Should find all the contexts of a routine-following agent")

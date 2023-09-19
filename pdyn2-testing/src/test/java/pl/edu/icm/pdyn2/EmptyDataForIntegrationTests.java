@@ -60,14 +60,14 @@ public class EmptyDataForIntegrationTests {
 
     public EmptyDataForIntegrationTests(BasicConfig basicConfig) {
         config = basicConfig.bento;
-        config.register("contextService", "behaviourBased");
-        config.register("contextImpactService", "basic");
-        config.register("gridRows", rows);
-        config.register("gridColumns", cols);
-        config.register("alpha", 0.5f);
-        config.register("simulationStartDate", "1977-04-01");
-        config.register("asymptomaticInfluenceShare", 0.1);
-        config.register("symptomaticInfluenceShare", 1.0);
+        config.register("pdyn2.infectivity.transmission.contexts.context-strategy", "behavior-based");
+        config.register("pdyn2.infectivity.transmission.contexts.context-impact-strategy", "basic");
+        config.register("soc-struct.geography.grid-rows", rows);
+        config.register("soc-struct.geography.grid-columns", cols);
+        config.register("pdyn2.infectivity.transmission.alpha", 0.5f);
+        config.register("pdyn2.simulation.start", "1977-04-01");
+        config.register("pdyn2.infectivity.transmission.contexts.stage-impact.INFECTIOUS_ASYMPTOMATIC", 0.1);
+        config.register("pdyn2.infectivity.transmission.contexts.stage-impact.INFECTIOUS_SYMPTOMATIC", 1.0);
         config.register(WorkDirFactory.IT, workDir);
 
         agentStateService = config.get(AgentStateServiceFactory.IT);

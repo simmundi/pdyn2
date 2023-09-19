@@ -25,7 +25,7 @@ import pl.edu.icm.pdyn2.model.progression.Stage;
 import pl.edu.icm.trurl.ecs.Entity;
 
 @ImplementationSwitch(
-        configKey = "outcomeModifier",
+        configKey = "pdyn2.infectivity.progression.outcome-modifier.strategy",
         cases = {
                 @ImplementationSwitch.When(name="none", implementation = NoneOutcomeModifier.class, useByDefault = true),
         }
