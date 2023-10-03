@@ -58,9 +58,8 @@ public class ImmunityEffectsOutcomeModifier implements OutcomeModifier {
     @Override
     public void modifyOutcomes(SoftEnumDiscretePDF<Stage> pdf, Load load, Entity person) {
         var currentDay = simulationClock.getDaysPassed();
-        var immunization = person.get(Immunization.class);
         if (pdf.isNonZero(INFECTIOUS_SYMPTOMATIC)) {
-            var sigmaObjawowy = immunizationStrategy.getImmunizationCoefficient(immunization,
+            var sigmaObjawowy = immunizationStrategy.getImmunizationCoefficient(person,
                     ImmunizationStage.SYMPTOMATIC,
                     load,
                     currentDay);
@@ -69,7 +68,7 @@ public class ImmunityEffectsOutcomeModifier implements OutcomeModifier {
                     INFECTIOUS_ASYMPTOMATIC);
         } else {
             if (pdf.isNonZero(HOSPITALIZED_NO_ICU)) {
-                var sigmaBezOiom = immunizationStrategy.getImmunizationCoefficient(immunization,
+                var sigmaBezOiom = immunizationStrategy.getImmunizationCoefficient(person,
                         ImmunizationStage.ASYMPTOMATIC,
                         load,
                         currentDay);
@@ -78,7 +77,7 @@ public class ImmunityEffectsOutcomeModifier implements OutcomeModifier {
                         HEALTHY);
             }
             if (pdf.isNonZero(HOSPITALIZED_PRE_ICU)) {
-                var sigmaPrzedOiom = immunizationStrategy.getImmunizationCoefficient(immunization,
+                var sigmaPrzedOiom = immunizationStrategy.getImmunizationCoefficient(person,
                         ImmunizationStage.HOSPITALIZED_PRE_ICU,
                         load,
                         currentDay);

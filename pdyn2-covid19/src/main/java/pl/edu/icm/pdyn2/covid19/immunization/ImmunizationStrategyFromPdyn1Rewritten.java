@@ -26,6 +26,7 @@ import pl.edu.icm.pdyn2.model.immunization.Immunization;
 import pl.edu.icm.pdyn2.model.immunization.ImmunizationEvent;
 import pl.edu.icm.pdyn2.model.immunization.Load;
 import pl.edu.icm.pdyn2.model.immunization.Loads;
+import pl.edu.icm.trurl.ecs.Entity;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -161,7 +162,8 @@ public class ImmunizationStrategyFromPdyn1Rewritten implements ImmunizationStrat
     }
 
     @Override
-    public float getImmunizationCoefficient(Immunization immunization, ImmunizationStage immunizationStage, Load load, int day) {
+    public float getImmunizationCoefficient(Entity agent, ImmunizationStage immunizationStage, Load load, int day) {
+        Immunization immunization = agent.get(Immunization.class);
         float coefficient = 0;
         if (immunization == null) {
             return coefficient;

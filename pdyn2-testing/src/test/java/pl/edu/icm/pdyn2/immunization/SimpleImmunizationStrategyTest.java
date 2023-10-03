@@ -23,23 +23,23 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.edu.icm.pdyn2.immunization.strategy.SimpleImmunizationStrategy;
-import pl.edu.icm.pdyn2.model.immunization.Immunization;
 import pl.edu.icm.pdyn2.model.immunization.Load;
 import pl.edu.icm.pdyn2.model.immunization.LoadClassification;
+import pl.edu.icm.trurl.ecs.Entity;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 class SimpleImmunizationStrategyTest {
     @Mock
-    Immunization immunization;
+    Entity agent;
 
     @Test
     void getImmunizationCoefficient() {
         //given
         var simpleImmunizationStrategy = new SimpleImmunizationStrategy(0.3f);
         //execute
-        var coef = simpleImmunizationStrategy.getImmunizationCoefficient(immunization,
+        var coef = simpleImmunizationStrategy.getImmunizationCoefficient(agent,
                 ImmunizationStage.LATENT,
                 new Load("WILD", 0, LoadClassification.VIRUS, 1.0f),
                 0);

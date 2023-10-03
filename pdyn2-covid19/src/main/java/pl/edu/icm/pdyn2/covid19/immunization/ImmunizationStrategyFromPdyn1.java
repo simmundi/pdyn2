@@ -24,6 +24,7 @@ import pl.edu.icm.pdyn2.immunization.ImmunizationStrategy;
 import pl.edu.icm.pdyn2.model.immunization.Immunization;
 import pl.edu.icm.pdyn2.model.immunization.ImmunizationEvent;
 import pl.edu.icm.pdyn2.model.immunization.Load;
+import pl.edu.icm.trurl.ecs.Entity;
 
 import java.io.IOException;
 
@@ -41,12 +42,15 @@ public class ImmunizationStrategyFromPdyn1 implements ImmunizationStrategy {
     }
 
     @Override
-    public float getImmunizationCoefficient(Immunization immunization,
+    public float getImmunizationCoefficient(Entity agent,
                                             ImmunizationStage immunizationStage,
                                             Load load,
                                             int day) {
+        Immunization immunization = agent.get(Immunization.class);
         float coefficient = 0;
-        if (immunization == null) return coefficient;
+        if (immunization == null) {
+            return coefficient;
+        }
 
         for (ImmunizationEvent event : immunization.getEvents()) {
             var immunizationLoad = event.getLoad();

@@ -27,6 +27,7 @@ import pl.edu.icm.pdyn2.BasicConfig;
 import pl.edu.icm.pdyn2.immunization.ImmunizationStage;
 import pl.edu.icm.pdyn2.model.immunization.Immunization;
 import pl.edu.icm.pdyn2.model.immunization.ImmunizationEvent;
+import pl.edu.icm.trurl.ecs.Entity;
 
 import java.util.List;
 
@@ -37,6 +38,10 @@ import static org.mockito.Mockito.when;
 class ImmunizationStrategyFromPdyn1RewrittenTest {
 
     final BasicConfig basicConfig = new BasicConfig();
+    @Mock
+    Entity agent1;
+    @Mock
+    Entity agent2;
     @Mock
     Immunization immunization1;
     @Mock
@@ -50,6 +55,8 @@ class ImmunizationStrategyFromPdyn1RewrittenTest {
         immunizationEvent1.setDay(1);
         immunizationEvent2.setLoad(basicConfig.BA45);
         immunizationEvent2.setDay(59);
+        when(agent1.get(Immunization.class)).thenReturn(immunization1);
+        when(agent2.get(Immunization.class)).thenReturn(immunization2);
         when(immunization1.getEvents()).thenReturn(List.of(immunizationEvent1, immunizationEvent2));
         when(immunization2.getEvents()).thenReturn(List.of(immunizationEvent1));
     }
@@ -59,8 +66,8 @@ class ImmunizationStrategyFromPdyn1RewrittenTest {
         //given
         var immunizationStrategy = new ImmunizationStrategyFromPdyn1Rewritten(basicConfig.loads);
         //execute
-        var coef1 = immunizationStrategy.getImmunizationCoefficient(immunization1, ImmunizationStage.LATENT, basicConfig.BA1, 73);
-        var coef2 = immunizationStrategy.getImmunizationCoefficient(immunization2, ImmunizationStage.LATENT, basicConfig.BA1, 73);
+        var coef1 = immunizationStrategy.getImmunizationCoefficient(agent1, ImmunizationStage.LATENT, basicConfig.BA1, 73);
+        var coef2 = immunizationStrategy.getImmunizationCoefficient(agent2, ImmunizationStage.LATENT, basicConfig.BA1, 73);
         //assert
         assertThat(coef1).isEqualTo(0.9f);
         assertThat(coef2).isEqualTo(0.76f);

@@ -136,11 +136,10 @@ public class TransmissionService {
      * @return
      */
     public double adjustProbabilityWithImmunity(double probability, Load chosenLoad, Entity agent) {
-        Immunization immunization = agent.get(Immunization.class);
-        double coefficient = immunization == null ? 1 : (1 - immunizationStrategy.getImmunizationCoefficient(immunization,
+        double coefficient = 1 - immunizationStrategy.getImmunizationCoefficient(agent,
                 ImmunizationStage.LATENT,
                 chosenLoad,
-                simulationClock.getDaysPassed()));
+                simulationClock.getDaysPassed());
         return probability * coefficient;
     }
 

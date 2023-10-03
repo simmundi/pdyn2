@@ -23,6 +23,7 @@ import net.snowyhollows.bento.annotation.ImplementationSwitch.When;
 import pl.edu.icm.pdyn2.immunization.strategy.SimpleImmunizationStrategy;
 import pl.edu.icm.pdyn2.model.immunization.Immunization;
 import pl.edu.icm.pdyn2.model.immunization.Load;
+import pl.edu.icm.trurl.ecs.Entity;
 
 @ImplementationSwitch(
         configKey = "pdyn2.infectivity.immunization.strategy",
@@ -31,7 +32,7 @@ import pl.edu.icm.pdyn2.model.immunization.Load;
         }
 )
 public interface ImmunizationStrategy {
-    float getImmunizationCoefficient(Immunization immunization,
+    float getImmunizationCoefficient(Entity agent,
                                      ImmunizationStage immunizationStage,
                                      Load load,
                                      int day);

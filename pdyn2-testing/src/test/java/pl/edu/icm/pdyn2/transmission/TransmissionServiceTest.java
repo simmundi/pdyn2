@@ -172,7 +172,7 @@ class TransmissionServiceTest {
         Immunization immunization = ComponentCreator.immunization();
         Entity agent = entityMocker.entity(immunization);
         when(simulationClock.getDaysPassed()).thenReturn(day);
-        when(immunizationStrategy.getImmunizationCoefficient(immunization, ImmunizationStage.LATENT, basicConfig.WILD, day))
+        when(immunizationStrategy.getImmunizationCoefficient(agent, ImmunizationStage.LATENT, basicConfig.WILD, day))
                 .thenReturn(0.5f);
 
         // execute

@@ -24,6 +24,7 @@ import pl.edu.icm.pdyn2.immunization.ImmunizationStage;
 import pl.edu.icm.pdyn2.immunization.ImmunizationStrategy;
 import pl.edu.icm.pdyn2.model.immunization.Immunization;
 import pl.edu.icm.pdyn2.model.immunization.Load;
+import pl.edu.icm.trurl.ecs.Entity;
 
 public class SimpleImmunizationStrategy implements ImmunizationStrategy {
     private final float simpleImmunizationStrategyValue;
@@ -34,7 +35,7 @@ public class SimpleImmunizationStrategy implements ImmunizationStrategy {
     }
 
     @Override
-    public float getImmunizationCoefficient(Immunization immunization, ImmunizationStage immunizationStage, Load load, int day) {
+    public float getImmunizationCoefficient(Entity agent, ImmunizationStage immunizationStage, Load load, int day) {
         return simpleImmunizationStrategyValue;
     }
 }

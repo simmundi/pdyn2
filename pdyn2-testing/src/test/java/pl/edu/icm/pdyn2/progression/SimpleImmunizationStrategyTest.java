@@ -26,6 +26,7 @@ import pl.edu.icm.pdyn2.BasicConfig;
 import pl.edu.icm.pdyn2.immunization.ImmunizationStage;
 import pl.edu.icm.pdyn2.immunization.strategy.SimpleImmunizationStrategy;
 import pl.edu.icm.pdyn2.model.immunization.Immunization;
+import pl.edu.icm.trurl.ecs.Entity;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -33,14 +34,14 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 class SimpleImmunizationStrategyTest {
     final BasicConfig basicConfig = new BasicConfig();
     @Mock
-    Immunization immunization;
+    Entity agent;
 
     @Test
     void getImmunizationCoefficient() {
         //given
         var simpleImmunizationStrategy = new SimpleImmunizationStrategy(0.3f);
         //execute
-        var coef = simpleImmunizationStrategy.getImmunizationCoefficient(immunization,
+        var coef = simpleImmunizationStrategy.getImmunizationCoefficient(agent,
                 ImmunizationStage.LATENT,
                 basicConfig.WILD,
                 0);
