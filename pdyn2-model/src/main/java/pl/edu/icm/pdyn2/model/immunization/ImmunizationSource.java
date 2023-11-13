@@ -24,90 +24,95 @@ import pl.edu.icm.trurl.ecs.annotation.WithMapper;
 
 @WithMapper
 public class ImmunizationSource {
-    private float workplaceInfluence;
-    private float kindergartenInfluence;
-    private float schoolInfluence;
-    private float universityInfluence;
-    private float streetInfluence;
-    private float bigUniversityInfluence;
-    private float householdInfluence;
+    private byte workplaceInfluence;
+    private byte kindergartenInfluence;
+    private byte schoolInfluence;
+    private byte universityInfluence;
+    private byte streetInfluence;
+    private byte bigUniversityInfluence;
+    private byte householdInfluence;
 
 
     public ImmunizationSource() {
     }
 
-    public float getHouseholdInfluence() {
+    public byte getHouseholdInfluence() {
         return householdInfluence;
     }
 
-    public void setHouseholdInfluence(float householdInfluence) {
+    public void setHouseholdInfluence(byte householdInfluence) {
         this.householdInfluence = householdInfluence;
     }
 
-    public float getWorkplaceInfluence() {
+    public byte getWorkplaceInfluence() {
         return workplaceInfluence;
     }
 
-    public void setWorkplaceInfluence(float workplaceInfluence) {
+    public void setWorkplaceInfluence(byte workplaceInfluence) {
         this.workplaceInfluence = workplaceInfluence;
     }
 
-    public float getKindergartenInfluence() {
+    public byte getKindergartenInfluence() {
         return kindergartenInfluence;
     }
 
-    public void setKindergartenInfluence(float kindergartenInfluence) {
+    public void setKindergartenInfluence(byte kindergartenInfluence) {
         this.kindergartenInfluence = kindergartenInfluence;
     }
 
-    public float getSchoolInfluence() {
+    public byte getSchoolInfluence() {
         return schoolInfluence;
     }
 
-    public void setSchoolInfluence(float schoolInfluence) {
+    public void setSchoolInfluence(byte schoolInfluence) {
         this.schoolInfluence = schoolInfluence;
     }
 
-    public float getUniversityInfluence() {
+    public byte getUniversityInfluence() {
         return universityInfluence;
     }
 
-    public void setUniversityInfluence(float universityInfluence) {
+    public void setUniversityInfluence(byte universityInfluence) {
         this.universityInfluence = universityInfluence;
     }
 
-    public float getBigUniversityInfluence() {
+    public byte getBigUniversityInfluence() {
         return bigUniversityInfluence;
     }
 
-    public void setBigUniversityInfluence(float bigUniversityInfluence) {
+    public void setBigUniversityInfluence(byte bigUniversityInfluence) {
         this.bigUniversityInfluence = bigUniversityInfluence;
     }
 
-    public float getStreetInfluence() {
+    public byte getStreetInfluence() {
         return streetInfluence;
     }
 
-    public void setStreetInfluence(float streetInfluence) {
+    public void setStreetInfluence(byte streetInfluence) {
         this.streetInfluence = streetInfluence;
     }
 
     public void setForContextType(ContextInfectivityClasses contextInfectivityClasses, ContextInfectivityClass contextType, float probability) {
+        byte byteProbability = (byte) (probability * Byte.MAX_VALUE);
+        if (probability < -1 || probability > 1) {
+            throw new IllegalArgumentException("Probability should be in range <-1,1>");
+        }
+
         int contextTypeIndex = contextType.ordinal();
         if (contextTypeIndex == contextInfectivityClasses.HOUSEHOLD.ordinal()) {
-            setHouseholdInfluence(probability);
+            setHouseholdInfluence(byteProbability);
         } else if (contextTypeIndex == contextInfectivityClasses.WORKPLACE.ordinal()) {
-            setWorkplaceInfluence(probability);
+            setWorkplaceInfluence(byteProbability);
         } else if (contextTypeIndex == contextInfectivityClasses.KINDERGARTEN.ordinal()) {
-            setKindergartenInfluence(probability);
+            setKindergartenInfluence(byteProbability);
         } else if (contextTypeIndex == contextInfectivityClasses.STREET.ordinal()) {
-            setStreetInfluence(probability);
+            setStreetInfluence(byteProbability);
         } else if (contextTypeIndex == contextInfectivityClasses.SCHOOL.ordinal()) {
-            setSchoolInfluence(probability);
+            setSchoolInfluence(byteProbability);
         } else if (contextTypeIndex == contextInfectivityClasses.UNIVERSITY.ordinal()) {
-            setUniversityInfluence(probability);
+            setUniversityInfluence(byteProbability);
         } else if (contextTypeIndex == contextInfectivityClasses.BIG_UNIVERSITY.ordinal()) {
-            setBigUniversityInfluence(probability);
+            setBigUniversityInfluence(byteProbability);
         } else {
                 throw new IllegalStateException("Unexpected value: " + contextType);
         }

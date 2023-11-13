@@ -176,8 +176,8 @@ class AgentStateServiceTest {
         // given
         ExampleData data = new ExampleData(basicConfig);
         SoftEnumDiscretePDF<ContextInfectivityClass> sourcesDistribution = new SoftEnumDiscretePDF<>(basicConfig.contextInfectivityClasses);
-        sourcesDistribution.set(basicConfig.contextInfectivityClasses.SCHOOL, 10f);
-        sourcesDistribution.set(basicConfig.contextInfectivityClasses.STREET, 12f);
+        sourcesDistribution.set(basicConfig.contextInfectivityClasses.SCHOOL, 126.0f);
+        sourcesDistribution.set(basicConfig.contextInfectivityClasses.STREET, 1.0f);
 
         // execute
         agentStateService.addSourcesDistribution(data.agent3, sourcesDistribution);
@@ -185,8 +185,8 @@ class AgentStateServiceTest {
         // assert
         var sources = data.agent3.get(ImmunizationSources.class);
 
-        assertThat(sources.getImmunizationSources().get(0).getSchoolInfluence()).isEqualTo(10f);
-        assertThat(sources.getImmunizationSources().get(0).getStreetInfluence()).isEqualTo(12f);
+        assertThat(sources.getImmunizationSources().get(0).getSchoolInfluence()).isEqualTo((byte) 126);
+        assertThat(sources.getImmunizationSources().get(0).getStreetInfluence()).isEqualTo((byte) 1);
     }
 
     static class ExampleData {

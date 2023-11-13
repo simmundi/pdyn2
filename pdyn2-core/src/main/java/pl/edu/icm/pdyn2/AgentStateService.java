@@ -236,6 +236,7 @@ public class AgentStateService {
     public void addSourcesDistribution(Entity agent, SoftEnumDiscretePDF<ContextInfectivityClass> exposurePerContext) {
         var immunizationSources = agent.getOrCreate(ImmunizationSources.class);
         var immunizationSource = new ImmunizationSource();
+        exposurePerContext.normalize();
         for (var contextType : contextInfectivityClasses.values()) {
             immunizationSource.setForContextType(contextInfectivityClasses, contextType, exposurePerContext.get(contextType));
         }
